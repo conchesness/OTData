@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+        <div class="containter">
+            <div class="jumbotron text-center">
+                <h1>Edit Profitle</h1>
+            </div>
+
+            {% for field in form.errors %}
+                {% for error in form.errors[field] %}
+                    <div class="alert alert-error">
+                        <strong>Error!</strong>{{field}}: {{error}}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <form method=post enctype="multipart/form-data">
+                <table class="table">
+                <!--This displays the form from the form abject that was passed to the template. If the fileds have values in them
+                    that were set by the routes code, then it will be editing.  If they are empty it 
+                    will create a new secion. -->
+                <tr><td collspan="2">{{ form.hidden_tag() }}Pronouns: {{ form.pronouns() }}</td></tr>
+                <tr><td>{{ form.fname.label }}<br>{{ form.fname }}</td><td>{{ form.lname.label }}<br>{{ form.lname() }}</td></tr>
+                <tr>
+                    <td>
+                        {{ form.image.label }}<br>
+                        {% if editUser.image %}
+                            <img class="img-thumbnail" width="100" src="data:image;base64,{{base64encode(editUser.image.read())}}"> <br>
+                        {% else %}
+                            <img class="img-thumbnail" width = "100" src="/static/oths.jpg">
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ form.image() }}
+                    </td>
+                </tr>
+                <tr><td>Your Mobile:<br>{{ form.mobile() }}<br></td><td>Personal Email:<br>{{form.personalemail()}}</td></tr>
+                <tr><td colspan ="2">Street Address:<br>{{ form.ustreet(rows="2", cols="75") }}</td></tr>
+                <tr><td>City</td><td>State &nbsp;  &nbsp;  &nbsp; Zip</td></tr>
+                <tr><td>{{form.ucity()}}</td><td>{{form.ustate(value="CA", size="2")}} {{form.uzipcode(size="5")}}</td></tr>
+                <tr><td colspan="2">How do you describe your gender?:<br>{{form.ugender(cols="75")}}</td></tr>
+                <tr><td colspan="2">How do you describe your ethnicity? This is the "official" OUSD list (select all that apply)?:<br>{{form.uethnicity()}}</td></tr>
+                <tr><td colspan="2">Is your ethnicity or culture not represented in the list above? Please add how you describe your ethnicity or culture here:<br>{{form.uethnicityother(cols="75")}}</td></tr>                
+                <tr><td colspan="2">{{form.submit()}}</td></tr>
+                </table>
+            </form>
+
+        </div>
+
+{% endblock %}

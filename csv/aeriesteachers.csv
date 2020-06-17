@@ -1,0 +1,202 @@
+lname,fname,aeriesname,teachernum,room,rmphone,dept,email,title
+Daigle, Clifford,Daigle C,1,217,217,Science ,clifford.daigle@ousd.org, Teacher
+Clarke, Stephen,Clarke S,2,UC10,654-7116,Social Studies ,stephen.clarke@ousd.org, Teacher
+Nord, Lauren,Nord L,3,222,222,Humanities-ELA/SocSt ,lauren.nord@ousd.org, Teacher
+Akhidenor, Omoaghe,Akhidenor O,4,TP8,452,CTE ,omoaghe.akhidenor@ousd.org, Teacher
+Augustine, Glen,Augustine G,5,140,140,Science ,glen.augustine@ousd.org, Teacher
+Vaughn, Elizabeth,Vaughn E,6,221,221,Humanities-ELA/SocSt ,elizabeth.vaughn@ousd.org, Teacher
+Orle, Karina,Orle K,8,210,210,Science ,karina.orle@ousd.org, Teacher
+Schneider, Alyse,Schneider A,9,236,236,Mathematics ,alyse.schneider@ousd.org, Teacher
+Brown, Charles,Brown C,10,S11,450,Science ,charles.brown@ousd.org, Teacher
+Johnson, Katita,Johnson K,11,UC-Fashion,654-7116,CTE ,katita.johnson@ousd.org, Teacher
+Hooper, Leonard,Hooper L,13,A1,309,Special Education ,leonard.hooper@ousd.org, Teacher
+Rusk, Timothy,Rusk T,15,S7A,324/594-9975,,timothy.rusk@ousd.org, Teacher
+Okeke, Obasi,Okeke O,17,UC7,117,English/Language Arts ,obasi.okeke@ousd.org, Teacher
+Belmont, Jennifer,Belmont J,18,UC5,654-7116/597,Special Education ,jennifer.belmont@ousd.org, Teacher
+Destefano, Jessica,Destefano J,19,S4,306,Special Education ,jessica.destefano@ousd.org, Teacher
+Cox, Ryan,Cox R,20,201,201,Mathematics ,ryan.cox@ousd.org, Teacher
+Moreno-Hernandez, E,Moreno-Hernandez E,21,S13,449,Science ,emily.moreno@ousd.org, Teacher
+Monroe, Mary,Monroe M,22,UC6,654-7116,CTE ,mary.monroe@ousd.org, Teacher
+Mahlke, Elizabeth,Mahlke E,23,S5,307,English/Language Arts ,elizabeth.mahlke@ousd.org, Teacher
+Luman, Stuart,Luman S,24,P5,328,Humanities-ELA/SocSt ,stuart.luman@ousd.org, Teacher
+Barrett, Digger,Barrett D,26,228,228,Humanities-ELA/SocSt ,robert.barrett@ousd.org, Teacher
+Allen, Barbara,Allen B,27,132,132,Special Education ,barbara.allen@ousd.org, Resource Specialist
+Dahlke, Ellen,Dahlke E,28,UC9,654-7116,English/Language Arts ,ellen.dahlke@ousd.org, Teacher
+Adler, Holly,Adler H,30,209,209,Special Education ,holly.adler@ousd.org, Resource Specialist
+Massarano, Sa'adia,Massarano S,31,218,218,Science ,saadia.massarano@ousd.org, Teacher
+Schoenhofer, Emily,Schoenhofer E,32,108,108,,emily.schoenhofer@ousd.org, Counselor
+Chacana, Max,Chacana M,33,UC16,654-7116,Science ,max.chacana@ousd.org, Teacher
+Cunningham, Natalie,Cunningham N,34,118,118,Counseling (9th Luu-Z) ,natalie.cunningham@ousd.org, Counselor
+Melious, Coriander,Melious C,35,UC4,654-7116,Special Education ,coriander.melious@ousd.org, Teacher
+Fraters, Randal,Fraters R,36,TP4,448,Humanities-ELA/SocSt ,randal.fraters@ousd.org, Teacher
+Guirao, Felicidad,Guirao F,40,144,144,World Languages ,felicidad.guirao@ousd.org, Teacher
+Fong, M.D.,Fong M,41,206,206,Mathematics ,marydaisy.fong@ousd.org, Teacher
+Senn, Joseph,Senn J,44,136,136,Science ,joseph.senn@ousd.org, Teacher
+Davidson, M.L.,Davidson M,48,131,131,ESL ,mary.davidson@ousd.org, Teacher
+Sutton, Jeremy,Sutton J,51,101,101,English/Language Arts ,jeremy.sutton@ousd.org, Teacher
+Berning, Beverly,Berning B,52,202,202,World Languages ,beverly.berning@ousd.org, Teacher
+Debro, Keith,Debro K,53,TP3,447,Special Education ,keith.debro@ousd.org, Teacher
+Evans, Lawrence,Evans L,59,216,216,Science ,lawrence.evans@ousd.org, Teacher
+Brandt, Patricia,Brandt P,60,Girls Gym,316,Physical Education ,patricia.brandt@ousd.org, Teacher
+Fairly, Richard,Fairly R,61,122,122,,richard.fairly@ousd.org, Assistant Principal
+Bascom, Peter,Bascom P,62,Boys Gym,320,Physical Education ,peter.bascom@ousd.org, Teacher
+Friedman, Patrick,Friedman P,65,237,237,Social Studies ,patrick.friedman@ousd.org, Teacher
+Riot, Elizabeth,Riot E,69,208,227,Special Education ,elizabeth.riot@ousd.org, Resource Specialist
+Green, Deborah,Green D,72,134,134,Arts-Visual ,deborah.green@ousd.org, Teacher
+Langston, Theresa,Langston T,73,116,116,,theresa.langston@ousd.org, Counselor
+Greene, Mary,Greene M,74,207,207,Special Education ,mary.greene@ousd.org, Resource Specialist
+Holladay, Denise,Holladay D,76,S7B,445/450-5431,Special Education ,denise.holladay@ousd.org, Teacher
+Heckel, Peter,Heckel P,77,UC8,654-7116,CTE ,peter.heckel@ousd.org, Teacher
+Zimmerman, Seth,Zimmerman S,78,204,204,Mathematics ,seth.zimmerman@ousd.org, Teacher
+Martinez, Amy,Martinez A,83,112,112,,amy.martinez@ousd.org, Counselor
+Harris, Clarence,Harris C,84,A5,322,Mathematics ,clarence.harris@ousd.org, Teacher
+Shewmaker, Aaron,Shewmaker A,86,141,141,Special Education ,aaron.shewmaker@ousd.org, Teacher
+Haugen, Elizabeth,Haugen E,87,103,103,Humanities-ELA/SocSt ,elizabeth.haugen@ousd.org, Teacher
+Lin, Yu Han,Lin Y,90,UC15,654-7116,World Languages ,yu-han.lin@ousd.org, Teacher
+Ketcham, Sara,Ketcham S,94,105,105,Humanities-ELA/SocSt ,sara.ketcham@ousd.org, Teacher
+Arnold, Alicia,Arnold A,98,UC11,654-7116,Arts-Visual ,alicia.arnold@ousd.org, Teacher
+Moonsamy, Susheela,Moonsamy S,101,110,110,Counseling (A-E) ,susheela.moonsamy@ousd.org, Counselor
+Joe, Marietta,Joe M,104,A4,311,Humanities-ELA/SocSt ,marietta.joe@ousd.org, Teacher
+Stubblefield, Douglas,Stubblefield D,105,241,241,Humanities-ELA/SocSt ,douglas.stubblefield@ousd.org, Teacher
+Rivera, Brenda,Rivera B,107,226,226,Humanities-ELA/SocSt ,brenda.rivera@ousd.org, Teacher
+Kappner, Tania,Kappner T,110,225,225,Social Studies ,tania.kappner@ousd.org, Teacher
+Li, Randolph,Li R,111,S3,305,Mathematics ,randolph.li@ousd.org, Teacher
+Kuchera, Cathrinemary,Kuchera C,121,139,139,World Languages ,cathrine.kuchera@ousd.org, Teacher
+Allen, Arthur,Allen A,135,A6,313,Arts-Performing ,arthur.allen@ousd.org, Teacher
+Love, Anastacia,Love A,136,S3,305,CTE ,anastacia.love@ousd.org, Teacher
+Arnoldy, Jacqueline,Arnoldy J,137,203,203,World Languages ,jacqueline.arnoldy@ousd.org, Teacher
+Madom, Heath,Madom H,143,135,135,Humanities-ELA/SocSt ,heath.madom@ousd.org, Teacher
+Miller, Eldica,Miller E,144,138,138,Arts-Visual ,eldica.miller@ousd.org, Teacher
+Wright, Stephen,Wright S,145,102,102,CTE ,stephen.wright@ousd.org, Teacher
+Bachicha, Errico,Bachicha E,146,S8,243,Mathematics ,errico.bachicha@ousd.org, Teacher
+Minaie, Ardeshir,Minaie A,147,234,234,Mathematics ,ardeshir.minaie@ousd.org, Teacher
+Frey, Rick,Frey R,148,002,100,CTE ,rick.frey@ousd.org, Teacher
+Ji, Kevin,Ji K,150,205,205,Mathematics ,kevin.ji@ousd.org, Teacher
+Morris, Deborah,Morris D,156,209,209,Special Education ,deborah.morris@ousd.org, Teacher
+Nicholas, Brennan,Nicholas B,159,137,137,English/Language Arts ,brennan.nicholas@ousd.org, Teacher
+Donaldson, Sierra,Donaldson S,163,211,211,Science ,sierra.donaldson@ousd.org, Teacher
+Hu, Zubin,Hu Z,169,UC14,654-7116,Mathematics ,zubin.hu@ousd.org, Teacher
+Onyeador, Emmanuel,Onyeador E,170,004,164,,emmanuel.onyeador@ousd.org, Teacher
+Coleman, Katherine,Coleman K,171,229,229,Humanities-ELA/SocSt ,katherine.coleman@ousd.org, Teacher
+Pasternak, Harry,Pasternak H,172,TP8,452,Social Studies ,harry.pasternak@ousd.org, Teacher
+Flynn, Sierra,Flynn S,175,S12,453,Science ,sierra.flynn@ousd.org, Teacher
+Fagen, Jessica,Fagen J,177,223,223,Humanities-ELA/SocSt ,jessica.fagen@ousd.org, Teacher
+Padilla, Rebecca,Padilla R,178,P6,329,World Languages ,rebecca.padilla@ousd.org, Teacher
+Lee, Pejing,Lee P,179,S1,454,Science ,pejing.lee@ousd.org, Teacher
+Sudduth, Dana,Sudduth D,180,UC-Main Office,654-7116,,dana.sudduth@ousd.org, Assistant Principal
+Raser, Stephen,Raser S,183,S6,308,Special Education ,stephen.raser@ousd.org, Teacher
+Taylor, Michael,Taylor M,188,S2,455,Mathematics ,michael.taylor1@ousd.org, Teacher
+Rocke, Brooke,Rocke B,189,S12A,456,Special Education ,brooke.rocke@ousd.org, Teacher
+Calzaretta, Elisabeth,Calzaretta E,190,111,111,,elisabeth.calzaretta@ousd.org, Assistant Principal
+Baum, Ethan,Baum E,192,106,106,Social Studies ,ethan.baum@ousd.org, Teacher
+Ruggiero, Kathryn,Ruggiero K,193,P1,321,World Languages ,kathryn.ruggiero@ousd.org, Teacher
+Sherman, Ashlee,Sherman A,199,Boys Gym,320,Physical Education ,ashlee.sherman@ousd.org, Teacher
+Javelo, Dennis,Javelo D,200,220,220,Mathematics ,dennis.javelo@ousd.org, Teacher
+Hart, Karega,Hart K,201,TP7,451,Social Studies ,karega.hart@ousd.org, Teacher
+Hamel, Kelly,Hamel K,202,P2,322,World Languages ,kelly.hamel@ousd.org, Teacher
+Ong, Christina,Ong C,203,104,104,CTE ,christina.ong@ousd.org, Teacher
+Bautista, Cristopher,Bautista C,204,P4,208,Humanities-ELA/SocSt ,cristopher.bautista@ousd.org, Teacher
+Corona, Patricia,Corona P,207,146,146,World Languages ,patricia.corona@ousd.org, Teacher
+Davis, Elisha,Davis E,211,Girls Gym,316,Physical Education ,elisha.davis@ousd.org, Teacher
+Fern, Casey,Fern C,214,A3,310,English/Language Arts ,casey.fern@ousd.org, Teacher
+Campisi, Russell,Campisi R,215,107,107,,russell.campisi@ousd.org, Assistant Principal
+Travick, Sonja,Travick S,225,Dance,319,Arts-Performing ,sonja.travick@ousd.org, Teacher
+Wing, Joel,Wing J,233,239,239,Social Studies ,joel.wing@ousd.org, Teacher
+Powell-Thomas, Lorrie,Powell-Thomas L,400,P3,299,Mathematics ,lorrie.powell-thomas@ousd.org, Teacher
+Johnson, Jacqueline,Johnson J,492,114,114,,jacqueline.johnson@ousd.org, Counselor
+Broderick, Tim,Broderick T,950,224,224,Special Education ,timothy.broderick@ousd.org, Teacher
+Price, Martel,Price M,959,113,113,,martel.price@ousd.org, Assistant Principal
+Bailey, Kathleen,Bailey K,965,231,231,Humanities-ELA/SocSt ,kathleen.bailey@ousd.org, Teacher
+Hahn, Moss,Hahn M,982,S12A,456,Special Education ,moss.hahn@ousd.org, Resource Specialist
+Cruickshanks, Lauchlin,Cruickshanks L,989,233,233,Science ,l.cruickshanks@ousd.org, Teacher
+Rey, Nicholas,Rey N,990,004,164,English/Language Arts ,nicholas.rey@ousd.org, Teacher on Special Assignment
+Langill, Johanna,Langill J,993,238,238,Mathematics ,johanna.langill@ousd.org, Teacher
+Dallas, Ena,Dallas E,999,A3,310,Arts-Performing ,ena.dallas@ousd.org, Teacher
+Habte, Abraham,Habte A,,,207,,abraham.habte@ousd.org, Para-educator
+Anderson, Adrian,Anderson A,,,654-7116/597,,adrian.anderson@ousd.org, Para-educator
+Epperson, Amanda,Epperson A,,,159,,amanda.epperson@ousd.org, School Nurse
+Hardwick, Amanda,Hardwick A,,,152,,amanda.hardwick@ousd.org, Psychologist
+Mbara, Anthony,Mbara A,,,324/594-9975,,anthony.mbarra@ousd.org, Intervention Support Specialist
+Currington, Antonia,Currington A,,,324/594-9975,,antonia.currington@ousd.org, Intervention Support Specialist
+Hegler, Aramis,Hegler A,,,117,,aramis.hegler@ousd.org, Security Officer
+Lanford-Allen, Brenda,Lanford-Allen B,,,447,,brenda.lanford-allen@ousd.org, Intervention Support Specialist
+Lopez, Brenda,Lopez B,,,235,,brenda.lopez@ousd.org, Clinician
+Dellaquila, Cara,Dellaquila C,,,158,,cara.dellaquila@ousd.org, Therapist
+Fisher, Charles,Fisher C,,,Radio,,charles.fisheriii@ousd.org, Custodian
+Pinkney, Chavon,Pinkney C,,,324/594-9975,,chavon.pinkney@ousd.org, Intervention Support Specialist
+Anderson, Cynthia,Anderson C,,,324/594-9975,,cynthia.anderson@ousd.org, Para-educator
+Borquez, Daniela,Borquez D,,,230,,daniela.borquez@ousd.org, Student Support Specialist
+Hussein, David,Hussein D,,,597-5013,,david.hussein@ousd.org, Lifeguard
+Taylor, David,Taylor D,,,Radio,,david.taylor@ousd.org, Custodian
+Williams, David,Williams D,,,308,,david.williams@ousd.org, Intervention Support Specialist
+Cole, De'andre,Cole D,,,309,,de'andre.cole@ousd.org, Para-educator
+Haskins, Deandre,Haskins D,,,Radio,,deandre.haskins@ousd.org, Head Custodian
+Haley, Deanna,Haley D,,,309,,deanna.haley@ousd.org, Intervention Support Specialist
+Carter-Kelly, Debra,Carter-Kelly D,,,158,,debra.carter-kelly@ousd.org, Parent Liaison
+Hunt, Dedra,Hunt D,,,224,,dedra.hunt@ousd.org, Intervention Support Specialist
+Ray, Dwan,Ray D,,,Radio,,dwan.ray@ousd.org, Custodian
+Madison, Ebony,Madison E,,,117,,ebony.madison@ousd.org, Security Officer
+Haemmel, Elizabeth,Haemmel E,,,306,,elizabeth.haemmel@ousd.org, Para-educator
+Hunter, Elizabeth,Hunter E,,,167,,elizabeth.hunter@ousd.org, College & Career Specialist
+Pho, Emerly,Pho E,,,209,,emerly.pho@ousd.org, Intervention Support Specialist
+Campbell, Erica,Campbell E,,,308,,erica.campbell@ousd.org, One-on-One Attendant
+Fauntleroy, Ethel,Fauntleroy E,,,120,,ethel.fauntleroy@ousd.org, District Registrar
+Layne, Felicia,Layne F,,,445/450-5431,,felicia.layne@ousd.org, Para-educator
+Demarinis, Franco,Demarinis F,,,443,Science ,franco.demarinis@ousd.org, Teacher
+Trotter, Fredrick,Trotter F,,,117,,fredrick.trotter@ousd.org, Security Officer
+Jimenez, Griselda,Jimenez G,,,153,,griselda.jimenez@ousd.org, Bilingual Attendance Specialist
+Mcbride, Gynelle,Mcbride G,,,235,,gynelle.mcbride@ousd.org, Community Schools Manager
+Lopez, Heriberto,Lopez H,,,Radio,,heriberto.lopez@ousd.org, Custodian
+Woo, Jah-Yee,Woo J,,,164,,jah-yee.woo@ousd.org, Teacher on Special Assignment
+Coplan, James,Coplan J,,,109,,james.coplanjr@ousd.org, Teacher
+Clachar, Janet,Clachar J,,,109,,janet.clachar@ousd.org, Administrative Assistant
+Dixon, Jason,Dixon J,,,Radio,,jason.dixon@ousd.org, Custodian
+Noble, Jelani,Noble J,,,164,,jelani.noble@ousd.org, Student Support Specialist
+Borens, Jennifer,Borens J,,,129,Special Education ,jennifer.borens@ousd.org, Teacher
+He, Jian,He J,,,Radio,,jian.he@ousd.org, Custodian
+Marker, Karen,Marker K,,,152,,karen.marker@ousd.org, Psychologist
+O�Keith, K.C. Room: 219,O�Keith K,,,ent: Social Studies ,#VALUE!,kc.okeith@ousd.org, Teacher
+Murry, Keith,Murry K,,,Radio,,keith.murry@ousd.org, Custodian
+Moss, Kelly,Moss K,,,117,,kelly.moss@ousd.org, Security Officer
+Ing, Kendra,Ing K,,,307,,kendra.ing@ousd.org, Clinician
+Smothers, Ketra,Smothers K,,,324/594-9975,,ketra.smothers@ousd.org, Para-educator
+Stamp, Kwame,Stamp K,,,456,,kwame.stamp@ousd.org, Instructional Assistant
+Cummings Lee, LaDale,Cummings Lee L,,,151,,ladale.cummings@ousd.org, Clerk Typist
+Sullivan, Laura,Sullivan L,,,428,,laura.sullivan@ousd.org, Speech Therapist
+Courtright, Lexee,Courtright L,,,447,,lexee.courtright@ousd.org, Para-educator
+Watkins, Lori,Watkins L,,,132,,lori.watkins@ousd.org, Para-educator
+Din, Lynna,Din L,,,169,,lynna.din@ousd.org, METS Talent Search
+Bailey, Marcus,Bailey M,,,654-7116,,marcus.bailey@ousd.org, Student Support Specialist
+Dates, Marina,Dates M,,,324/594-9975,,marina.dates@ousd.org, Intervention Support Specialist
+Boytes, Marisol,Boytes M,,,425/450-5400,,marisol.boytes@ousd.org, Bilingual Administrative Assistant
+Floyd, Meredyth,Floyd M,,,654-7116,,meredyth.floyd@ousd.org, Intervention Support Specialist
+Felix, Michael,Felix M,,,324/594-9975,,michael.felix@ousd.org, Para-educator
+Bellow, Mildred,Bellow M,,,129,,mildred.bellow@ousd.org, Para-educator
+Mann, Minnie,Mann M,,,324/594-9975,,minnie.mann@ousd.org, Para-educator
+Saechao, Muanglim,Saechao M,,,126/450-5400,,muanglim.saechao@ousd.org, Administrative Assistant
+Williams, Philip,Williams P,,,No,#VALUE!,philip.williams@ousd.org, Technology Manager
+Sabater-Fong, Rene,Sabater-Fong R,,,209,,rene.sabater@ousd.org, Intervention Support Specialist
+Brooks-Pines, Renita,Brooks-Pines R,,,133,Arts-Visual ,renita.pines@ousd.org, Teacher
+Jelinski, Rory,Jelinski R,,,115,,rory.jelinski@ousd.org, Clinician
+Whisenton, Rosemary,Whisenton R,,,119/174,,rosemary.whisenton@ousd.org, School Treasurer
+Pe�a, Ruby,Pe�a R,,,230,,ruby.pena@ousd.org, Student Support Specialist
+Ramirez, Ruth,Ramirez R,,,141,,ruth.ramirez@ousd.org, Social Worker
+Boyd, Sarah,Boyd S,,,147,,sarah.boyd@ousd.org, School Nurse
+Levy, Sarah,Levy S,,,230,,sarah.levy@ousd.org, Student Support Specialist
+Saephan, Sarn,Saephan S,,,Radio,,sarnkwang.saephanh@ousd.org, Custodian
+Van, Shanetta,Van S,,,445/450-5431,,shanetta.van@ousd.org, Intervention Support Specialist
+Carter, Niki,Carter N,,,176,,shanicqura.carter@ousd.org, Food Service Assistant
+Patterson-Pratt, Sharif,Patterson-Pratt S,,,308,,sharif.patterson@ousd.org, Para-educator
+Rhynes, Sharon,Rhynes S,,,428,,sharon.rhynes@ousd.org, Speech Therapist
+Ross-Morrison, Staci,Ross-Morrison S,,,425/450-5400,,staci.ross-morrison@ousd.org, Principal
+Bryan, Stephanie,Bryan S,,,654-7116,,stephanie.bryan@ousd.org, Administrative Assistant
+Graham, Steven,Graham S,,,224,,steven.graham@ousd.org, Social Worker
+Fuaau, Tatiana,Fuaau T,,,163,,tatiana.fuaau@ousd.org, Restorative Justice Coordinator
+Wallace, Taylor,Wallace T,,,423,,taylor.wallace@ousd.org, After School Program
+Williams, Teresa,Williams T,,,116,Counseling (9th A-Luon ,teresa.williams@ousd.org, Counselor
+Holliday, Terrance,Holliday T,,,170,,terrance.holliday@ousd.org, Work-Based Learning Liaison
+Haile, Tesfai,Haile T,,,117,,tesfai.haile@ousd.org, Security Officer
+Akins, Tonya,Akins T,,,445/450-5431,,tonya.akins@ousd.org, Para-educator
+Tang, Victor,Tang V,,,117,,victor.tang@ousd.org, Security Officer
+Yee, Wing,Yee W,,,Radio,,wing.yee@ousd.org, Custodian
+Omari, Yaminah,Omari Y,,,445/450-5431,,yaminah.omari@ousd.org, Para-educator

@@ -1,0 +1,160 @@
+<!--You will likely make extensive edits to this file but I would suggest holding on this file (copy and rename)
+because it is really help to be able to pull up all the values that are available for each user in the session,
+via google and via the User data object-->
+
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="containter.fluid">
+<div class="row">
+<div class="col-1"></div>
+<div class="col-10">
+
+
+    <h1>
+    {% if currUser.image %}
+        <img class="img-thumbnail" width = "100" src="data:image;base64,{{base64encode(currUser.image.read())}}">
+    {% else %}
+        <img class="img-thumbnail" width = "100" src="/static/oths.jpg">
+    {% endif %}
+    {{currUser.fullName}} {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}</h1>
+    <hr>
+    <h2>{{currUser.role}}</h2>
+    {% if currUser.role != "Student" %}
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-5">
+                email: {{currUser.otemail}} <br>
+            </div>
+            <div class="col-5">
+                Room: {{currUser.troom}} <br>
+                Teacher Aeries Number: {{currUser.tnum}}
+            </div>
+        </div>
+        <hr>
+    {% else %} <!--Student-->
+        <div class="row">
+            <div class="col-8 border" >
+                    <h4>Aeries Info</h4>
+            </div>  
+
+            <div class="col-4 border">
+                <h4>Student's Preferred Info <a class="btn-sm btn-primary" href="/editprofile/{{currUser.aeriesid}}">Edit</a></h4>
+            </div>  
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <b>Aeries Name:</b> {{currUser.afname}} {{currUser.alname}} <br>
+                <b>OUSD Email:</b> {{currUser.otemail}} <br>
+                <b>Home Phone:</b> {{currUser.aphone}} <br>
+                <b>Adults:</b>  {{currUser.aadults}} <br>
+                <b>Adult 1 Phone:</b>  {{currUser.aadult1phone}} <br>
+                <b>Adult 2 Phone:</b>  {{currUser.aadult2phone}} <br>
+                <b>Adult Email:</b>  {{currUser.aadultemail}} <br>
+                <b>Address:</b> <br>
+                &nbsp;&nbsp;&nbsp;{{currUser.astreet}} <br>
+                &nbsp;&nbsp;&nbsp;{{currUser.acity}} {{currUser.astate}}  {{currUser.azipcode}}
+            </div>
+            <div class="col-4">
+                <b>AeriesID:</b> {{currUser.aeriesid}} <br>
+                <b>Grade:</b> {{currUser.grade}} <br>
+                <b>Language Fluency:</b> {{currUser.langflu}} <br>
+                <b>SPED:</b> {% if currUser.sped %}{{currUser.sped}}{% endif %} <br>
+                <b>AGPA:</b> {{currUser.gpa}} <br>
+                <b>Academy/House:</b> {{currUser.cohort}}
+            </div>
+            <div class="col-4">
+                <b>Name:</b> {% if currUser.ufname %}{{currUser.ufname}} {% endif %} 
+                                {% if currUser.ulname %} {{currUser.ulname}} {% endif %} <br>
+                <b>Pronouns:</b> {% if currUser.pronouns %} {{currUser.pronouns}} {% endif %} <br>
+                <b>Mobile:</b> {% if currUser.mobile %}{{currUser.mobile}} {% endif %}<br>
+                <b>Other Phone:</b> {% if currUser.altphone %}{{currUser.altphone}}{% endif %} <br>
+                <b>Personal Email:</b> {% if currUser.personalemail %}{{currUser.personalemail}}{% endif %} <br>
+                <b>Gender:</b> {% if currUser.ugender %}{{currUser.ugender}}{% endif %} <br>
+                <b>Ethnicity (OUSD Categories):</b> {% if currUser.uethnicity %}{{currUser.uethnicity}}{% endif %} <br>
+                <b>Ethnicity (non-OUSD Description):</b> {% if currUser.uethnicityother %}{{currUser.uethnicityother}}{% endif %} <br>
+                <b>Address: </b> <br>
+                &nbsp;&nbsp;&nbsp;{% if currUser.ustreet %}{{currUser.ustreet}}{% endif %} <br>
+                &nbsp;&nbsp;&nbsp;{% if currUser.ucity %}{{currUser.ucity}}{% endif %} 
+                                    {% if currUser.ustate %}{{currUser.ustate}}{% endif %}  
+                                    {% if currUser.uzipcode %}{{currUser.uzipcode}}{% endif %}
+            </div>
+            <div class="col-12 border">
+                <h4>Adults  <a class="btn-sm btn-primary" href="/addadult/{{currUser.aeriesid}}">Add</a></h4>
+            </div>
+            <div class="col-12">
+                <table class="table">
+                {% for adult in currUser.adults %}
+                <thead class="thead-light">
+                    <tr><th>Relation</th><th>Name</th><th>mobile</th><th>Alt Phone</th><th>email</th><th>Alt Email</th></tr>
+                </thead>
+                    <tr><td>{{adult.relation}}</td><td>{{adult.fname}} {{adult.lname}}</td><td>{{adult.mobile}}</td><td>{{adult.altphone}}</td><td>{{adult.email}}</td><td>{{adult.altemail}}</td></tr>
+                    <tr><td><a class="btn-sm btn-primary" href="/editadult/{{currUser.aeriesid}}/{{adult.oid}}">Edit</a> <a class="btn-sm btn-primary" href="/deleteadult/{{currUser.aeriesid}}/{{adult.oid}}">Delete</a> </td><td><b>Address:</b></td></td><td>{{adult.street}}</td><td>{{adult.city}}</td><td>{{adult.state}}</td><td>{{adult.zipcode}}</td><td></td></tr>
+                    <tr><td></td><td><b>Notes:</b></td></td><td colspan="4">{{adult.notes}}</td></tr>
+                {% endfor %}
+                </table>
+            </div>
+            <div class="col-12 border">
+                <h4>Classes</h4>
+            </div>
+            <div class="col-12">
+                <table class="table">
+                    <tr><th>Per</th><th>Course</th><th>Rm</th><th>teacher</th><th>Ph#</th><th>Email</th></tr>
+                    {% for section in currUser.sections %}
+                        <tr>
+                            <td>{{section.per}} </td>
+                            <td>{{section.coursename}}</td>
+                            <td>{{section.room}}</td>
+                            <td>{{section.teacher.afname}} {{section.teacher.alname}}</td>
+                            <td>{{section.teacher.trmphone}}</td>
+                            <td>{{section.teacher.otemail}}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% endif %}
+<div class="col-1"></div>
+</div>
+</div>
+    
+
+    <br> <br><br> <br><br> <br><br> <br><br> <br>
+
+    {% if session.devenv  %}
+    <div class="container">
+        <h3>The User Object from this site</h3>
+        <table class="table">
+        {% for item in currUser %}
+        <tr>
+            <td>{{item}}</td> <td> {{ currUser[item] }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+
+        <h3>The Data Object from Google</h3>
+        <table class="table">
+        {% for item in data %}
+        <tr>
+            <td>{{ item }}</td> <td>{{data[item]}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+
+        <h3>The Session Object</h3>
+        <table class="table table=sm">
+        {% for item in session %}
+        <tr>
+            <td>{{ item }}</td> <td>{{session[item]}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+        
+    </div>
+    {% endif %} <!--Dev Env Data-->
+    <br><br><br>
+</div>
+
+{% endblock %}
+

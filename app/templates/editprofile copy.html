@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+        <div class="containter">
+            <div class="jumbotron text-center">
+                <h1>Edit Profitle</h1>
+            </div>
+
+            {% for field in form.errors %}
+                {% for error in form.errors[field] %}
+                    <div class="alert alert-error">
+                        <strong>Error!</strong>{{field}}: {{error}}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <form method=post enctype="multipart/form-data">
+                <table class="table">
+                <!--This displays the form from the form abject that was passed to the template. If the fileds have values in them
+                    that were set by the routes code, then it will be editing.  If they are empty it 
+                    will create a new secion. -->
+                <tr><td>{{ form.hidden_tag() }}{{ form.fname.label }}<br>{{ form.fname }}</td><td>{{ form.lname.label }}<br>{{ form.lname() }}</td></tr>
+                <tr><td>{{ form.pronouns.label }}<br>{{ form.pronouns() }}</td><td>{{ form.birthdate.label }}<br>{{ form.birthdate() }}</td></tr>
+                <tr>
+                    <td>
+                        {{ form.image.label }}<br>
+                        {% if currUser.image %}
+                            <img class="img-thumbnail" width="200" src="data:image;base64,{{base64encode(currUser.image.read())}}"> <br>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ form.image() }}
+                    </td>
+                </tr>
+                <tr><td>Mobile:<br>{{ form.mobile() }}<br>Personal Email:<br>{{form.personalemail()}}</td><td>Social Media:<br>{{form.socmedia(rows="4")}}</td></tr>
+                <tr><td colspan ="2">Address:<br>{{ form.address(rows="2", cols="25") }}</td></tr>
+                <tr><td>City</td><td>State &nbsp;  &nbsp;  &nbsp; Zip</td></tr>
+                <tr><td>{{form.city()}}</td><td>{{form.state(value="CA", size="2")}} {{form.zipcode(size="5")}}</td></tr>
+                <tr><td colspan="2">2021 and Beyond:<br>{{form.nextyr(cols="75", rows="4")}}</td></tr>
+                <tr><td colspan="2">{{form.submit()}}</td></tr>
+                </table>
+            </form>
+
+        </div>
+
+{% endblock %}

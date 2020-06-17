@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h3>
+    {% if currUser.image %}
+        <img class="img-thumbnail" width="50" src="data:image;base64,{{base64encode(currUser.image.read())}}">
+    {% else %}
+        <img class="img-thumbnail" width="50" src="/static/oths.jpg">
+    {% endif %}
+    {{currUser.fname}} {{currUser.lname}} <a href="/editprofile" class="btn btn-info btn-sm" role="button">Edit your Profile</a> 
+</h3>
+
+    {% if page %}
+        <table class="table">
+            <tr>
+                <td colspan="2">
+                    <a href="/page/{{page.id}}" class="btn btn-primary btn-sm" role="button">View Page</a> &nbsp;&nbsp;&nbsp;
+                    <a href="/editpage/{{page.id}}" class="btn btn-primary btn-sm" role="button">Edit Page</a> &nbsp;&nbsp;&nbsp;
+                    <a href="/deletepage/{{page.id}}" class="btn btn-primary btn-sm" role="button">Delete Page</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>Title: {{page.title}}</b> <br> 
+                    Status: {{page.status}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    Invite list: {{page.invitelist}}
+                </td>
+            </tr>
+            {% if page.signreqs %}
+            <tr>
+                <td>
+                    Requests to Sign: <br>
+                    To add them to your invite list just copy the email address from here to the Invitelist above
+                    {% for req in page.signreqs%}
+                        {{req.fname}} {{req.lname}} {{req.email}} <br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td colspan="2">
+                    {% if page.headerimage %}
+                    <img width = "400" src="data:image;base64,{{base64encode(page.headerimage.read())}}">
+                    {% else %}
+                        Heder Image Goes Here
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">{{page.description}}</td>
+            </tr>
+            <tr>
+                <td>
+                    {% if page.image1 %}
+                        <img width = "200" src="data:image;base64,{{base64encode(page.image1.read())}}"> <br>
+                    {% else %}
+                        Image 1 Goes Here <br>
+                    {% endif %}
+                    {% if page.caption1 %}
+                        {{page.caption1}}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if page.image3 %}
+                        <img width = "200" src="data:image;base64,{{base64encode(page.image3.read())}}"> <br>
+                    {% else %}
+                        Image 3 Goes Here <br>
+                    {% endif %}
+                    {% if page.caption3 %}
+                        {{page.caption3}}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {% if page.image2 %}
+                        <img width = "200" src="data:image;base64,{{base64encode(page.image2.read())}}"> <br>
+                    {% else %}
+                        Image 2 Goes Here <br>
+                    {% endif %}
+                    {% if page.caption2 %}
+                        {{page.caption2}}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if page.image4 %}
+                        <img width = "200" src="data:image;base64,{{base64encode(page.image4.read())}}"> <br>
+                    {% else %}
+                        Image 4 Goes Here <br>
+                    {% endif %}
+                    {% if page.caption4 %}
+                        {{page.caption4}}
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+            <hr>
+    {% else %}
+        <a href="/newpage" class="btn btn-info btn-lg" role="button">New Senior Page</a> <br>
+    {% endif %}
+
+
+{% endblock %}

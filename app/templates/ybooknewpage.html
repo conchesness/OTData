@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    {% for error in form.errors %}
+    {{ error }}: {{form.errors[error]}}
+    {% endfor %}
+
+    <form method=post enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <table class="table">
+            <tr>
+                <td colspan="2">
+                    {{form.title.label}}: {{form.title(size = '50')}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan = 2>
+                    Public = Anyone can view or sign your page (Best choice)<br>
+                    Privite = Anyone can view your page but have to be invited to sign (this does not work great) <br>
+                    Draft = Still working on it so don't show it to anyone <br>
+                    {{form.status.label}}: {{form.status()}}
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
+                    Invites to sign your page? <br> 
+                    (Make a comma separated list of <br>OUSD email addresses for seniors or teachers)
+                </td>
+                <td>
+                    {{form.invitetxt(cols="75")}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    {% if page.signreqs %}
+                    To invite someone to sign just copy their email address from here and add it to your invite list <br>
+                    {% for req in page.signreqs %}
+                        {{loop.index}}: {{req.fname}} {{req.lname}}: {{req.email}} <br>
+                    {% endfor %}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    Statement: <br> {{form.description(rows=6, cols=100)}}
+                </td>
+            </tr>
+        
+            <tr>
+                <td colspan="2">
+                    <b>Header Image</b> <br>
+                    {% if page and page.headerimage %}
+                        <img class="img-thumbnail" width="200" src="data:image;base64,{{base64encode(page.headerimage.read())}}"><br>
+                    {% endif %}
+                    {{form.headerimage()}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Image 1</b> <br>
+                    {% if page and page.image1 %}
+                        <img class="img-thumbnail" width="200" src="data:image;base64,{{base64encode(page.image1.read())}}">
+                    {% endif %}
+                    {{form.image1()}} <br>
+                    <em>Caption optional</em>: <br>
+                    {{form.caption1(size="50")}}
+                </td>
+                <td>  
+                    <b>Image 3</b><br>
+                    {% if page and page.image3 %}
+                        <img class="img-thumbnail" width="200" src="data:image;base64,{{base64encode(page.image3.read())}}">
+                    {% endif %}
+                    {{form.image3()}} <br>
+                    <em>Caption optional</em>: <br>
+                    {{form.caption3(size="50")}}
+                    
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Image 2</b> <br>
+                    {% if page and page.image2 %}
+                        <img class="img-thumbnail" width="200" src="data:image;base64,{{base64encode(page.image2.read())}}">
+                    {% endif %}
+                    {{form.image2()}} <br>
+                    <em>Caption optional</em>: <br>
+                    {{form.caption2(size="50")}}
+                </td>
+                <td>  
+                    <b>Image 4</b><br>
+                    {% if page and page.image4 %}
+                        <img class="img-thumbnail" width="200" src="data:image;base64,{{base64encode(page.image4.read())}}">
+                    {% endif %}
+                    {{form.image4()}} <br>
+                    <em>Caption optional</em>: <br>
+                    {{form.caption4(size="50")}}
+                </td>
+            </tr>
+            <tr><td colspan="2">{{form.submit()}}</td></tr>
+        
+
+    </table>
+    </form>
+
+{% endblock %}

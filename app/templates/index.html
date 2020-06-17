@@ -1,0 +1,30 @@
+<!--This is the Home page of the site-->
+
+{% extends "base.html" %}
+
+{% block body %}
+<!--This is the home page -->
+<div class="containter">
+    <div class="jumbotron text-center">
+        <div class="row">
+            <div class="col">
+                <h1>Announcements</h1>
+                {% if announcement %}
+                    <b>{{announcement.subject}}</b><br>
+                    <small>{{announceBody}}</small>
+                {% else %}
+                    (No Announcements)
+                {% endif %}
+                <br> <a href="/posts" class="btn btn-info btn-sm" role="button">All Announcements</a>
+                {% if session.admin %}
+                    <br> <a href="/newpost" class="btn btn-info btn-sm" role="button">New Announcement</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+        
+
+
+
+{% endblock %}

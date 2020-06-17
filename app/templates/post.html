@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="containter">
+        <div class="jumbotron text-center">
+            <h1>{{announcement['subject']}}</h1>
+        </div>
+    </div>
+
+    <div class="container">
+            <div class="container">
+                    <table class='table'>
+                        <tr><td>Author</td><td>{{announcement.user.fname}} {{announcement.user.lname}} </td></tr>
+                        <tr><td>Subject:</td><td>{{announcement.subject}}</td></tr>  
+                        <tr><td></td><td>{{announceBody}}</td></tr>  
+                        <tr><td>Created</td><td>{{announcement.createdate}} </td></tr>  
+                        {% if announcement.modifydate %}
+                            <tr><td>Modified</td><td>{{announcement.modifydate}} </td></tr>  
+                        {% endif %}    
+                        <tr>
+                            <td colspan="2">
+                                <a href="/post/{{announcement['id']}}">View</a> - 
+                                <a href="/editpost/{{announcement['id']}}">Edit</a> - 
+                                <a href="/deletepost/{{announcement['id']}}">Delete</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+        <hr>
+    </div>
+    <br><br><br>
+
+{% endblock %}

@@ -131,8 +131,9 @@ dmypy.json
 
 # Other
 *.code-workspace
-
-# CapstoneTemplate
 credentials.json
 *.csv
 app.yaml
+*.pem
+req.conf
+appengine_config.py

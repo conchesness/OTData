@@ -4,6 +4,7 @@ from app.classes.data import User, Adult, User, Course, Section, Config
 import pandas as pd
 import time
 
+# A script that is supposed to remove a field from the MongoDB
 # @app.route('/unsetadults')
 # def unseradults():
 #     users=User.objects()

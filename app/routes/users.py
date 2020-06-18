@@ -112,9 +112,9 @@ def login():
     data = people_service.people().get(resourceName='people/me', personFields='names,emailAddresses,photos').execute()
 
     if data['emailAddresses'][0]['value'][-8:] == "ousd.org" and data['emailAddresses'][0]['value'][0:2] == "s_":
-        session['role'] = 'student'
+        session['role'] = 'Student'
     else:
-        session['role'] = 'teacher'
+        session['role'] = 'Teacher'
 
     if data['emailAddresses'][0]['value'] in admins:
         session['isadmin'] = True

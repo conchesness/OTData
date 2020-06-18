@@ -16,7 +16,7 @@ def findstudent():
 
     form = StudentForm()
     if form.validate_on_submit():
-        query3 = Q(role='Student')
+        query3 = Q(role__icontains = 'Student')
 
         if len(form.fname.data)>0 and len(form.lname.data)>0:
             query1 = Q(afname__icontains = form.fname.data) | Q(ufname__icontains = form.fname.data)
@@ -43,7 +43,7 @@ def findstudent():
 def students(fname=None,lname=None):
     if session['role'].lower() == "student":
         return redirect(url_for('profile'))
-        
+
     if fname:
         query = Q(afname__contains=fname) and Q(alname__contains=lname)
     else:

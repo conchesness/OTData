@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <br>
+      {% for field in form.errors %}
+        {% for error in form.errors[field] %}
+            <div class="alert alert-error">
+                <strong>Error!</strong>{{field}}: {{error}}
+            </div>
+          {% endfor %}
+      {% endfor %}
+      <form method=post>
+        {{ form.hidden_tag() }}
+        <table>
+          <tr>
+            <td>First Name</td><td>Last Name</td>
+          </tr>
+          <tr>
+            <td>{{ form.fname }} </td><td>{{ form.lname }}</td>
+          </tr>
+        </table>
+         <br>
+        {{form.submit(class_="btn btn-primary")}}
+      </form>
+      <br>
+      {% if students %}
+      {% for student in students %}
+        <a href="/profile/{{student.aeriesid}}">{{student.afname}} {{student.alname}} </a><br>
+      {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

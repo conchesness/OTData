@@ -9,11 +9,17 @@ class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
-class UserForm(FlaskForm):
+class StudentForm(FlaskForm):
     fname = StringField("First Name")
     lname = StringField("Last Name")
+    submit = SubmitField("Submit")
+
+class UserForm(FlaskForm):
+    afname = StringField("First Name")
+    alname = StringField("Last Name")
+    ufname = StringField("First Name")
+    ulname = StringField("Last Name")
     pronouns = SelectField(choices=[('He/Him', 'He/Him'),('She/Her','She/Her'),('They/Them','They/Them'),('Any/All','Any/All')])
-    image = FileField('Avatar')
     birthdate = DateField()
     personalemail = EmailField('Personal Email')
     mobile = IntegerField(validators=(validators.Optional(),))

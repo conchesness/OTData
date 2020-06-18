@@ -19,7 +19,7 @@
     {{currUser.fullName}} {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}</h1>
     <hr>
     <h2>{{currUser.role}}</h2>
-    {% if currUser.role != "Student" %}
+    {% if currUser.role.lower() != "student" %}
         <div class="row">
             <div class="col-2"></div>
             <div class="col-5">

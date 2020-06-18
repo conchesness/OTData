@@ -121,10 +121,13 @@ def login():
     else:
         session['isadmin'] = False
 
-    #try:
-    # see if the user already exists in the user database document. If they don't then this attempt
-    # to create a currUser object from the User class in the data.py file will fail 
-    currUser = User.objects.get(otemail = data['emailAddresses'][0]['value'])
+    try:
+        currUser = User.objects.get(otemail = data['emailAddresses'][0]['value'])
+        # if currUser.role == "Student":
+        #     flash('Students cannot yet access this site.')
+    except:
+        flash(f'You are not in the database.  Please contact Steve Wright to get access. stephen.wright@ousd.org')
+        return redirect('/')
 
     if not currUser.gid:
         currUser.update(
@@ -171,14 +174,20 @@ def login():
 @app.route('/profile/<aeriesid>')
 @app.route('/profile')
 def profile(aeriesid=None):
-    if aeriesid and session['role'] != "Student":
+    if session['role'] == "Student":
+        return render_template('/profile')
+    elif aeriesid and session['role'] != "Student":
         try:
             targetUser = User.objects.get(aeriesid=aeriesid)
         except:
             flash(f"Aeries ID {aeriesid} is not in the database, displaying your profile instead. Contact Steve Wright if you feel this is an error (stephen.wright@ousd.org).")
             targetUser=User.objects.get(gid=session['gid'])
     else:
-        targetUser=User.objects.get(gid=session['gid'])
+        try:
+            targetUser=User.objects.get(gid=session['gid'])
+        except:
+            flash(f"Aeries ID {aeriesid} is not in the database, displaying your profile instead. Contact Steve Wright if you feel this is an error (stephen.wright@ousd.org).")
+            targetUser=User.objects.get(gid=session['gid'])        
     #Send the user to the profile.html template
 
     if targetUser.ufname:

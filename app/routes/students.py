@@ -9,6 +9,8 @@ import requests
 
 @app.route('/findstudent', methods=['GET', 'POST'])
 def findstudent():
+    if session['role'].lower() == "student":
+        return redirect(url_for('profile'))
 
     students = None
 

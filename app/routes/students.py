@@ -41,7 +41,9 @@ def findstudent():
 @app.route('/students/<lname>/<fname>')
 @app.route('/students/<lname>')
 def students(fname=None,lname=None):
-
+    if session['role'].lower() == "student":
+        return redirect(url_for('profile'))
+        
     if fname:
         query = Q(afname__contains=fname) and Q(alname__contains=lname)
     else:

@@ -5,7 +5,7 @@ setuptools==40.8.0
 pymongo==3.10.1
 WTForms_Components==0.10.4
 google_auth_oauthlib==0.4.1
-Flask_Moment==1.1.2
+Flask_Moment==0.9.0
 WTForms==2.2.1
 requests==2.22.0
 Flask==1.1.1

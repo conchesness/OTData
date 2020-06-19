@@ -48,7 +48,7 @@ def before_request():
     # Create a list of all the paths that do not need authorization or are part of authorizing
     # so that each path this is *not* in this list requires an authorization check.
     # If you have urls that you want your user to be able to see without logging in add them here.
-    unauthPaths = ['/','/home','/authorize','/login','/oauth2callback', '/static/favicon.ico', '/static/local.css','/logout','/revoke']   
+    unauthPaths = ['/','/home','/authorize','/login','/oauth2callback','/static','/logout','/revoke']   
     studentPaths = ['/profile','/editprofile','/addadult','/editadult','/deleteadult'] 
     # this is some tricky code designed to send the user to the page they requested even if they have to first go through
     # a authorization process.
@@ -56,10 +56,12 @@ def before_request():
         session['return_URL']
     except:
         session['return_URL'] = '/'
-    
-    if request.path not in unauthPaths:
+    basePath = request.path
+    basePath = basePath.split('/')
+    basePath = '/'+basePath[1]
+    if basePath not in unauthPaths:
         session['return_URL'] = request.full_path
-        if session['role'].lower() == 'student' and request.path not in studentPaths:
+        if session['role'].lower() == 'student' and basePath not in studentPaths:
             # Send students to their profile page
             return redirect(url_for('profile'))
 

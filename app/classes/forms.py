@@ -15,8 +15,9 @@ class StudentForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class UserForm(FlaskForm):
-    afname = StringField("First Name")
-    alname = StringField("Last Name")
+    fname = StringField("First Name")
+    lname = StringField("Last Name")
+    image = FileField("Image")
     ufname = StringField("First Name")
     ulname = StringField("Last Name")
     pronouns = SelectField(choices=[('He/Him', 'He/Him'),('She/Her','She/Her'),('They/Them','They/Them'),('Any/All','Any/All')])

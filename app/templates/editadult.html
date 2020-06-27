@@ -11,9 +11,9 @@
 
             {% for field in form.errors %}
                 {% for error in form.errors[field] %}
-                    <div class="alert alert-error">
-                        <strong>Error!</strong>{{field}}: {{error}}
-                    </div>
+                    <mark>
+                        <strong>Error!</strong> {{field}}: {{error}} <br>
+                    </mark>
                 {% endfor %}
             {% endfor %}
 

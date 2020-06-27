@@ -166,23 +166,19 @@ def login():
     session['gdata'] = data
     session['role'] = currUser.role
     session['isadmin'] = currUser.isadmin
+    session['email'] = data['emailAddresses'][0]['value']
 
-    # except:
-    #     flash(f'Please contact Mr. Wright (stephen.wright@ousd.org) and let him know you need an an account on OTData.')
-    #     return redirect('/')
-
-
-    # The return_URL value is set above in the before_request route. This enables a user you is redirected to login to
-    # be able to be returned to the page they originally asked for.
+    # The return_URL value is set above in the before_request route. This redirects a user to login and then
+    # sent to the page they originally asked for.
     return redirect(session['return_URL'])
 
 #This is the profile page for the logged in user
 @app.route('/profile/<aeriesid>')
 @app.route('/profile')
 def profile(aeriesid=None):
-    if session['role'] == "Student":
+    if session['role'].lower() == "student":
         return render_template('/profile')
-    elif aeriesid and session['role'] != "Student":
+    elif aeriesid:
         try:
             targetUser = User.objects.get(aeriesid=aeriesid)
         except:
@@ -192,9 +188,8 @@ def profile(aeriesid=None):
         try:
             targetUser=User.objects.get(gid=session['gid'])
         except:
-            flash(f"Aeries ID {aeriesid} is not in the database, displaying your profile instead. Contact Steve Wright if you feel this is an error (stephen.wright@ousd.org).")
-            targetUser=User.objects.get(gid=session['gid'])        
-    #Send the user to the profile.html template
+            flash(f"You are not in the database of users which doesn't make sense cause you're already looged in. Sorry this shouldn't ever happen. (stephen.wright@ousd.org).")
+            return redirect('/')
 
     if targetUser.ufname:
         fname = targetUser.ufname
@@ -222,7 +217,7 @@ def editprofile(aeriesid):
     # googleId from the active session to load the right record
     if aeriesid == session['aeriesid'] or aeriesid == 'None':
         editUser = User.objects.get(gid=session['gid'])
-    elif session['role'] != 'Student':
+    elif session['role'].lower() != 'student':
         editUser = User.objects.get(aeriesid=aeriesid)
     else:
         flash(f"You do not have access to edit this user's profile.")
@@ -298,6 +293,7 @@ def editprofile(aeriesid):
     form.uethnicity.data = editUser.uethnicity
     form.uethnicityother.data = editUser.uethnicityother
     form.ugender.data = editUser.ugender
+    form.mobile.data = editUser.mobile
 
     # render the editprofile template and send the pre-populated form object.
     return render_template('editprofile.html', form=form, editUser=editUser)

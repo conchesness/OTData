@@ -16,7 +16,10 @@
     {% else %}
         <img class="img-thumbnail" width = "100" src="/static/oths.jpg">
     {% endif %}
-    {{currUser.fullName}} {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}</h1>
+    {{currUser.fullName}} {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}
+    {% if currUser.role.lower() == 'student' %}
+    <a class="btn btn-danger" href="/sendstudentemail/{{currUser.aeriesid}}">Email</a>
+    {% endif %}</h1>
     <hr>
     <h2>{{currUser.role}}</h2>
     {% if currUser.role.lower() != "student" %}
@@ -34,7 +37,7 @@
     {% else %} <!--Student-->
         <div class="row">
             <div class="col-8 border" >
-                    <h4>Aeries Info</h4>
+                <h4>Aeries Info</h4>
             </div>  
 
             <div class="col-4 border">
@@ -57,6 +60,7 @@
             <div class="col-4">
                 <b>AeriesID:</b> {{currUser.aeriesid}} <br>
                 <b>Grade:</b> {{currUser.grade}} <br>
+                <b>Ethnicity</b> {{currUser.aethnicity}} <br>
                 <b>Language Fluency:</b> {{currUser.langflu}} <br>
                 <b>SPED:</b> {% if currUser.sped %}{{currUser.sped}}{% endif %} <br>
                 <b>AGPA:</b> {{currUser.gpa}} <br>
@@ -70,8 +74,8 @@
                 <b>Other Phone:</b> {% if currUser.altphone %}{{currUser.altphone}}{% endif %} <br>
                 <b>Personal Email:</b> {% if currUser.personalemail %}{{currUser.personalemail}}{% endif %} <br>
                 <b>Gender:</b> {% if currUser.ugender %}{{currUser.ugender}}{% endif %} <br>
-                <b>Ethnicity (OUSD Categories):</b> {% if currUser.uethnicity %}{{currUser.uethnicity}}{% endif %} <br>
-                <b>Ethnicity (non-OUSD Description):</b> {% if currUser.uethnicityother %}{{currUser.uethnicityother}}{% endif %} <br>
+                <b>Ethnicity:</b> {% if currUser.uethnicity %}{{currUser.uethnicity}}{% endif %} <br>
+                {% if currUser.uethnicityother %}<b>Ethnicity (non-OUSD Description):</b> {{currUser.uethnicityother}}<br>{% endif %} 
                 <b>Address: </b> <br>
                 &nbsp;&nbsp;&nbsp;{% if currUser.ustreet %}{{currUser.ustreet}}{% endif %} <br>
                 &nbsp;&nbsp;&nbsp;{% if currUser.ucity %}{{currUser.ucity}}{% endif %} 
@@ -87,9 +91,23 @@
                 <thead class="thead-light">
                     <tr><th>Relation</th><th>Name</th><th>mobile</th><th>Alt Phone</th><th>email</th><th>Alt Email</th></tr>
                 </thead>
-                    <tr><td>{{adult.relation}}</td><td>{{adult.fname}} {{adult.lname}}</td><td>{{adult.mobile}}</td><td>{{adult.altphone}}</td><td>{{adult.email}}</td><td>{{adult.altemail}}</td></tr>
-                    <tr><td><a class="btn-sm btn-primary" href="/editadult/{{currUser.aeriesid}}/{{adult.oid}}">Edit</a> <a class="btn-sm btn-primary" href="/deleteadult/{{currUser.aeriesid}}/{{adult.oid}}">Delete</a> </td><td><b>Address:</b></td></td><td>{{adult.street}}</td><td>{{adult.city}}</td><td>{{adult.state}}</td><td>{{adult.zipcode}}</td><td></td></tr>
-                    <tr><td></td><td><b>Notes:</b></td></td><td colspan="4">{{adult.notes}}</td></tr>
+                    <tr><td><b>{{adult.relation}}</b></td><td>{{adult.fname}} {{adult.lname}}</td><td>{{adult.mobile}}</td><td>{{adult.altphone}}</td><td>{{adult.email}}</td><td>{{adult.altemail}}</td></tr>
+                    {% if adult.street %}
+                    <tr>
+                        <td></td>
+                        <td><b>Address:</b></td>
+                        <td>{{adult.street}}</td>
+                        <td>{{adult.city}}</td>
+                        <td>{{adult.state}}</td>
+                        <td>{{adult.zipcode}}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td>
+                            <a class="btn-sm btn-primary" href="/editadult/{{currUser.aeriesid}}/{{adult.oid}}">Edit</a> 
+                            <a class="btn-sm btn-primary" href="/deleteadult/{{currUser.aeriesid}}/{{adult.oid}}">Delete</a> 
+                        </td>
+                        <td><b>Notes:</b></td></td><td colspan="4">{{adult.notes}}</td></tr>
                 {% endfor %}
                 </table>
             </div>
@@ -98,7 +116,9 @@
             </div>
             <div class="col-12">
                 <table class="table">
+                    <thead class="thead-light">
                     <tr><th>Per</th><th>Course</th><th>Rm</th><th>teacher</th><th>Ph#</th><th>Email</th></tr>
+                    </thead>
                     {% for section in currUser.sections %}
                         <tr>
                             <td>{{section.per}} </td>
@@ -116,6 +136,31 @@
 <div class="col-1"></div>
 </div>
 </div>
+{% if currUser.communications %}
+<div class="row">
+    <div class="col-1"></div>
+    <div class = "col-10">
+        <h1>Communications</h1>
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                <th>Type</th><th>From</th><th>To</th><th>Subject</th>
+            </tr>
+            
+        {% for comm in currUser.communications %}
+            <tr>
+                <td>{{comm.type_}}</td><td>{{comm.fromwho.afname}} {{comm.fromwho.alname}} ({{comm.fromwho.role}})</td><td>{{comm.to}}</td><td>{{comm.subject}}</td>
+            </tr>
+            {% if comm.body %}
+            <tr><th align="right">Message:</th><td colspan="3"> {{comm.body}} </td></tr>
+            {% endif %}
+        {% endfor %}
+            </thead>
+        </table>
+    </div>
+    <div class="col-1"></div>
+</div>
+{% endif %} <!--if currUser.communications-->
     
 
     <br> <br><br> <br><br> <br><br> <br><br> <br>

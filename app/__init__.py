@@ -14,15 +14,11 @@ connect("otdata", host='mongodb+srv://admin:bulldogz@cluster0-8m0v1.gcp.mongodb.
 
 moment = Moment(app)
 
-
-
 def base64encode(img):
     image = base64.b64encode(img)
     image = image.decode('utf-8')
     return image
 
 app.jinja_env.globals.update(base64encode=base64encode)
-
-
 
 from .routes import *

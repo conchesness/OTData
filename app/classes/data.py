@@ -34,10 +34,8 @@ class Enrollment(EmbeddedDocument):
 class Communication(EmbeddedDocument):
     oid = ObjectIdField(sparse=True, required=True, default=ObjectId(), unique=True, primary_key=True)
     type_ = StringField() # sms, email
-    to = StringField() # email address of phone num
-    fromadd = StringField() # email address of phone num
-    student = ReferenceField('User')
-    toother = StringField()
+    to = StringField() # email addresses or phone num
+    fromadd = StringField() # email address or phone num
     fromwho = ReferenceField('User')
     subject = StringField()
     body = StringField()
@@ -81,7 +79,7 @@ class User(Document):
     ulname = StringField()
     image = FileField()
     birthdate = DateField()
-    personalemail = EmailField()
+    personalemail = StringField()
     mobile = IntField()
     ustreet = StringField()
     ucity = StringField()

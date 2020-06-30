@@ -26,11 +26,13 @@
           those messages are displayed -->
           {% with messages = get_flashed_messages() %}
           {% if messages %}
-          <mark>
-              {% for message in messages %}
-                  {{ message }}<br>
-              {% endfor %}
-          </mark><br><br>
+            <div class="container">
+                <mark>
+                    {% for message in messages %}
+                        {{ message }}<br>
+                    {% endfor %}
+                </mark>
+            </div>
           {% endif %}
       {% endwith %}
     <!--This is where each of the templates are embedded in to this template -->

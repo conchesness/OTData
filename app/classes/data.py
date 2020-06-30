@@ -33,6 +33,7 @@ class Enrollment(EmbeddedDocument):
 
 class Communication(EmbeddedDocument):
     oid = ObjectIdField(sparse=True, required=True, default=ObjectId(), unique=True, primary_key=True)
+    date = DateTimeField(default=d.datetime.utcnow)
     type_ = StringField() # sms, email
     to = StringField() # email addresses or phone num
     fromadd = StringField() # email address or phone num

@@ -140,7 +140,7 @@
 <div class="row">
     <div class="col-1"></div>
     <div class = "col-10">
-        <h1>Communications</h1>
+        <h1>Communications <a class="btn btn-danger" href="/sendstudentemail/{{currUser.aeriesid}}">Email</a></h1>
         <table class="table">
             <thead class="thead-light">
             <tr>
@@ -152,7 +152,17 @@
                 <td>{{comm.type_}}</td><td>{{comm.fromwho.afname}} {{comm.fromwho.alname}} ({{comm.fromwho.role}})</td><td>{{comm.to}}</td><td>{{comm.subject}}</td>
             </tr>
             {% if comm.body %}
-            <tr><th align="right">Message:</th><td colspan="3"> {{comm.body}} </td></tr>
+            <tr>
+                <th align="right">
+                    Message:
+                    {% if session.isadmin %}
+                    <br> <a href="/deletecommunication/{{currUser.aeriesid}}/{{comm.oid}}" class="btn btn-primary btn-sm" role="button">Delete</a>
+                    {% endif %}
+                </th>
+                <td colspan="3"> 
+                    {{comm.body}}
+                </td>
+            </tr>
             {% endif %}
         {% endfor %}
             </thead>

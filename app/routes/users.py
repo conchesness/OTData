@@ -17,7 +17,7 @@ import os
 
 
 # List of email addresses for Admin users
-admins = ['stephen.wright@ousd.org']
+admins = ['stephen.wright@ousd.org','russell.campisi@ousd.org']
 
 # This code is run right after the app starts up and then not again. It defines a few universal things
 # like is the app being run on a local computer and what is the local timezone

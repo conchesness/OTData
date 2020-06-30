@@ -71,25 +71,29 @@ def sendstudentemail(aeriesid):
     
     emailList = []
     # add the student
-    emailList.append((student.otemail,student.otemail))
+    if student.ufname:
+        studentName = f"{student.afname} ({student.ufname}) {student.alname}"
+    else:
+        studentName = f"{student.afname} {student.alname}"
+    emailList.append((student.otemail,f"<b>Student:</b> {studentName}"))
 
     # add adults
     if student.aadultemail:
-        emailList.append((student.aadultemail,student.aadultemail))
+        emailList.append((student.aadultemail,f"<b>Aeries Parent:</b> {student.aadults}"))
     if student.adults:
         for adult in student.adults:
             if adult.email and adult.altemail:
-                emailList.append((adult.email,adult.email))
-                emailList.append((adult.altemail,adult.altemail))
+                emailList.append((adult.email,f"<b>{adult.relation}:</b> {adult.fname} {adult.lname}"))
+                emailList.append((adult.altemail,f"<b>{adult.relation}</b> (Alt Email): {adult.fname} {adult.lname}"))
             elif adult.email:
-                emailList.append((adult.email,adult.email))
+                emailList.append((adult.email,f"<b>{adult.relation}:</b> {adult.fname} {adult.lname}"))
             elif adult.altemail:
-                emailList.append((adult.altemail,adult.altemail))
+                emailList.append((adult.altemail,f"<b>{adult.relation}</b> (Alt Email): {adult.fname} {adult.lname}"))
 
     # add the teachers
     if student.sections:
         for section in student.sections:
-            emailList.append((section.teacher.otemail,section.teacher.otemail))
+            emailList.append((section.teacher.otemail,f"<b>{section.coursename}:</b> {section.teacher.afname} {section.teacher.alname}"))
 
     form = SendemailForm()
     form.to.choices = emailList
@@ -103,13 +107,17 @@ def sendstudentemail(aeriesid):
         service = build('gmail', 'v1', credentials=credentials)
 
         emailToString = ""
-        for email in form.to.data:
-            emailToString = emailToString + email + ", "
+        if form.to.data:
+            for email in form.to.data:
+                emailToString = emailToString + email + ", "
+
+        if form.otherto.data:
+            emailToString = emailToString + form.otherto.data
 
         emailCCString = ""
-        for email in form.cc.data:
-            emailCCString = emailCCString + email + ", "
-
+        if form.cc.data:
+            for email in form.cc.data:
+                emailCCString = emailCCString + email + ", "
 
         # Call the Gmail API
         message = MIMEText(form.body.data)
@@ -124,21 +132,30 @@ def sendstudentemail(aeriesid):
         try:
             message = (service.users().messages().send(userId='me', body=message)
                     .execute())
-            msgSent = True
         except:
-            flash('Something went wrong')
+            flash('Something went wrong. Check the format of any emails you put in the Other To field. Make sure they are comma seperated if there is more than on.')
+            return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
 
-        if msgSent:
-            currUser = User.objects.get(id=session['currUserId'])
-            student.communications.create(
-                type_ = "email",
-                to = emailToString + emailCCString,
-                fromadd = session['email'],
-                fromwho = currUser,
-                subject = form.subject.data,
-                body = form.body.data
-            )
-            student.save()
+        currUser = User.objects.get(id=session['currUserId'])
+        student.communications.create(
+            type_ = "email",
+            to = emailToString + emailCCString,
+            fromadd = session['email'],
+            fromwho = currUser,
+            subject = form.subject.data,
+            body = form.body.data
+        )
+        student.save()
         return redirect(url_for('profile',aeriesid=aeriesid))
 
     return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
+
+@app.route('/deletecommunication/<aeriesid>/<commid>')
+def deletecomm(aeriesid,commid):
+    editUser = User.objects.get(aeriesid=aeriesid)
+    delComm = editUser.communications.get(oid=commid)
+    editUser.communications.filter(oid=commid).delete()
+    editUser.adults.filter(oid=commid).save()
+    flash(f"Communication record {delComm.oid} was deleted")
+    
+    return redirect(url_for('profile', aeriesid=aeriesid))

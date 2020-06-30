@@ -5,7 +5,18 @@
 <div class="container">
     <div class="row">
         <div class=col-12>
-            <h1>Send an Email ({{student.afname}} {{student.alname}})</h1>
+            <h1>
+                Send an Email regaurding 
+                <a href="/profile/{{student.aeriesid}}">
+                {{student.afname}} 
+                {% if student.ufname %}
+                    ({{student.ufname}})
+                {% endif %}
+                {{student.alname}}</a>
+            </h1> 
+            This email will be sent from your OUSD email account and will show up in your sent email folder in GMail.  All replies will come
+            to your email and will not show up here. However, this email will be stored here on the student's profile. 
+            <hr>
             {% for field in form.errors %}
                 {% for error in form.errors[field] %}
                     <mark>
@@ -15,82 +26,25 @@
             {% endfor %}
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            <form method=post>
-                <table>
-                    <tr>
-                        <td>{{ form.hidden_tag() }}
-                            To: <br>
-                            {% for item in form.to %}
-                                {{item}} {{item.label}} <br>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            CC: <br>
-                            {% for item in form.cc %}
-                                {{item}} {{item.label}} <br>
-                            {% endfor %}                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                           Subj: <br> {{form.subject(size="72")}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" valign="top">
-                            Body: <br> {{form.body(rows="8", cols="75")}}
-                        </td>
-                    </tr>
-                    <tr><td colspan="3">{{form.submit()}}</td></tr>
-                </table>
-            </form>
-        </div>
-        <div class="col">
-            <table class="table table-sm">
-                <thead class="thead-light">
-                <tr>
-                    <th colspan="3"><b>Student</b></th>
-                </tr>
-                </thead>
-                <tr>
-                    <td colspan="2">{{student.otemail}}</td>
-                    <td>{{student.afname}} {{student.alname}}</td>
-                </tr>
-                <thead class="thead-light">
-                <tr>
-                    <th colspan="3"><b>Adults</b></th>
-                </tr>
-                </thead>
-                <tr>
-                    <td>{{student.aadultemail}}</td>
-                    <td colspan="2">{{student.aadults}}</td>
-                </tr>
-                {% if student.adults %}
-                {% for adult in student.adults %}
-                <tr>
-                    <td>{{adult.email}}</td>
-                    <td>{{adult.altemail}}</td>
-                    <td>{{adult.relation}}: {{adult.fname}} {{adult.lname}} </td>
-                </tr>
+    <form method=post>
+        <div class="row">
+            <div class="col">
+                {{ form.hidden_tag() }}
+                To: <br>
+                {% for item in form.to %}
+                    {{item}} {{item.label}} <br>
                 {% endfor %}
-                {% endif %} <!--if student.adults-->
-
-                {% if student.sections %}
-                <thead class="thead-light">
-                <tr><th colspan="3"><b>Teachers</b></th></tr>
-                </thead>
-                {% for section in student.sections %}
-                <tr>
-                    <td colspan="2">{{section.teacher.otemail}}</td>
-                    <td> {{section.teacher.afname}} {{section.teacher.alname}} <br> ({{section.coursename}}) </td>
-                </tr>
-                {% endfor %}
-                {% endif %} <!--if student.sections-->
-            </table>
+            </div>
+            <div class="col">
+                From: {{session.email}}<br>
+                Other To (optional):<br><small>Comma seperated list of email addresses</small><br>
+                {{form.otherto(size="72")}} <br>
+                Subj: <br> {{form.subject(size="72")}} <br>
+                Body: <br> {{form.body(rows="8", cols="75")}} <br>
+                {{form.submit()}} <br>
+            </div>
         </div>
-    </div>
-
+    </form>
 </div>
 
 

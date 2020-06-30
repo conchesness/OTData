@@ -5,11 +5,13 @@
 
 # For a thorough description of how to do stuff, go to the feedback.py file.
 
+# anothr possible email scope if we want to manage a Label for the user
+# 'https://www.googleapis.com/auth/gmail.labels'
+
 SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
     'openid',
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.labels'
+    'https://www.googleapis.com/auth/gmail.send'
     ]
  

@@ -12,6 +12,7 @@ class MultiCheckboxField(SelectMultipleField):
 class SendemailForm(FlaskForm):
     to = MultiCheckboxField(choices=[])
     cc = MultiCheckboxField(choices=[])
+    otherto = StringField()
     from_ = EmailField('From',validators=[(validators.Optional()),(Email())])
     subject = StringField()
     body = TextAreaField()

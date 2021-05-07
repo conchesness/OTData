@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+{% for field in form.errors %}
+    {% for error in form.errors[field] %}
+        <div class="alert alert-error">
+            <strong>Error!</strong>{{field}}: {{error}}
+        </div>
+    {% endfor %}
+{% endfor %}
+<h3>Current Time: {{ moment().format('MMMM Do YYYY, h:mm:ss a') }}
+</h3> <br>
+<h3>
+{% if student.ufname %}
+    {{student.ufname}} ({{student.afname}}) {{student.alname}} <br>
+{% else %}
+    {{student.afname}} {{student.alname}} <br>
+{% endif %}
+</h3>
+
+
+<h3>{{ section.per }} {{section.coursename}} with {{section.teacher.afname}} {{section.teacher.alname}}</h3>
+By checkin in here, you confirm that you am attending the class from this point until the end. <br>
+
+<form method=post>
+    <table class="table">
+    <tr><td>{{ form.hidden_tag() }} Confirm?: </td><td>{{ form.confirm() }}</td></tr>
+    <tr><td colspan="2">{{form.submit()}}</td></tr>
+    </table>
+</form>
+
+</div>
+
+
+{% endblock %}

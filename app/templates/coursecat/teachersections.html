@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+
+<h1>Sections for {{teacher.afname}} {{teacher.alname}} room: {{teacher.troom}}</h1>
+<h3>This is from 2 years agao and is not accurate information</h3>
+It is only here for testing purposes <br>
+
+    {% if sections %}
+        <table class="table">
+            <tr>
+                <th>Course</th>
+                <th>Sections</th>
+            </tr>
+            {% for section in sections | sort(attribute=sort)  %}
+            <tr>
+                <td>
+                    <a href="/cccourse/{{section.course.aeriesnum}}">
+                        {% if section.course.name  %}
+                            {{section.course.name}}
+                        {% else %}
+                            {{section.course.aeriesname}}
+                        {% endif %}
+                    </a>
+                </td>
+                <td><a href="/ccteacherclass/{{teacher.tnum}}/{{section.course.aeriesnum}}">{{section.pers}}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h3>No Teacehrs</h3>
+    {% endif %}
+</div>
+
+{% endblock %}

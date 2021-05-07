@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+
+
+    
+    <table class="table">
+    <tr><th>Cohort <small><a href="/rostersort/{{gclassroom.gclassid}}/sort">(Sort)</a></small></th><th>Student</th><th>Cohorts <a href="/sortcohorts/{{gclassroom.gclassid}}"><img width="20" src="/static/edit.png"></a></th><th>Submit</th></tr>
+    {% for i in range(numForms) %}  
+        
+        <tr>
+            <td>
+                {{groster.roster[i].sortCohort}}
+            </td>
+            <td>
+                {{groster.roster[i].profile.name.fullName}}
+                {% if groster.roster[i].updateGClasses.lower() == "true" %}(u){% endif %}
+                <form method=post>
+                {{forms["form"+i|string].hidden_tag()}}
+            </td>
+            <td class="border">
+                {{forms["form"+i|string].sortOrderCohort()}}
+            </td>
+            <td>
+                {{forms["form"+i|string].gid()}}
+                {{forms["form"+i|string].gclassid()}}
+                {{forms["form"+i|string].order()}}
+                {{forms["form"+i|string].submit(value=i|string)}}
+                </form> 
+            </td>
+        </tr>
+    {% endfor %} 
+</table>
+
+
+
+</div>
+{% endblock %}

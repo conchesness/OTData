@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+    <b>
+    {{ moment().format('MMMM Do YYYY, h:mm:ss a') }} <br>
+    {% if student.ufname %}
+        {{student.ufname}} ({{student.afname}}) {{student.alname}} <br>
+    {% else %}
+        {{student.afname}} {{student.alname}} <br>
+    {% endif %}
+    </b>
+    <div class="row">
+        <div class="col-1">
+        <div class="float-right">
+            {% for count in checkincounts %}
+                {{count}} <br>
+            {% endfor %}
+        </div>
+        </div>
+        <div class="col-11">
+            {% for section in student.sections %}
+                <a href="/checkinform/{{section.id}}">Button</a>
+                {{section.per}} {{section.teacher.afname}} {{section.teacher.alname}} {{section.coursename}} <br>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

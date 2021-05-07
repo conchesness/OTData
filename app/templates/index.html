@@ -1,0 +1,30 @@
+<!--This is the Home page of the site-->
+
+{% extends "base.html" %}
+
+{% block body %}
+<!--This is the home page -->
+{% if not session['credentials'] %}
+<a class="btn btn-secondary btn-sm float-end" role="button" href="/checkin">Checkin</a> 
+{% endif %}
+<div class="container">
+
+    <div class="jumbotron text-center">
+
+                <h1>OTData</h1>
+                OTData is the website of the Oakland Technical High School Computer Academy community. The site
+                is used by teachers, students, alumni and parents to communicate and to find critical information
+                like the Okalnd Tech Course Catalog.  From OTData teachers and staff are able to send email and text
+                messages to student and parents. OTData is also connected to Google Classroom so teachers are able to 
+                access lists of all their students for purposes of communication and attendence. Students can access 
+                OTData to check-in for distance learning.  In the neat future parents and alumni will be able to access the site
+                to update their contact information.  Parents and alumni will need to request access before they are given 
+                permission to login.
+
+    </div>
+</div>
+        
+
+
+
+{% endblock %}

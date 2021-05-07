@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class=col-12>
+            <h1>
+                Send an Email regaurding 
+                <a href="/profile/{{student.aeriesid}}">
+                {{student.afname}} 
+                {% if student.ufname %}
+                    ({{student.ufname}})
+                {% endif %}
+                {{student.alname}}</a>
+            </h1> 
+            This email will be sent from your OUSD email account and will show up in your sent email folder in GMail.  All replies will come
+            to your email and will not show up here. However, this email will be stored here on the student's profile. 
+            <hr>
+            {% for field in form.errors %}
+                {% for error in form.errors[field] %}
+                    <mark>
+                        <strong>Error!</strong> {{field}}: {{error}} <br>
+                    </mark>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    <form method=post>
+        <div class="row">
+            <div class="col">
+                {{ form.hidden_tag() }}
+                To: <br>
+                <table>
+                    {% for item in form.to %}
+                    <tr>
+                        <td valign="top">{{item}}</td><td>{{item.label}}</td>
+                    </tr>
+                    {% endfor %}
+                </table> <br>
+                <em>Note: If you do not see any teachers here it is because the student needs to log in and refresh their classes.</em>
+            </div>
+            <div class="col">
+                From: {{session.email}}<br>
+                Other To (optional):<small>Comma seperated list of email addresses</small><br>
+                {{form.otherto(size="72")}} <br>
+                Subj: <br> {{form.subject(size="72")}} <br>
+                Body: <br> {{form.body(rows="8", cols="75")}} <br>
+                {{form.submit()}} <br>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}

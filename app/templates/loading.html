@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+    <center><h1>Working</h1>
+    <img src="/static/loading.gif"></center><br>
+
+    <table class="table table-bordered ">
+        <tr>
+            {% for i in range(total) %}
+            <td class="{% if i < nextIndex %}table-success{% else %}table-active{% endif %}">
+                
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+    <center>
+        <h1>{{nextIndex}} / {{total}}</h1>
+    </center>
+    <br>
+</div>
+
+
+
+
+<script type="text/javascript">
+    window.location.replace('{{url}}/{{nextIndex}}');
+</script>
+
+{% endblock %}

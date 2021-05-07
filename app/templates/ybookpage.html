@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+<script>
+    function updateDiv() { $( "#here" ).load(location.href + " #here" ); }
+</script>
+
+{% block body %}
+<div class="container">
+    <div class="hicontainer">
+        {% if page.headerimage %}
+            <img class="img-fluid" src="data:image;base64,{{base64encode(page.headerimage.read())}}">
+        {% else %}
+            No header image yet
+        {% endif %}
+        <div class="itcentered">
+            <p class="text-center text-white display-3">{{page.title}}</p>
+        </div>
+    </div>
+    <hr>
+    {{page.description}} 
+    <hr>
+    <div class="row">
+        <div class="col">
+    {% if page.image1 %}
+        <img class="img-fluid" src="data:image;base64,{{base64encode(page.image1.read())}}"> <br>
+        <p>{{page.caption1}}</p>
+    {% endif %}
+    {% if page.image2 %}
+        <img class="img-fluid" src="data:image;base64,{{base64encode(page.image2.read())}}"> <br>
+        <p>{{page.caption2}}</p>
+    {% endif %}
+        </div>
+        <div class="col">
+    {% if page.image3 %}
+        <img class="img-fluid" src="data:image;base64,{{base64encode(page.image3.read())}}"> <br>
+        <p>{{page.caption3}}</p>
+    {% endif %}
+    {% if page.image4 %}
+        <img class="img-fluid" src="data:image;base64,{{base64encode(page.image4.read())}}"> <br>
+        <p>{{page.caption4}}</p>
+    {% endif %}
+        </div>
+    </div>
+    <div class="row here">
+        <div class="col">
+            {% if session.gdata.emailAddresses[0].value in page.invitelist or page.status == "public" or page.owner.id|string == session['currUserId']|string %}
+                {% if form %}
+                    <form method=post>
+                        {{ form.hidden_tag() }}
+                        Sign the page: <br>
+                        {{form.content(rows='3',cols='50')}} <br>
+                        {{form.submit()}}
+                    </form>
+                {% else %}
+                    <a href="/sign/{{page.id}}" class="btn btn-primary btn-sm" role="button">Sign</a> <br>
+                {% endif %}
+
+                {% if signs %}
+                <table>
+                    {% for sign in signs %}
+                        {% if not loop.index % 2 == 0 %}
+
+                            <tr align = "left">
+                                <td>
+                                    {% if sign.owner.image %}
+                                        <img class="img-thumbnail" width="100" src="data:image;base64,{{base64encode(sign.owner.image.read())}}"> 
+                                    {% else %}
+                                        <img class="img-thumbnail" width="100" src="/static/oths.jpg">
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <em>{{sign.owner.fname}} {{sign.owner.lname}}:</em> {{sign.content}}
+                                </td>
+                                <td>
+                                    &nbsp;
+                                </td>
+                                <td>
+                                    {% if page.owner.id|string == session.currUserId|string or sign.owner.id|string == session.currUserId|string %}                                
+                                        <a href="/deletesig/{{sign.id}}/{{page.id}}" class="btn btn-primary btn-sm" role="button">Delete</a>                                
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        {% else %}
+
+                            <tr align="right">
+                                <td>
+                                    &nbsp;
+                                </td>
+                                <td>
+                                    <em>{{sign.owner.fname}} {{sign.owner.lname}}:</em> {{sign.content}}
+                                </td>
+                                <td>
+                                    {% if sign.owner.image %}
+                                        <img class="img-thumbnail" width="100" src="data:image;base64,{{base64encode(sign.owner.image.read())}}"> 
+                                    {% else %}
+                                        <img class="img-thumbnail" width="100" src="/static/oths.jpg">
+                                    {% endif %}
+                                </td>
+                                {% if page.owner.id|string == session.currUserId|string or sign.owner.id|string == session.currUserId|string %}
+                                    <td>
+                                        <a href="/deletesig/{{sign.id}}/{{page.id}}" class="btn btn-primary btn-sm" role="button">Delete</a>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endif %}
+
+                    {% endfor %}
+                </table>
+                {% endif %}
+            {% else %}
+                <a href="/signreq/{{page.id}}/{{session.currUserId}}" class="btn btn-primary btn-sm" role="button">Ask to sign</a> <br>
+            {% endif %}
+            {% if page.signreqs %}
+                <b>Requests to Sign</b> <br>
+                {% for req in page.signreqs %}
+                    {{req.fname}} {{req.lname}} <br>
+                {% endfor %}
+            {% endif %}
+            <br> <br> <br>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

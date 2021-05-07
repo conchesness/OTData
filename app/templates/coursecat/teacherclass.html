@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+
+<a href="/ccteacherclassedit/{{section.teacher.tnum}}/{{section.course.aeriesnum}}">Edit</a>
+
+    <h1>
+        {% if section.course.name %}
+            {{section.course.name}}
+        {% else %}
+            {{section.course.aeriesname}}
+        {% endif %}
+    </h1>
+    
+<h3>{{section.teacher.afname}} {{section.teacher.alname}} room: {{section.teacher.troom}}</h3>
+<small><a href="/cccourse/{{section.course.aeriesnum}}">See All Teachers of this class</a></small> <br>
+
+{% if section.course.pathway %}
+    Pathway {{section.course.pathway}}
+    <small>If a pathway is listed here you can't enroll in this class if you are not in this pathway without permission from the teacher.</small> <br>
+{% elif section.pathway %}
+    Pathway: {{section.pathway}} <br>
+    <small>If a pathway is listed here you can't enroll in this class if you are not in this pathway without permission from the teacher.</small> <br>
+{% endif %}
+{% if section.prereq %}
+    Prequesites: {{section.prereq}} <br>
+    <small>If any classes are listed here, you can't take this class if you have not completed the classes listed without permission of the teacher.</small> <br>
+{% endif %}
+{% if section.course.yearinschool %}
+    Year: {{section.course.yearinschool}} <br>
+{% elif section.yearinschool %}
+    Year: {{section.yearinschool}} <br>
+    <small>If any classes are listed here you can't take this class if you are not in that year when you take the class without permission of the teacher.</small> <br>
+{% endif %}
+
+Periods: {{section.pers}} <br>
+Link: {{section.url}} <br>
+Description <br>
+{{section.desc}}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<a class="btn btn-secondary btn-sm" role="button" href="/findstudent">Find A Student</a> 
+
+<div class="container mt-3">
+{% for field in form.errors %}
+    {% for error in form.errors[field] %}
+        <mark>
+            <strong>Error!</strong> {{field}}: {{error}} <br>
+        </mark>
+    {% endfor %}
+{% endfor %}
+{% if users %}
+        RESULTS: 
+        <a href="#table">table</a> | 
+        <a href="#students">student emails</a> | 
+        <a href="#parents">parent emails</a>
+{% endif %}
+<form method=post>
+    {{ form.hidden_tag() }} 
+
+    <div class="row">
+
+        <div class="col text-nowrap">
+            <h3>Ethnicities</h3>
+            {% for eth in form.ethnicity %}
+                {{eth}} {{eth.label}} <br>
+            {% endfor %}
+        </div>
+
+        <div class="col text-nowrap">
+        <h3>Grades</h3>
+        {% for grade in form.grade %}
+                {{grade}} {{grade.label}}
+        {% endfor %}
+        
+        <h3>Genders</h3>
+        {% for gender in form.gender %}
+                {{gender}} {{gender.label}}
+        {% endfor %}
+
+        <h3>Cohorts</h3>
+        {% for cohort in form.cohort %}
+            {{cohort}} {{cohort.label}} <br>
+        {% endfor %}
+        {{form.submit()}}
+        </div>
+        
+    </div>
+</form>
+{% if users %}
+<a id="table"></a>
+<hr>
+<br>RESULTS: 
+<a href="#table">table</a> | 
+<a href="#students">student emails</a> | 
+<a href="#parents">parent emails</a>
+<h1>Total students {{total}}</h1>
+<table class="table">
+    <tr>
+        <th>name</th><th>cohort</th><th>ethnicity</th><th>grade</th><th>gender</th>
+    </tr>
+{% for user in users %}
+    <tr>
+        <td><a href="/profile/{{user.aeriesid}}">{{user.afname}} {{user.alname}}</a></td>
+        <td>{{user.cohort}}</td>
+        <td>{{user.aethnicity}}</td>
+        <td>{{user.grade}}</td>
+        <td>{{user.agender}}</td>
+    </tr>
+{% endfor %}
+</table>
+<hr>
+<a id="students"></a>
+<br>RESULTS: 
+<a href="#table">table</a> | 
+<a href="#students">student emails</a> | 
+<a href="#parents">parent emails</a>
+<h1>Student emails</h1>
+{% for user in users %}
+    {{user.otemail}},
+{%endfor%}
+<hr>
+<a id="parents"></a>
+<br>RESULTS: 
+<a href="#table">table</a> | 
+<a href="#students">student emails</a> | 
+<a href="#parents">parent emails</a>
+<h1>Parent emails</h1>
+{% for user in users %}
+    {{user.aadultemail}},
+    {% for adult in user.adults %}
+        {{adult.email}},
+    {% endfor %}
+{%endfor%}
+{% endif %}
+
+</div>
+{% endblock %}

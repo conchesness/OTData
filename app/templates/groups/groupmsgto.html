@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="container">
+
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <h1>Send a Message</h1>
+        This msg will go to: <br>
+        {% for stu in group.students %}
+            {{stu.afname}} {{stu.alname}},
+        {% endfor %}
+        <br>
+
+        <form method=post>
+            {{ form.hidden_tag() }}
+            <table class="table">
+            <tr><td>Message<br>{{form.field(rows="10", cols="80")}}</td></tr>
+            <tr><td colspan="2">{{form.submit()}}</td></tr>
+            </table>
+        </form>
+
+    </div>
+
+{% endblock %}

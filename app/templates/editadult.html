@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="row">
+            <h1>Add/Edit Adult 
+            For {% if editUser.ufname%}{{editUser.ufname}}{% else %}{{editUser.afname}}{% endif %}
+            {% if editUser.ulname%}{{editUser.ulname}}{% else %}{{editUser.alname}}{% endif %}</h1>
+        </div>
+
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <mark>
+                    <strong>Error!</strong> {{field}}: {{error}} <br>
+                </mark>
+            {% endfor %}
+        {% endfor %}
+
+        <form method=post enctype="multipart/form-data">
+            <table class="table">
+            <!--This displays the form from the form abject that was passed to the template. If the fileds have values in them
+                that were set by the routes code, then it will be editing.  If they are empty it 
+                will create a new secion. -->
+            <tr>
+                <td colspan="2">Preferred Contact: {{form.preferredcontact()}} <em>Check this box if this is an adult you would like to be a primary contact</em></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    Relation (ie Mother, Father, Aunt, Friend, Doctor, ...): <br>
+                    {{form.relation(size="40")}}
+                </td>
+            </tr>
+            <tr>
+                <td>{{ form.hidden_tag() }}
+                    First Name: <br>
+                    {{form.fname()}}
+                </td>
+                <td>
+                    Last Name: <br>
+                    {{form.lname()}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Mobile Phone: <br>
+                    {{form.mobile()}}
+                </td>
+                <td>
+                    Other Phone: <br>
+                    {{form.altphone()}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Email: <br>
+                    {{form.email()}}
+                </td>
+                <td>
+                    Other Email: <br>
+                    {{form.altemail()}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan='2'>
+                    Street Address (if different from Student): <br>
+                    {{form.street(cols='75')}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    City: <br>
+                    {{form.city(size="40")}}
+                </td>
+                <td>
+                    State:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Zip <br> 
+                    {{form.state( size="2")}}&nbsp;{{form.zipcode()}}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    Primary Language<br>{{form.primarylang()}}<br>
+                    {{form.needstranslation()}} Needs Translation
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    Notes:<br>{{form.notes(cols="75")}} <br>
+                    <small>Please add any notes about contact preferences 
+                        like prefers email or text as well as any other notes that might be helpful.</small>
+                </td>
+            </tr>
+
+            <tr><td colspan="2">{{form.submit()}}</td></tr>
+            </table>
+        </form>
+
+    </div>
+
+{% endblock %}

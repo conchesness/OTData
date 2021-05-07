@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+
+    {% if form %}
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-8">
+            <h4>
+                Success Plan <br> <a href="/profile/{{plan.student.aeriesid}}">{{plan.student.afname}} {{plan.student.alname}}</a> 
+            </h4>
+        </div>
+        <div class="col-4 border">
+            <h6>
+                Timeframe: {{settings.timeframe}}
+                {% if session['isadmin'] %}
+                    <a href="/plansettings"><img width="20" src="/static/edit.png"></a>
+                {% endif %}
+            </h6>
+            <h6>Current: <span id="settingstf"> </span></h6>
+        </div>
+    </div>
+
+<hr>
+
+
+    {% if planThemeForm %}
+    <form method=post>{{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-12 bg-light border border-2 mb-3 py-2">
+                <a href="#themevideo">What is a Theme?</a>
+                {% if form.name.data %}
+                <h4>Edit Theme</h4>
+                {% else %}
+                <h4>New Theme</h4>
+                {% endif %}
+        </div>
+        <div class="col-md-6 col-lg-5 col-xl-4">
+            {{ form.timeframe() }} of {{ form.name(placeholder="Theme Name", size="23") }}
+        </div>
+        <div class="col-md-6 col-lg-7 col-xl-8">
+            <em><u>Theme Name: </u></em>
+            A purpose of a Theme is to help you make decisions that result in the outcomes you want. 
+            A Theme should be general like "health", "creating", "focus", "completion", "fun". Themes 
+            last for a specific amount of time like a "season", "semester" or "year". So a theme will be something 
+            like Spring of Health, or Fall of Fun.
+        </div>
+        <div class="col-12"><hr></div>
+        <div class="col-md-6 col-lg-5 col-xl-4">
+            {{ form.description(cols="40", rows="8",placeholder="Theme Description") }}<br>{{form.old()}} This is old and should be hidden. <br> {{ form.submit()}}
+        </div>
+        <div class="col-md-6 col-lg-7 col-xl-8">
+            The <em><u>description</u></em> of your Theme should give information for why you chose this theme. 
+            Feel free to describe your theme however you like. If you are stuck, just complete these two sentence stems: <br>
+            &nbsp;&nbsp;&nbsp;Without {% if form.name.data %} {{form.name.data}} {%else%}<i>&lt;Theme Name&gt;</i>{% endif %} I... <br> 
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;but <br> &nbsp;&nbsp;&nbsp;With {% if form.name.data %} {{form.name.data}} {%else%}<i>&lt;Theme Name&gt;</i>{% endif %} I hope to... </td>
+        </div>
+
+    </div> <!--Row-->
+    </form>
+    
+
+    {% endif %}
+
+    {% if planIdealOutcomeForm %}
+    <div class="row mt-3">
+        <div class="col-12 bg-light border border-2 mb-3 py-2">
+            <form method=post>
+            <h4>An Ideal Outcome of your <span id="settingstf2"> </span> of {{ theme.name }}</h4>
+            <small>An ideal outcome is something that will result from practice, effort and attention to <strong>{{theme.name}}</strong> for a {{theme.timeframe}}.</small>
+        </div>
+        
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                {{ form.hidden_tag() }} {{ form.name(size="40",placeholder="Ideal Outcome Name") }} <br>
+            </div>
+            <div class="col-md-6 col-lg-7 col-xl-8">
+                <small>If you practice {{ theme.name }} for the entire {{settings.timeframe}} what would be an <em>Ideal Outcome</em>?
+                For example if I eat well I hope to feel more energetic so if my Theme was {{ theme.timeframe }} of Health, an Ideal
+                Outcome might by "Increased Energy".</small>
+            </div>
+            <div class="col-12"><hr></div>
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                {{ form.description(cols="43", rows="8", placeholder="Ideal Outcome Description") }}
+            </div>
+            <div class="col-md-6 col-lg-7 col-xl-8">
+                <small>Why would a {{settings.timeframe}} of {{ theme.name }} create this Ideal Outcome? Think 
+                    of some specific decisions you might be presented with and how your could apply your theme to achieve 
+                    this Ideal Outcome. For example, if I have a {{settings.timeframe}} of Health and I have the opportunity to
+                    walk to school instead of getting a ride I might do that and if I do that regularly it is reasonably to 
+                    believe that I might have More Energy because I will be getting exercise, so More Energy would be an Ideal Outcome of 
+                    a {{settings.timeframe}} of {{ theme.name }}.
+                </small> 
+            </div>
+            <div class="col-12"><hr></div>
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                {{ form.example(cols="43", rows="8", placeholder="Ideal Outcome Example Activity") }}<br>{{ form.submit()}}
+            </div>
+            <div class="col-md-6 col-lg-7 col-xl-8">
+                <small>List at least one specific activity that you might do that could lead to this ideal outcome. For example, 
+                    "Today I will walk to school and back home again." or "Today I will place everything I need to do on a list and review 
+                    that list at the end of the day."
+                </small> 
+            </div>
+    </div>
+    </form>
+    {% endif %}
+    <h5 class="mt-5"><a id="themevideo"></a>What is a theme?</h5>
+    <iframe width="450" height="315" src="https://www.youtube.com/embed/NVGuFdX5guE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+{% include 'plans/planscripts.html' %}
+
+{% endblock %}

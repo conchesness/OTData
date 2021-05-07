@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <div class="container">
+            <h1>Edit Profile</h1>
+            <hr>
+        <div class="row">
+            <div class="col-12">
+            {% for field in form.errors %}
+                {% for error in form.errors[field] %}
+                    <mark>
+                        <strong>Error!</strong> {{field}}: {{error}} <br>
+                    </mark>
+                {% endfor %}
+            {% endfor %}
+            <form method=post enctype="multipart/form-data">
+            <div class=row>
+                <div class=col-7>
+                        <table class="table">
+                        <tr><td collspan="2">{{ form.hidden_tag() }}Pronouns: {{ form.pronouns() }}</td></tr>
+                        <tr><td>{{ form.fname.label }}<br>{{ form.fname }}</td><td>{{ form.lname.label }}<br>{{ form.lname() }}</td></tr>
+                        <tr>
+                            <td>
+                                {{ form.image.label }}<br>
+                                {% if editUser.image %}
+                                    <img class="img-thumbnail" width="100" src="data:image;base64,{{base64encode(editUser.image.read())}}"> <br>
+                                {% else %}
+                                    <img class="img-thumbnail" width = "100" src="/static/oths.jpg">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.image() }}
+                            </td>
+                        </tr>
+                        <tr><td>Your Mobile:</td><td>{{ form.mobile() }}</td></tr>
+                        {% if session.role.lower() == "student" or (request.view_args['aeriesid'] and session['role'].lower() != 'student') %}
+                            <tr><td>Other Phone:</td><td>{{ form.altphone() }}</td></tr>
+                            <tr><td colspan=2>Personal Email:<br>{{form.personalemail()}}</td></tr>
+                            <tr><td colspan ="2">Street Address:<br>{{ form.ustreet(rows="2", cols="75") }}</td></tr>
+                            <tr><td>City</td><td>State &nbsp;  &nbsp;  &nbsp; Zip</td></tr>
+                            <tr><td>{{form.ucity()}}</td><td>{{form.ustate(value="CA", size="2")}} {{form.uzipcode(size="5")}}</td></tr>
+                            <tr><td colspan="2">How do you describe your gender?:<br>{{form.ugender(cols="75")}}</td></tr>
+                            <tr><td>Shirt Size</td> <td>{{form.shirtsize()}}</td> </tr>
+                            <tr><td>linkedin</td> <td>{{form.linkedin()}}<br><small>Must begin with https://</small></td> </tr>
+                        {% endif %}
+                        <tr><td colspan="2">{{form.submit()}}</td></tr>
+                        </table>
+                    
+        
+                </div>
+                <div class="col-5">
+                    {% if session.role.lower() == "student" %}
+                        How do you describe your ethnicity? This is the "official" OUSD list (select all that apply)?:<br>
+                        {% for item in form.uethnicity %}
+                            {{item}} {{item.label}} <br>
+                        {% endfor %}
+                        Is your ethnicity or culture not represented in the list above? <br>
+                        Please add how you describe your ethnicity or culture here:<br>
+                        {{form.uethnicityother(cols="75")}}
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}}

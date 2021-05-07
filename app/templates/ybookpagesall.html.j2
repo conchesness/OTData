@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="row">
+    <div class="col-6">
+        {% if pages %}
+            {% for page in pages %}
+                <a href="/page/{{page.id}}">{{page.owner.fname}} {{page.owner.lname}}</a> {{page.owner.gfname}} {{page.owner.glname}} {{page.status}} {{page.invitelist}} {{page.signreqs}} <br>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="col-6">
+        {% if users %}
+            {% for user in users %}
+                {{user.email}},
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+
+
+{% endblock %}

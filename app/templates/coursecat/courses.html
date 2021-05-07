@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+
+{% for field in form.errors %}
+{% for error in form.errors[field] %}
+    <div class="alert alert-error">
+        <strong>Error!</strong>{{field}}: {{error}}
+    </div>
+{% endfor %}
+{% endfor %}
+
+<h1>
+    Courses
+    {% if session['courseCatAdmin'] or session['isadmin'] %}
+    <a href="/cccoursenew"><img width="20"src="/static/new.png"></a>
+    {% endif %}
+</h1>
+
+<form method="post">
+    {{form.hidden_tag()}}
+    Aeries Name (can be partial): {{form.aeriesname()}}  Aeries Number (must be exact): {{form.aeriesnum()}} 
+    <table>
+        <tr><td>Department</td><td>A-G</td><td>Level</td><td>Not Updated?</td><td></td></tr>
+        <tr>
+            <td>{{form.dept()}}</td><td>{{form.atog()}}</td><td>{{form.level()}}</td><td>{{form.notupdated()}}</td><td>{{form.submit()}}</td>
+        </tr>
+    </table>
+</form>        
+
+
+{# Macro for creating navigation links #}
+{% macro render_navigation(pagination, endpoint) %}
+<div class=pagination>
+Pages:&nbsp; 
+{% for page in pagination.iter_pages() %}
+    {% if page %}
+        {% if page != pagination.page %}
+            <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+        {% else %}
+            <strong>{{ page }}</strong>
+        {% endif %}
+        &nbsp;
+    {% else %}
+        <span class=ellipsis>…</span>
+    {% endif %}
+    &nbsp;
+{% endfor %}
+</div>
+{% endmacro %}
+
+{{ render_navigation(courses, 'courses') }}
+
+
+{# Display a page of courses #}
+<table class="table">
+    <tr><th>Aeries Name</th><th>Course Number</th><th>Department</th><th>A-G</th><th># of Secions</th></tr>
+    {% for course in courses.items %}
+        <tr>
+            {% if course.name %}
+                <td>
+                    <a href="/cccourse/{{course.aeriesnum}}">{{ course.name }}</a><br><small>{{ course.aeriesname }}</small>
+                </td>
+            {% else %}
+                <td><a href="/cccourse/{{course.aeriesnum}}">{{ course.aeriesname }}</a></td>
+            {% endif %}
+            <td>{{ course.aeriesnum }}</td>
+            <td>{{ course.dept }}</td>
+            <td>{{ course.atog }} </td>
+            <td>{{course.sections|length}}</td>
+        </tr>
+        
+    {% endfor %}
+</table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 col-xl"> 
+        {% if form %}
+          {% for error in form.errors %}
+            {{ error }}: {{form.errors[error]}}
+          {% endfor %}
+
+          <h2><a href="/profile/{{student.aeriesid}}">
+            {% if student.ufname %} 
+              {{student.ufname}} ({{student.afname}}) {{student.alname}}
+            {% else %}
+              {{student.afname}} {{student.alname}}
+            {% endif %}
+          </a></h2>
+          <h3>
+          <form method=post>
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            {{form.to.label}}<br>{{form.to()}} 
+          </div>
+          <div class="form-group">
+          {{form.body.label}}<br>{{form.body(rows="5", cols="40" )}} <br>{{form.submit()}}
+          </div>
+          </form>
+          </h3>
+        {% endif %}
+        <small>Cclck any of the numbers below to put them in to the 'To' field above.  You can only send to 
+        one number at a time.</small>
+        <h4>
+        <table class="table table-bordered">
+          {% for num in phoneNums %}
+          <tr>
+            <td nowrap><a href="/msg/{{student.aeriesid}}/{{num[0]}}">{{formatphone(num[0])}}</a></td><td>{{num[1]}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+        </h4>
+      </div>
+
+
+      <div class="col-12 col-xl">
+        {% if msgs %}
+        <h3>Last 20 (or fewer) messages</h3>
+        <a href="{{reloadurl}}" class="btn btn-primary btn-sm" role="button">Reload</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <table class="table-sm">
+            <tr><th>Sent</th><th>From</th><th>To</th><th>Status</th><th>Msg</th></tr>
+            {% for msg in msgs %}
+              {% if msg.status == 'received' %}
+              <tr class="table-primary">
+                <td>
+                  {{moment(msg.datetimesent).calendar()}}
+                </td>
+                <td>
+                  {% set counter = {'count':0} %}
+                  {% for num in phoneNums %}
+                    {% if '+1'~num[0] == msg.from_|string and counter.count < 1 %}
+                        {{num[1]}}
+                        {% do counter.update({'count':1}) %}
+                    {% endif %}
+                  {% endfor %}
+                </td>
+                <td>OTData</td>
+                <td>{{msg.status}}</td>
+                <td>
+                  {% if msg.reply_to %}
+                    <em>Assumed reply to: {{msg.reply_to.afname}} {{msg.reply_to.alname}}</em> <br>
+                  {% endif %}
+                  {{msg.body}}<br>{% if msg.media %}<img width="400" src="{{msg.media}}">{% endif %} 
+                </td>
+              </tr>
+              {% else %}
+                <tr class="table-secondary">
+                  <td>
+                    {{moment(msg.datetimesent).calendar()}}
+                  </td>
+                  <td>{{msg.from_user.afname}} {{msg.from_user.alname}}</td>
+                  <td>
+                    {% set counter = {'count':0} %}
+                    {% for num in phoneNums %}
+                      {% if '+1'~num[0] == msg.to|string and counter.count < 1 %}
+                          {{num[1]}}
+                          {% do counter.update({'count':1}) %}
+                      {% endif %}
+                    {% endfor %}
+                  </td>
+                  <td>{{msg.status}}</td>
+                  <td>
+                    {{msg.body}}
+                  </td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </table>
+        {% endif %}
+      </div>
+    </div>
+  <br><br><br>
+
+{% endblock %}

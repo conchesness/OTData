@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <h3>All Senior Pages</h3> Alphabetical left to right
+    <div class="row">
+        {% for page in pages | sort(attribute='owner.glname')  %}
+            <div class="col-4">
+                <a href="/page/{{page.id}}">{{page.owner.fname}} {{page.owner.lname}}</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

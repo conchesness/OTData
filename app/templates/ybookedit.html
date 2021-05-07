@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+{% for error in form.errors %}
+    {{ error }}: {{form.errors[error]}}
+{% endfor %}
+
+<form method=post>
+    {{ form.hidden_tag() }}{{form.title.label}}: {{form.title(size = '50')}} <br>
+    {{form.status.label}}{{form.status()}} <br>
+    {{form.submit()}}
+</form>
+
+{% endblock %}

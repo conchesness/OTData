@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block body %}
+<a class="btn btn-secondary btn-sm" role="button" href="/listq">Student Lists</a> 
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <br>
+      {% for field in form.errors %}
+        {% for error in form.errors[field] %}
+            <div class="alert alert-error">
+                <strong>Error!</strong>{{field}}: {{error}}
+            </div>
+          {% endfor %}
+      {% endfor %}
+      <form method=post>
+        {{ form.hidden_tag() }}
+        <div class="row">
+          <div class=col-7>
+            <div class="row">
+              <div class="col-lg-4">
+                <h6>First Name</h6>
+                <h6>{{ form.fname(size="18") }}</h6> 
+              </div>
+              <div class="col-lg-4">
+                <h6>Last Name</h6>
+                <h6>{{ form.lname(size="18") }}</h6> 
+              </div>
+              <div class="col-lg-2">
+                <h6>AeriesID</h6>
+                <h6>{{ form.aeriesid(size="8") }}</h6> 
+              </div>
+              <div class="col-lg-4">
+                <h6>{{form.submit(class_="btn btn-info")}}</h6> 
+              </div>
+              <div class="col-lg-8">
+                <small><em>If you enter and Aeries ID the other values will be ignored.</em></small>
+              </div>
+            </div>
+          </div>
+          <div class="col=5"></div>
+        </div>
+      <br>
+      {% if students %}
+      {% for student in students %}
+        <h3><a href="/profile/{{student.aeriesid}}">{{student.afname}} {{student.alname}} </a></h3><br>
+      {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+        <div class="container">
+            <div class="jumbotron text-center">
+                <h3>
+                    Note about <a href="/profile/{{student.aeriesid}}">{{student.afname}} 
+                    {% if student.ufname %}({{student.ufname}}){% endif %}
+                    {{student.alname}}</a>
+                </h3>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {% for field in form.errors %}
+                        {% for error in form.errors[field] %}
+                            <div class="alert alert-error">
+                                <strong>Error!</strong>{{field}}: {{error}}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+        
+                    <form method=post>
+                        {{ form.hidden_tag() }}
+                        Type: {{form.type_()}} <br><br>
+                        Date: {{form.date()}} <br><br>
+                        Note: {{form.content( cols="75")}} <br><br>
+                        {{form.submit}}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

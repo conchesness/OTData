@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Student Success Plan Settings</h1>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong> {{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <form method=post>
+            
+        <table class="table table-sm">
+            <tr><th>Time Frame</th><td>{{ form.hidden_tag() }} {{ form.timeframe() }}</td></tr>
+            <tr><td>Year Start</td><td>{{ form.yearbegin() }}</td></tr>
+            <tr><td>Summer Start</td><td>{{ form.summerbegin() }}</td></tr>
+            <tr><th>Semester</th><td></td></tr>
+            <tr><td>Semester One (Year) Start</td><td>See Above</td></tr>
+            <tr><td>Semester Two Start</td><td>{{ form.semestertwobegin() }}</td></tr>
+            <tr><td>Summer Start</td><td>See Above</td></tr>
+            <tr><th>Season</th><td></td></tr>
+            <tr><td>Fall (Year) Start</td><td>See Above</td></tr>
+            <tr><td>Winter Start</td><td>{{ form.seasonwinterbegin() }}</td></tr>
+            <tr><td>Spring Start</td><td>{{ form.seasonspringbegin() }}</td></tr>
+            <tr><td>Summer Start</td><td>See Above</td></tr>
+            <tr><td></td><td>{{ form.submit() }}</td></tr>
+
+        </table>
+        </form>
+
+    </div>
+{% endblock %}

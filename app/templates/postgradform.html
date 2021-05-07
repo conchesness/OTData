@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Post Grad Form</h1>
+
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong> {{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <div class="row" id="row1">
+        <form method=post>
+            {{ form.hidden_tag() }}
+            <table class="table table-sm">
+            <tr> <th>Type:<font color="red">*</font> <br>{{form.type_()}} </th> </tr>
+            <tr> 
+                <th>
+                    Organization:<font color="red">*</font><br>{{form.org()}} <br>  
+                    <small>Wright "Don't Know" if you don't know yet. </small>
+                </th> 
+            </tr>
+            <tr> <th>Link to Organization (incl "http://"):<br>{{form.link()}} </th> </tr>
+            <tr> <th>Year Started:<font color="red">*</font><br>{{form.yr_started()}} </th> </tr>
+            <tr> <th>Year Ended:<br>{{form.yr_ended()}} </th> </tr>
+            <tr> <th>Tell us about it!:</b><br>{{form.desc(cols="40")}} </th> </tr>
+            </table>
+
+            <table class="table table-sm">
+            <tr> 
+                <th>
+                    <h3>Other Info</h3>
+                    Address: <br> {{form.pg_st_address(cols="40")}} 
+                </th> 
+            </tr>
+            <tr> <th>City: <br> {{form.pg_city()}} </th> </tr>
+            <tr> <th>State: <br> {{form.pg_state()}} </th> </tr>
+            <tr> <th>Zipcode: <br> {{form.pg_zip()}} </th> </tr>
+            <tr> <th>Major:<br>{{form.major()}} </th> </tr>
+            <tr> <th>Have You Graduated?: {{form.graduated()}} </th> </tr>
+            <tr><td>{{form.submit()}}</td></tr>
+            </table>
+        </form>
+        </div> <!--Row-->
+    </div> <!--Container-->
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <h1>Student Record Edits</h1>
+        </div>
+        <div class="row">
+            {% for edit in edits %}
+                <div class="col-4">
+                    <a href="/profile/{{edit.aeriesid}}">
+                        {{edit.afname}} {% if edit.ufname %}({{edit.ufname}}){% endif %} {{edit.alname}}
+                    </a>
+                    {% if edit.adults %}
+                        (Adults)
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

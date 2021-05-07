@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Form Page Title</h1>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <form method=post>
+            {{ form.hidden_tag() }}
+            <table class="table">
+            <tr><th>Header 1</th><th>Header 2</th></tr>
+            <tr><td colspan="2">{{form.submit()}}</td></tr>
+            </table>
+        </form>
+        
+    </div>
+{% endblock %}

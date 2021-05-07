@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    {% for field in form.errors %}
+        {% for error in form.errors[field] %}
+            <div class="alert alert-error">
+                <strong>Error!</strong>{{field}}: {{error}}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <form method="post">
+        {{ form.hidden_tag() }}
+        {{form.image.label}}: {{form.image()}} <br>
+        {{form.submit()}}
+    </form>
+
+{% endblock %}

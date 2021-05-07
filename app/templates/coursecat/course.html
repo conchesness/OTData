@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+
+
+<a href="/cccourseedit/{{course.aeriesnum}}">Edit</a>
+{% if course.name %}
+    <h1>{{course.name}}</h1>
+{% endif %}
+<h3>{{course.aeriesnum}} {{course.aeriesname}}</h3>
+<em>This is from 2 years agao and is not accurate information
+It is only here for testing purposes.</em> <br>
+
+Department: {{course.dept}} <br>
+A-G: {{course.atog}} <br>
+    {% if sections %}
+        <table class="table">
+            <tr>
+                <th>Teacher</th>
+                <th>Room</th>
+                <th>Periods</th>
+            </tr>
+            {% for section in sections %}
+            <tr>
+                {% if section %}
+                    <td>
+                        <a href="/ccteachersections/{{section.teacher.id}}">{{section.teacher.afname}} {{section.teacher.alname}}</a> 
+                    </td>
+                    <td>{{section.teacher.troom}}</td>
+                    <td>
+                        <a href="/ccteacherclass/{{section.teacher.tnum}}/{{section.course.aeriesnum}}">{{section.pers}}</a>
+                    </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h3>No Sections</h3>
+    {% endif %}
+</div>
+
+{% endblock %}

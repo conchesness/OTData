@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container">
+        <h1>Logins</h1>
+        <table class="table">
+            <tr><th>Login</th><th>Grade</th><th>Name</th><th>Profile Edits</th><th>Adults?</th></tr>
+            {% for login in logins %}
+                <tr>
+                    <td>{{moment(login.lastlogin).calendar()}} </td>
+                    <td>{{login.grade}}</td>
+                    <td>
+                        <a href="/profile/{{login.aeriesid}}">
+                            {{login.afname}} {% if login.ufname %}({{login.ufname}}){% endif %} {{login.alname}}
+                        </a>
+                    </td>
+                    <td>
+                        {% if login.lastedited %}Yes{% else %}No{% endif %}
+                    </td>
+                    <td>
+                        {% if login.adults %} Yes {% else %}No{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% for login in logins %}
+            {{login.otemail}}, 
+        {% endfor %}
+    </div>
+{% endblock %}

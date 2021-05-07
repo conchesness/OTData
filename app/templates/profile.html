@@ -1,0 +1,549 @@
+
+
+{% extends "base.html" %}
+{% block body %}
+
+{% set threecolbreak="col-xl-4 mb-2" %}
+
+<div class="row" id="ProfileHead">
+    <h1>
+        {{currUser.role}}
+    </h1>
+    <div class="col-md-4">
+        {% if currUser.image %}
+            <img class="img-thumbnail" width = "200" src="data:image;base64,{{base64encode(currUser.image.read())}}">
+        {% else %}
+            <img class="img-thumbnail" width = "100" src="/static/oths.jpg">
+        {% endif %}
+    </div>
+    <div class="col-md-8">
+        <h2>
+            {{currUser.fname}} {{currUser.lname}}
+                
+            {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}
+        </h2>
+            <a href="/plan/{{currUser.gid}}" class="btn btn-primary btn-sm" role="button">Success Plan</a> 
+            <a href="#compborrow" class="btn btn-primary btn-sm" role="button">Computer Checkout Section</a> 
+        {% if currUser.lastlogin %}
+            <p class="mt-1 mb-0"><small>Last login: {{moment(currUser.lastlogin).calendar()}}</small></p>
+        {% endif %}
+        {% if currUser.lastedited %}
+        <span class="mt-0"><small>Last 3 Edits: 
+        {% for edit in currUser.lastedited %}
+            {% if loop.index < 4 %}
+            {{moment(edit[0]).calendar()}} by {{edit[1].afname}} {{edit[1].alname}}, 
+            {% endif %}
+        {% endfor %}</small></span> 
+    {% endif %}
+    </div>
+</div><!--ProfileHead-->
+<hr>
+
+<div id="Teacher">{% if currUser.role.lower() == "teacher" %}
+    <div class="row">
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Basic Info <a href="/editprofile"><img width="20" src="/static/edit.png"></a></a></h5>
+                    <h6 class="card-subtitle mb-2 text-muted">In Progress...</h6>
+                    <p class="card-text">
+                        email: {{currUser.otemail}} <br>
+                        mobile: {{formatphone(currUser.mobile)}} <br>
+                        Room: {{currUser.troom}} <br>
+                        Teacher Aeries Number: {{currUser.tnum}}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="mt-3">
+        My Groups
+        <a href="/newgroup"><img width="20" src="static/new.png"></a>
+    </h3>
+    <div class="row"> <!--Groups-->
+        <div class="col-12">
+            {% if groups %}
+            {% for group in groups %}
+            <a data-bs-toggle="collapse" href="#collapse{{loop.index}}" role="button" aria-expanded="false" aria-controls="collapse{{loop.index}}">
+                <img width="20" src="static/collapse.png">
+            </a>
+                {% set ns = namespace(emails="") %}
+                {% for stu in group.students %}
+                    {% set ns.emails = ns.emails + stu.otemail + ", " %}
+                {% endfor %}
+                <a data-toggle="tooltip" data-placement="top" title="Send a txt msg to everyone" href="/groupmsgto/{{group.id}}"><img width="20" src="static/txt.png"></a>
+                <a data-toggle="tooltip" data-placement="top" title="Delete this group" href="/deletegroup/{{group.id}}"><img width="20" src="static/delete.png"></a>
+                <a data-toggle="tooltip" data-placement="top" title="Get Parent Emails" href="/groupaddresses?emails={{ns.emails}}">P's</a> | 
+                <b>{{group.name}} ({{group.students|length}}):</b> {{group.desc}} <br>
+                <div class="collapse" id="collapse{{loop.index}}">
+                {{ns.emails}}
+                <br>
+            </div>
+            {% endfor %}
+            {% else %}
+            No Groups Yet. make some --> <a href="/newgroup"><img width="20" src="static/new.png"></a>
+            {% endif %}
+            <hr>
+        </div>
+    </div>
+
+</div>
+
+<div>{% elif currUser.role.lower() == "student" %}
+
+    <div class="row" id="StudentRowOne">
+        <div class="{{threecolbreak}}"> <!--Student's Custom Info-->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Preferred Info 
+                        {% if request.view_args['aeriesid'] %}
+                            <a href="/editprofile/{{request.view_args['aeriesid']}}">
+                        {% else %}
+                            <a href="/editprofile">
+                        {% endif %}
+                            <img width="20" src="/static/edit.png"></a>
+                        </a>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Edited by the user</h6>
+                    <p class="card-text">
+                        <b>Name:</b> {% if currUser.ufname %}{{currUser.ufname}} {% endif %} 
+                                {% if currUser.ulname %} {{currUser.ulname}} {% endif %} <br>
+                        <b>Pronouns:</b> {% if currUser.pronouns %} {{currUser.pronouns}} {% endif %} <br>
+                        {% if currUser.uethnicity %}
+                            <b>Ethnicity:</b> 
+                            {% for ethnicity in currUser.uethnicity %}
+                                {{ethnicity}}{% if loop.index < loop.length %}, {% endif %}
+                            {% endfor %} 
+                        {% endif %}<br>
+                        {% if currUser.uethnicityother %}
+                            <b>Ethnicity (non-OUSD Description):</b> {{currUser.uethnicityother}}<br>
+                        {% endif %} 
+                        {% if currUser.mobile %}
+                            <b>Mobile:</b> 
+                            <a href="/msg/{{currUser.aeriesid}}/{{currUser.mobile}}">{{formatphone(currUser.mobile)}}</a>
+                        {% endif %}<br>
+                        {% if currUser.altphone %}
+                            <b>Other Phone:</b> {% if currUser.altphone %}{{formatphone(currUser.altphone)}}{% endif %} <br>
+                        {% endif %}
+                        <b>Personal Email:</b> {% if currUser.personalemail %}{{currUser.personalemail}}{% endif %} <br>
+                        {% if currUser.ugender %}
+                            <b>Gender:</b> {% if currUser.ugender %}{{currUser.ugender}} {% endif %}<br>
+                        {% endif %}
+                        <b>Address:</b> <br>
+                        <span class="ms-2">
+                            {% if currUser.ustreet %}{{currUser.ustreet}}{% endif %} <br>
+                        </span>
+                        <span class="ms-2">
+                            {% if currUser.ucity %}{{currUser.ucity}}{% endif %} 
+                            {% if currUser.ustate %}{{currUser.ustate}}{% endif %}  
+                            {% if currUser.uzipcode %}{{currUser.uzipcode}}{% endif %} <br>
+                        </span>
+                        <b>T-Shirt Size:</b> {{currUser.shirtsize}} <br>
+                        <b>LinkedIn:</b> {{currUser.linkedin}}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="{{threecolbreak}}"> <!--Student's Aeries info Card 1-->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Aeries Info
+                        {% if session.role.lower() == "teacher" %}
+                        <a target='_blank' href='https://aeries.ousd.org/Helpers/SetStudentAndRedirect.aspx?ID={{currUser.aeriesid}}&DU=StudentProfile.aspx'>
+                            <small>&#128279;</small>
+                        </a>
+                        {% endif %}
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Cannot be editted</h6>
+                    <p class="card-text">
+                        <b>Aeries Name:</b> {{currUser.afname}} {{currUser.alname}} <br>
+                        <b>OUSD Email:</b> {{currUser.otemail}} <br>
+                        <b>Home Phone:</b> {{currUser.aphone}} <br>
+                        <b>Adults:</b>  {{currUser.aadults}} <br>
+                        <b>Adult 1 Phone:</b>  {{currUser.aadult1phone}} <br>
+                        <b>Adult 2 Phone:</b>  {{currUser.aadult2phone}} <br>
+                        <b>Adult Email:</b>  {{currUser.aadultemail}} <br>
+                        <b>Address:</b> <br>
+                        <span class="ms-2">{{currUser.astreet}} </span><br>
+                        <span class="ms-2">{{currUser.acity}} {{currUser.astate}}  {{currUser.azipcode}}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="{{threecolbreak}}"> <!--Student's Aeries Info Card 2-->
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">
+                        <b>AeriesID:</b> {{currUser.aeriesid}} <br>
+                        <b>Grade:</b> {{currUser.grade}} <br>
+                        <b>Gender:</b> {{currUser.agender}} <br>
+                        <b>Ethnicity</b> {{currUser.aethnicity}} <br>
+                        <b>Language Fluency:</b> {{currUser.langflu}} <br>
+                        {% if currUser.sped %}<b>SPED:</b> {{currUser.sped}}<br>{% endif %}
+                        <b>AGPA:</b> {{currUser.gpa}} <br>
+                        <b>Academy/House:</b> {{currUser.cohort}} <br>
+                        {% if session.isadmin %}
+                        {% if currUser.casemanager %}
+                            <b>Case Manager: </b>{{currUser.casemanager}}
+                        {% endif %}
+                        <hr>
+                        <form method=post>
+                            {{ form.hidden_tag() }}
+                            <b>Academy/House: </b>{{ form.cohort() }}<br>
+                            <b>Case Manager: </b>{{ form.casemanager }} <br>
+                            {{form.submit()}}
+                        </form>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div> <!--StudentRowOne-->
+
+    {% if currUser.grade >= 12 and (currUser.id|string == session['currUserId']|string or session['role'].lower() != "student") %}
+    <div class="row" id="PostGrad">
+        <h2>
+            Post Grad Info
+            <a href="/postgradnew/{{currUser.id}}"><img width="20" src="/static/new.png"></a>
+        </h2>
+        {% if currUser.postgrads %}
+        {% for postgrad in currUser.postgrads %}
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{postgrad.org}}
+                        {% if postgrad.link %}
+                            <a target="_blank" href="{{postgrad.link}}">&#128279;</a>
+                        {% endif %}
+                        <a href="/postgradedit/{{currUser.id}}/{{postgrad.oid}}"><img width="20" src="/static/edit.png"></a>
+                        <a href="/postgraddelete/{{currUser.id}}/{{postgrad.oid}}"><img width="20" src="/static/delete.png"></a>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{postgrad.type_}}</h6>
+                    <p class="card-text">
+                        {% if postgrad.type_ and postgrad.type_.lower() == "college" %}
+                            {% if postgrad.major %}
+                                Major: {{postgrad.major}} <br>
+                            {% endif %}
+                            {% if postgrad.graduated %}
+                                Graduated: {{postgrad.graduated}} <br>
+                            {% endif %}
+                        {% endif %}
+                        
+                        Year Started: {{postgrad.yr_started}} <br>
+                        {% if postgrad.yr_ended %}
+                            Year Ended: {{postgrad.yr_ended}} <br>
+                        {% endif %}
+                        {% if postgrad.desc %}
+                            {{postgrad.desc}} <br>
+                        {% endif %}
+                        {% if postgrad.pg_st_address %}
+                            {{postgrad.pg_st_address}} <br>
+                            {{postgrad.pg_city}} {{postgrad.pg_state}} {{postgrad.pg_zip}}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %} <!--not post grad records-->
+
+    </div>
+    {% endif %}
+
+    <div class="row mt-3 px-3" id="StudentClasses">
+        <div class="col">
+            <h2>Active Classes</h2>
+        <table class="table table-sm">
+            <tr>
+                <th>Status</th>
+                <th>Class</th>
+                <th>Teacher</th>
+                <th>
+                    Missing Assignments
+                    {% if currUser.gid == session.gid %}
+                        <br><small><a href="/missingassignmentsstu/{{currUser.gid}}">Update</a>
+                        <a href="/missingassignmentslist/{{currUser.aeriesid}}" class="missingUpdate">
+                            <!--list--></a></small>
+                        {% endif %}
+                </th>
+            </tr>
+            {% for class in currUser.gclasses %}
+            {% if class.gclassroom and class.status and class.status.lower() == "active" %}
+                <tr>
+                    <td>{{class.status}}</td>
+                    <td>
+                        <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a> <br>
+                    </td>
+                    <td>{% if class.gclassroom.gteacherdict %}{{class.gclassroom.gteacherdict.name.fullName}}{% endif %}</td>
+                    <td>
+                        {% if class.nummissing|int > 0 %}
+                            {% if currUser.gid == session.gid %}
+                                <a href="{{class.missinglink}}">
+                                    {{class.nummissing}} 
+                                </a>
+                            {% else %}
+                                {{class.nummissing}}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+        </div>
+    </div>
+
+    {% if checkins %} 
+    <div class="row mt-3 px-3" id="StudentCheckins">
+        <div class="col">
+            <h3>Check Ins (last 10)</h3>               
+            <table class="table">
+            <tr>
+                <th>Class</th><th>Date</th><th>Status (1-5)</th>
+            </tr>
+            {% for checkin in checkins | sort(attribute='createdate', reverse = True) %}
+                <tr>
+                <td>
+                    <a href="/deletecheckin/{{checkin.id}}"><img width="20 "src="/static/delete.png"></a>{{checkin.gclassname}}
+                </td>
+                <td>
+                    {{moment(checkin.createdate).calendar()}}
+                </td>
+                <td>
+                    {{checkin.status}} - {{checkin.desc}}
+                </td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% endif %}<!-- CheckIns -->
+
+    <div class="row mt-3" id="StudentAdults">
+        <h2>
+            Student's Adults  
+            <a href="/addadult/{{currUser.aeriesid}}"><img width="20" src="/static/new.png"></a> <br>
+        </h2>
+        {% if not currUser.adults %}
+            <p><small>
+                <span class="text-primary"> Even if they are already in Aeries, please <a href="/addadult/{{currUser.aeriesid}}">add</a>  
+                <b>{{currUser.aadults}}</b> and any other adults here so that we have the correct information. 
+                You can designate any/all of these adults as "preferred" and add notes about each of them.</span>
+            </small></p>
+        {% endif %}
+        {% if currUser.adults %}
+        {% for adult in currUser.adults %}
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{adult.fname}} {{adult.lname}}
+                        <a href="/editadult/{{currUser.aeriesid}}/{{adult.oid}}"><img width="20" src="/static/edit.png"></a>
+                        <a href="/deleteadult/{{currUser.aeriesid}}/{{adult.oid}}"><img width="20" src="/static/delete.png"></a>
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{adult.relation}}</h6>
+                    <p class="card-text">
+                            {% if adult.mobile %}
+                                <b>Mobile:</b> <a href="/msg/{{currUser.aeriesid}}/{{adult.mobile}}">{{formatphone(adult.mobile)}}</a><br>
+                            {% endif %}
+                        {% if adult.altphone %}
+                            <b>Alt Phone:</b> {{formatphone(adult.altphone)}}<br>
+                        {% endif %}
+                        {% if adult.email %}
+                            <b>Email:</b> {{adult.email}} <br>
+                        {% endif %}
+                        {% if adult.altemail %}
+                            <b>Alt Email:</b> {{adult.altemail}} <br>
+                        {% endif %}
+                    </tr>
+                    {% if adult.street %}
+                        <br><b>Address:</b>
+                        {{adult.street}} <br>
+                        {{adult.city}}
+                        {{adult.state}}
+                        {{adult.zipcode}} <br>
+                    {% endif %}
+                    {% if adult.notes %}
+                        <b>Notes:</b> <br>
+                        <span class="ms-2">{{adult.notes}}</span> <br>
+                    {% endif %}
+                    {% if adult.primarylang %}
+                        <b>Primary Language:</b> {{adult.primarylang}} <br>
+                    {% endif %}
+                    {% if adult.needstranslation %}
+                        <b>Needs Translation:</b> {{adult.needstranslation}} <br>
+                    {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div><!--StudentAdults-->
+    
+    <div class="row mt-3" id="Activities">
+        <h2>
+            Activities
+            <a data-toggle="tooltip" data-placement="top" title="Send an email" href="/sendstudentemail/{{currUser.aeriesid}}"><img width="40" src="/static/email.png"></a>
+            {% if not session.role.lower() == 'student' %}
+                <a data-toggle="tooltip" data-placement="top" title="Write a Note" href="/studentnote/{{currUser.aeriesid}}"><img width="35" src="/static/note.png"></a>
+                <a href="/msg/{{currUser.aeriesid}}"><img data-toggle="tooltip" data-placement="top" title="Send a Txt" width="35" src="/static/txt.png"></a>
+            {% endif %}
+        </h2>
+        <!--Notes-->
+        {% if currUser.notes and not session['role'].lower() == "student"%}
+        {% for note in currUser.notes|sort(attribute='date') %}
+            <div class="{{threecolbreak}}">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Note: {{note.date.strftime('%m-%d-%Y')}}                         
+                            {% if session.isadmin %}
+                                <a href="/deletenote/{{currUser.aeriesid}}/{{note.oid}}"><img width="30" src="/static/delete.png"></a>
+                            {% endif %}
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Not Visible to Student</h6>
+                        <p class="card-text">
+                            <b>Author:</b> {{note.author.afname}} {{note.author.alname}} <br>
+                            <b>Type:</b> {{note.type_}} <br>
+                            {{note.content}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% endif %}
+        <!--Communications-->
+        {% if currUser.communications %}
+        {% for comm in currUser.communications|sort(attribute='date') %}
+            {% if (not session.role.lower() == "student") or (session.role.lower() == "student" and not comm.confidential) %}
+                <div class="{{threecolbreak}}">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{comm.type_}}: {{moment(comm.date).calendar()}}</h5>
+                            {% if comm.confidential %}
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                        Not Visible to student
+                                </h6>
+                            {% endif %}
+                            <p class="card-text">
+                                <b>From:</b> {{comm.fromwho.afname}} {{comm.fromwho.alname}} ({{comm.fromwho.role}}) <br>
+                                <b>To:</b> {{comm.to}} <br>
+                                {% if comm.body or comm.subject %}
+                                    {% if session.isadmin %}
+                                        <a href="/deletecommunication/{{currUser.aeriesid}}/{{comm.oid}}"><img width="35" src="/static/delete.png"></a>
+                                    {% endif %}
+                                        {% if comm.subject %}{{comm.subject}}<br>{% endif %}
+                                        {% if comm.body %}{{comm.body}}{% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+    </div><!--Activities-->
+
+    <a id="compborrow"></a>
+    <h2>Computer Checkout <a href="/compborrow/{{currUser.aeriesid}}"><img width="35" src="/static/new.png"></a></h2>
+     
+    <div class="row mt-3" id="BorrowedComputer">
+        {% if currUser.compequiptype %}
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Borrowed Computer 
+                        <a href="/compborrow/{{currUser.aeriesid}}"><img width="30" src="/static/edit.png"></a> 
+                        
+                        <a href="/compdelete/{{currUser.aeriesid}}"><img width="30" src="/static/delete.png"></a> 
+                    </h5>
+                    <p class="card-text">
+                        {% if currUser.compequiptype %}Type: {{currUser.compequiptype}} <br> {%endif%}
+                        {% if currUser.compidnum %}ID#: {{currUser.compidnum}} <br> {%endif%}
+                        {% if currUser.compstickernum %}Sticker#: {{currUser.compstickernum}} <br> {%endif%}
+                        {% if currUser.compdateout %}Checked out: {{currUser.compdateout}} <br> {%endif%}
+                        {% if currUser.compdatereturned %}Returned{{currUser.compdatereturned}} <br> {%endif%}
+                        {% if currUser.compstatus %}Status: {{currUser.compstatus}} <br> {%endif%}
+                        {% if currUser.compstatusdesc %}Description: {{currUser.compstatusdesc}}{%endif%}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <hr>
+
+</div>{% endif %} <!--End student-->
+
+<div class="mt-3" id="debug">   
+    <a class="btn-sm btn-primary" data-bs-toggle="collapse" href="#collapseDeBug" role="button" aria-expanded="false" aria-controls="collapseDebug">
+        Show/Hide DeBug Values
+    </a>
+    <div class="container collapse" id="collapseDeBug">
+        {{today}} <br>
+        {{moment(today).calendar()}}
+        <h3>The User Object from this site</h3>
+        <table class="table">
+        {% for item in currUser %}
+        <tr>
+            <td>{{item}}</td> <td> {{ currUser[item] }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+
+        <h3>The Data Object from Google</h3>
+        <table class="table">
+        {% for item in data %}
+        <tr>
+            <td>{{ item }}</td> <td>{{data[item]}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+
+        <h3>The Session Object</h3>
+        <table class="table table=sm">
+        {% for item in session %}
+        <tr>
+            <td>{{ item }}</td> <td>{{session[item]}}</td>
+        </tr>
+        {% endfor %}
+        </table>
+
+        <h3>Request Object</h3>
+        user_agent: {{ request.user_agent }} <br>
+        host: {{ request.host }} <br>
+        host_url: {{ request.host_url }} <br>
+        is_secure: {{ request.is_secure }} <br>
+        scheme: {{ request.scheme }} <br>
+        values: {{ request.values }} <br>
+        view_args: {{ request.view_args }} <br>
+        headers: {{request.headers}} <br>
+        remote_addr: {{request.headers.get('X-Forwarded-For', request.remote_addr)}}
+        <hr>
+        <b>request.environ</b> <br>
+        {% for item in request.environ %}
+            <u>{{ item }}:</u> {{request.environ[item]}} <br>
+        {% endfor %}
+        
+    </div>
+
+</div> <!--Debug-->
+
+{% endblock %}
+

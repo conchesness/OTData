@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container py-3">
+<div class="row">  
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Ad Hoc Groups <a href="/profile" class="card-link">&#128279;</a></h5>
+                <p class="card-text">Create groups of students for communications.  You can send them each the same txt msg.  You can mass email them and.or their parents.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">All Txt Msgs <a href="/msgs" class="card-link">&#128279;</a>
+                </h5>
+                <p class="card-text">Get all the text messages that have been sent or received. By default it will
+                    give you the last 7 days.  You can change the url to get any number of days. ie /msgs/14 will give you 
+                    14 days.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Txt Msg Replies <a href="/msgs/replies" class="card-link">&#128279;</a></h5>
+                <p class="card-text">Get all the replies to recent text messages. By default it will
+                    give you the last 7 days.  You can change the url to get any number of days. ie /msgs/14 will give you 
+                    14 days.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Undelivered Msgs <a href="/msgs/undelivered" class="card-link">&#128279;</a></h5>
+                <p class="card-text">List any messages that were sent but did not get delivered.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Get Parents <a href="/groupaddresses" class="card-link">&#128279;</a>
+                </h5>
+                <p class="card-text">Paste a comma seperated list of student emails to retrieve a list of all of the parents emails.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Borrowed Computers <a href="/complistall" class="card-link">&#128279;</a>
+                </h5>
+                <p class="card-text">List of students who have borrowed a computer.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Computer Science Mail Merge <a href="/mmcompsci" class="card-link">&#128279;</a>
+                </h5>
+                <p class="card-text">list of names and email addresses for all students 
+                    and their parents in Computer Science comma seperated by row for pasting
+                    in to a spreadsheet to do a mail merge.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Equity/Demographics <a href="/equity/Schoolwide" class="card-link">&#128279;</a>
+                </h5>
+                <p class="card-text">A series of graphs for each academy and 9th grade focused on performance by ethnicity cohort.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">CompSci Seniors with no PostGrad Plans <a href="/pglist" class="card-link">&#128279;</a>
+                </h5>
+                <p class="card-text">List of all CompSci Academy seniors with no logged Post Grad plans.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col pb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">All Success Plans <a href="/plans" class="card-link">&#128279;</a>
+                </h5>
+                <p class="card-text">List of all Success Plans for OT Community.</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+{% endblock %}

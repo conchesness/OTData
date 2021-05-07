@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <table class="table">
+        <tr>
+          <h5><th>Student</th><th>Message</th></h5>
+        </tr>
+        {% for msg in msgs %}
+        <tr>
+          <td nowrap>
+            <small>{{moment(msg.datetimesent).calendar()}}</small>
+            <h4><a href="/msg/{{msg.student.aeriesid}}">{{msg.student.afname}} {{msg.student.alname}}</a></h4>
+          </td>
+          <td>
+            <b>To:</b> {{msg.to}} <br>
+            <b>From:</b> {{msg.from_}} <br>
+            {{msg.body}}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

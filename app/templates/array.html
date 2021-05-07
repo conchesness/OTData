@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+    {% if nested %}
+        {% for nest in array %} 
+            {% for item in nest %}
+                {{item}},
+            {% endfor %}
+            <br>
+        {% endfor %}
+
+    {% else %}
+
+        {% for item in array %}
+            {{item}},
+        {% endfor %}
+
+    {% endif %}
+</div>
+
+
+{% endblock %}

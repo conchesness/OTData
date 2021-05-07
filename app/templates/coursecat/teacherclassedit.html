@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+
+{% if section.course.name %}
+    <h1>{{section.course.name}}</h1>
+{% else %}
+    <h1>{{section.course.aeriesname}}</h1>
+{% endif %}
+<h3>{{section.teacher.afname}} {{section.teacher.alname}} room: {{section.teacher.troom}}</h3>
+
+{% for field in form.errors %}
+    {% for error in form.errors[field] %}
+        <div class="alert alert-error">
+            <strong>Error!</strong>{{field}}: {{error}}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<form method=post>
+    {{ form.hidden_tag() }} 
+    Pathway: {{form.pathway()}} <br>
+    <small>Selecting a pathway here means that the class is managed by a pathway and students outside the pathway need permission to enroll</small> <br>
+    Prerequisite: {{form.prereq()}} <br>
+    <small>List any classes that a student must take before enrolling in this class.</small> <br>
+    Year: {{form.yearinschool()}} <br>
+    <small>If this class is restricted to specific years in school please select those here.</small> <br>
+    Link: {{form.url()}} <br>
+    <small>Please provide a link to a Syllabus or a course website if you have one.</small>
+    Description: <br>
+    {{form.desc()}} <br>
+    {{form.submit()}} <br>
+</form>
+
+
+</div>
+
+{% endblock %}

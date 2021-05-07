@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="row">
+
+
+<div class="col-1"></div>
+<div class="col-10">
+    <div class="row position-fixed">
+        <div class="col bg-white">
+            <h3>Cohort:&nbsp;
+            <select name="forma" onchange="location = this.value;">
+                {% for dir in rootDirs %}
+                    {% if currdir == dir %}
+                        <option value="/equity/{{dir}}" selected>{{dir}}</option>
+                    {% else %}
+                        <option value="/equity/{{dir}}">{{dir}}</option> 
+                    {% endif %}
+                {% endfor %}
+            </select>
+            </h3>
+        </div>
+    </div>
+    <br><br><br>
+    {% if currdir %}
+        {% set imgdir = root+'/'+currdir %}
+        {% for image in charts[imgdir] %}
+            <h2> {{image}} </h2>>
+            <img class="equity" src="{{root[5:]}}/{{currdir}}/{{image}}">
+            {% if image == "zipcodeCount.png" %}
+                <img class="equity" src="{{root[5:]}}/zipcodes.PNG">
+            {% endif %}
+            <hr>
+        {% endfor %}
+    {% endif %}
+
+</div>
+<div class="col-1"></div>
+</div>
+{% endblock %}

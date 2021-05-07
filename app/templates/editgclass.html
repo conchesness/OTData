@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+<br> <br>
+    {% for field in form.errors %}
+        {% for error in form.errors[field] %}
+            <div class="alert alert-error">
+                <strong>Error!</strong>{{field}}: {{error}}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <h1>Edit the Classname for {{editGClass.gclassroom.gclassdict.name}}</h1>
+    <em>This edit can only be seen by you and only on this site</em> <br> <br>
+    Instructions: <br>
+    <ul>
+        <li>Leave the fiield blank to revert to the original name: {{editGClass.gclassroom.gclassdict.name}}</li>
+        <li>What ever you type in this field will appear BEFORE {{editGClass.gclassroom.gclassdict.name}}</li>
+        <li>What ever you type here will impact the sort order of your classes</li>
+        <li>If you add a '~' it will force it to the end of the list and if you add a '!' it will be at the beginning of the list.</li>
+    </ul>
+    <br>
+    <form method=post>
+        {{ form.hidden_tag() }} 
+        <b>Prefix:</b> <br>
+        {{ form.classname(size="20") }} 
+        {{ form.status() }}
+        {{form.submit()}}
+    </form>
+    <br>
+    <table> 
+        <td><a href="/deletegclass/{{editGClass.gclassid}}" class="btn btn-danger btn-sm" role="button">Delete this class</a></td>
+        <td><small><--This will only remove the class from OTData. It will not delete the class from Google Classroom. <br><--If the class 
+            still exists in Google Classroom it will re-appear when you update your classes.</small></td>
+    </table>
+</div>
+{% endblock %}

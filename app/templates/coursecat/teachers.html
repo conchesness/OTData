@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container">
+<h1>Teachers</h1>
+<h3>This is from 2 years agao and is not accurate information</h3>
+It is only here for testing purposes <br>
+
+    {% if teachers %}
+        <table class="table">
+            <tr>
+                <th>Department (<a href="/ccteachers/tdept,alname,afname">sort</a>)</th>
+                <th>Teacher (<a href="/ccteachers/alname,afname">sort</a>)</th>
+                <th>Room</th>
+            </tr>
+            {% for teacher in teachers | sort(attribute=sort)  %}
+            <tr>
+                <td>{{teacher.tdept}}</td>
+                <td><a href="/ccteachersections/{{teacher.id}}">{{teacher.afname}} {{teacher.alname}}</a></td>
+                <td>{{teacher.troom}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h3>No Teacehrs</h3>
+    {% endif %}
+</div>
+
+{% endblock %}

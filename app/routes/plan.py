@@ -67,6 +67,8 @@ def plan(gid=None):
         for checkin in checkins:
             lastCheckin = checkin
             break
+    else:
+        lastCheckin = None
 
     settings=PlanSettings.objects.first()
     status = 0

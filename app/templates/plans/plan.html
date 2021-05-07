@@ -108,7 +108,9 @@
             {% endfor %}
             <div class="col-12">
                 <div class="row">
+                    {% if checkins|length > 0 %}
                     <div class="col-12"><h5>Checkins</h5></div>
+                    {% endif %}
                     
                 {% for checkin in checkins %}
                     <div class="col">

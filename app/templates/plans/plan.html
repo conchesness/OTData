@@ -72,8 +72,6 @@
                     <em>An ideal outcome is something that will result from practice, effort and attention to <strong>{{theme.name}}</strong> over the course of a <b>{{theme.timeframe}}</b>.</em>
                     
                 </div>
- {{ moment().diff(lastCheckin.createdate) }}
-
                 {% if theme.idealoutcomes %}
                     {% for idealoutcome in theme.idealoutcomes %}
                         <div class="col-md-4 ms-3 ps-5">
@@ -81,9 +79,14 @@
                             {% if plan.student.gid == session.gid or session.isadmin %}
                             <br>
 
-                            <a data-toggle="tooltip" data-placement="top" title="Checkin" href="/plancheckin/{{plan.student.gid}}/{{theme.oid}}/{{idealoutcome.oid}}">
+                            <a class='plancheckin' data-toggle="tooltip" data-placement="top" title="Checkin" href="/plancheckin/{{plan.student.gid}}/{{theme.oid}}/{{idealoutcome.oid}}">
                                 <img width="30" src="/static/checkin.png">
                             </a>
+
+                            <a class='plancheckinoff' data-toggle="tooltip" data-placement="top" title="You have already checkedin today. You can delete or edit today's checkin.">
+                                <img width="20" src="/static/checkinoff.png">
+                            </a>
+
                             <a data-toggle="tooltip" data-placement="top" title="Edit" href="/planidealoutcomeedit/{{plan.id}}/{{theme.oid}}/{{idealoutcome.oid}}"><img width="30" src="/static/edit.png"></a>
                             <a data-toggle="tooltip" data-placement="top" title="Delete" href="/planidealoutcomedelete/{{plan.id}}/{{theme.oid}}/{{idealoutcome.oid}}"><img width="30" src="/static/delete.png"></a>
                             {% endif %}
@@ -148,5 +151,18 @@
 </div>
 
 {% include 'plans/planscripts.html' %}
+
+<script type="text/javascript">
+    var yesterday = moment().subtract(1, 'days')
+    var lastCheckin = moment('{{lastCheckin.createdate}}')
+    var fromyesterday = yesterday.diff(lastCheckin)
+    if (fromyesterday <= 0) {
+        $('.plancheckin').hide();
+        $('.plancheckinoff').show();
+    } else {
+        $('.plancheckin').show();
+        $('.plancheckinoff').hide();        
+    }
+</script>
 
 {% endblock %}

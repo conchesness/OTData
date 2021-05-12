@@ -34,6 +34,7 @@
                             </td>
                         </tr>
                         <tr><td>Your Mobile:</td><td>{{ form.mobile() }}</td></tr>
+                        <tr><td>Shirt Size</td> <td>{{form.shirtsize()}}</td> </tr>
                         {% if session.role.lower() == "student" or (request.view_args['aeriesid'] and session['role'].lower() != 'student') %}
                             <tr><td>Other Phone:</td><td>{{ form.altphone() }}</td></tr>
                             <tr><td colspan=2>Personal Email:<br>{{form.personalemail()}}</td></tr>
@@ -41,7 +42,6 @@
                             <tr><td>City</td><td>State &nbsp;  &nbsp;  &nbsp; Zip</td></tr>
                             <tr><td>{{form.ucity()}}</td><td>{{form.ustate(value="CA", size="2")}} {{form.uzipcode(size="5")}}</td></tr>
                             <tr><td colspan="2">How do you describe your gender?:<br>{{form.ugender(cols="75")}}</td></tr>
-                            <tr><td>Shirt Size</td> <td>{{form.shirtsize()}}</td> </tr>
                             <tr><td>linkedin</td> <td>{{form.linkedin()}}<br><small>Must begin with https://</small></td> </tr>
                         {% endif %}
                         <tr><td colspan="2">{{form.submit()}}</td></tr>

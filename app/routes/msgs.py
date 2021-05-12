@@ -41,12 +41,19 @@ def txtGroupFunc(groupid,msg):
     client = Client(account_sid, auth_token)
 
     for phnum in phnums:
-        client.messages.create(
-                body=msg,
-                from_='+15108043552',
-                status_callback='https://otdata.hsoakland.tech/msgstatus',
-                to=f"+1{phnum}"
-            )
+        try:
+            client.messages.create(
+                    body=msg,
+                    from_='+15108043552',
+                    status_callback='https://otdata.hsoakland.tech/msgstatus',
+                    to=f"+1{phnum}"
+                )
+        except Exception as error:
+            flash(f"Got this error: {error} when trying to send a msg to +1{phnum}")
+            for stu in group.students:
+                if stu.mobile == phnum:
+                    flash(f"The student with this number is {stu.fname} {stu.lname}")
+                    break
 
     return 
 
@@ -318,8 +325,10 @@ def addstudtomsgs():
             aquery = Q(aphone = aMatchPhone) | Q(adult1phone = aMatchPhone) | Q(adult2phone = aMatchPhone)
             try:
                 astud = User.objects.get_or_404(aquery)
-                msg.update(aeries = astud)
             except Exception as error:
-                flash(f'error line 263 msgs.py {error}')
+                flash(f'error line 323 msgs.py {error}')
+            else:
+                msg.update(aeries = astud)
+
     return redirect('/')
     

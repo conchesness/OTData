@@ -284,7 +284,7 @@ class GoogleClassroom(Document):
     aeriesname = StringField()
     pers = ListField()
 
-# TODO I don't think I used this either.  It is left over from when I was going to import Aeries classes
+# used in CourseCatalog
 class Course(Document):
     aeriesnum = StringField(unique=True)
     aeriesname = StringField()
@@ -295,7 +295,7 @@ class Course(Document):
     yearinschool = StringField()
     pathway = StringField()
 
-# TODO I don't think I used this either.  It is left over from when I was going to import Aeries classes
+# used in CourseCatalog
 class Section(Document):
     course = ReferenceField('Course')
     teacher = ReferenceField('User', unique_with='course')

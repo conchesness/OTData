@@ -2,7 +2,7 @@ from app.routes.coursecat import course
 from app import app
 from .scopes import SCOPES
 from flask import render_template, redirect, url_for, request, session, flash, Markup
-from app.classes.data import User, Config, CheckIn, Post, Group
+from app.classes.data import User, CheckIn, Post, Group, Section
 from app.classes.forms import UserForm, AdultForm, CohortForm, PostGradForm
 from .credentials import GOOGLE_CLIENT_CONFIG
 from mongoengine import Q
@@ -229,6 +229,7 @@ def formatphone(phnum):
     return phnum
 
 #get the profile page for a designated or the logged in user. Can use either gid or aeriesid.
+#TODO change this to GID instead of AeriesId so Teacher profiles can be accessed
 @app.route('/profile/<aeriesid>', methods=['GET', 'POST'])
 @app.route('/profile', methods=['GET', 'POST'])
 def profile(aeriesid=None):
@@ -306,7 +307,12 @@ def profile(aeriesid=None):
     else:
         groups=None
 
-    return render_template("profile.html",groups=groups,currUser=targetUser, data=session['gdata'], form=form, today=dttoday, checkins=checkins)
+    if targetUser.role.lower() == "teacher":
+        sections = Section.objects(teacher = targetUser)
+    else:
+        sections = None
+
+    return render_template("profile.html",groups=groups,currUser=targetUser, data=session['gdata'], form=form, today=dttoday, checkins=checkins, sections=sections)
 
 # Function to record edits to user and related adult records
 def userModified(editUser):

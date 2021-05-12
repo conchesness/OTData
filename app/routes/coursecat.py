@@ -13,7 +13,7 @@ def teachers(sort="lname,fname"):
     teachers=User.objects(role__iexact="teacher")
     return render_template("coursecat/teachers.html",teachers=teachers, sort=sort)
 
-@app.route("/ccteachersections/<teacherid>")
+@app.route("/sections/<teacherid>")
 def teachersections(teacherid):
     teacher = User.objects.get(pk=teacherid)
     sections = Section.objects(teacher=teacher)

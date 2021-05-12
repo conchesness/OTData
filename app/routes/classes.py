@@ -13,7 +13,7 @@ def addgclass(gclassid,gid,gclassname):
 
     try:
         stu = User.objects.get(gid=gid)
-    except Exception as error:
+    except :
         flash(f"Got an error: {error}")
         flash("I can't find this user in OTData.")
         return redirect(url_for('roster',gclassid=gclassid, gclassname=gclassname))

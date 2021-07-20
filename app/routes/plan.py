@@ -161,7 +161,7 @@ def planthemeedit(planid,planthemeid):
 
     canEdit = checkPlanEditPriv(editPlan.student.gid)
     if not canEdit:
-        return redirect(url_for("profile"))
+        return redirect(request.url)
 
     try:
         editTheme = editPlan.themes.get(oid=planthemeid)
@@ -194,10 +194,16 @@ def planthemeedit(planid,planthemeid):
 @app.route('/planthemedelete/<planid>/<planthemeid>')
 def planthemedelete(planid,planthemeid):
     editPlan = Plan.objects.get(pk=planid)
+    theme = editPlan.themes.get(oid=planthemeid)
+
+    if len(theme.idealoutcomes) > 0:
+        flash("You can't delete a Theme while it has Ideal Outcomes. Delete the Ideal Outcomes first.")
+        return redirect(url_for('plan',gid=editPlan.student.gid))
 
     canEdit = checkPlanEditPriv(editPlan.student.gid)
     if not canEdit:
-        return redirect(url_for("profile"))
+        flash("You don't have necessary permisions to delete this Theme.")
+        return redirect(url_for('plan',gid=editPlan.student.gid))
 
     editPlan.themes.filter(oid=planthemeid).delete()
     editPlan.save()

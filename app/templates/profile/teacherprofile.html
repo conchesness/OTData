@@ -1,0 +1,62 @@
+<div id="Teacher">
+    <div class="row">
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Basic Info <a href="/editprofile"><img width="20" src="/static/edit.png"></a></a></h5>
+                    <h6 class="card-subtitle mb-2 text-muted">In Progress...</h6>
+                    <p class="card-text">
+                        email: {{currUser.otemail}} <br>
+                        mobile: {{formatphone(currUser.mobile)}} <br>
+                        Room: {{currUser.troom}} <br>
+                        Teacher Aeries Number: {{currUser.tnum}} <br>
+                        T-Shirt Size: {{currUser.shirtsize}} <br>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12"><h3>Sections</h3></div>
+        {% for section in sections %}
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    {% if section.course %}
+                        {{section.course.name}} <br>
+                        {{section.pers}}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <h3 class="mt-3">
+        My Groups
+        <a href="/newgroup"><img width="20" src="static/new.png"></a>
+    </h3>
+    <div class="row"> <!--Groups-->
+        <div class="col-12">
+            {% if groups %}
+                {% for group in groups %}
+                <a data-bs-toggle="collapse" href="#collapse{{loop.index}}" role="button" aria-expanded="false" aria-controls="collapse{{loop.index}}">
+                    <img width="20" src="static/collapse.png">
+                </a>
+                    {% set ns = namespace(emails="") %}
+                    {% for stu in group.students %}
+                        {% set ns.emails = ns.emails + stu.otemail + ", " %}
+                    {% endfor %}
+                    <a data-toggle="tooltip" data-placement="top" title="Send a txt msg to everyone" href="/groupmsgto/{{group.id}}"><img width="20" src="static/txt.png"></a>
+                    <a data-toggle="tooltip" data-placement="top" title="Delete this group" href="/deletegroup/{{group.id}}"><img width="20" src="static/delete.png"></a>
+                    <a data-toggle="tooltip" data-placement="top" title="Get Parent Emails" href="/groupaddresses?emails={{ns.emails}}">P's</a> | 
+                    <b>{{group.name}} ({{group.students|length}}):</b> {{group.desc}} <br>
+                    <div class="collapse" id="collapse{{loop.index}}">
+                    {{ns.emails}}
+                    <br>
+                </div>
+                {% endfor %}
+            {% else %}
+                No Groups Yet. make some --> <a href="/newgroup"><img width="20" src="static/new.png"></a>
+            {% endif %}
+            <hr>
+        </div>
+    </div>
+</div>

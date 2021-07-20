@@ -22,8 +22,10 @@
                 
             {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}
         </h2>
+        {% if session.audience.lower() == "ot" %}
             <a href="/plan/{{currUser.gid}}" class="btn btn-primary btn-sm" role="button">Success Plan</a> 
             <a href="#compborrow" class="btn btn-primary btn-sm" role="button">Computer Checkout Section</a> 
+        {% endif %}
         {% if currUser.lastlogin %}
             <p class="mt-1 mb-0"><small>Last login: {{moment(currUser.lastlogin).calendar()}}</small></p>
         {% endif %}
@@ -37,71 +39,12 @@
     {% endif %}
     </div>
 </div><!--ProfileHead-->
+
 <hr>
-
-<div id="Teacher">{% if currUser.role.lower() == "teacher" %}
-    <div class="row">
-        <div class="{{threecolbreak}}">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Basic Info <a href="/editprofile"><img width="20" src="/static/edit.png"></a></a></h5>
-                    <h6 class="card-subtitle mb-2 text-muted">In Progress...</h6>
-                    <p class="card-text">
-                        email: {{currUser.otemail}} <br>
-                        mobile: {{formatphone(currUser.mobile)}} <br>
-                        Room: {{currUser.troom}} <br>
-                        Teacher Aeries Number: {{currUser.tnum}} <br>
-                        T-Shirt Size: {{currUser.shirtsize}} <br>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12"><h3>Sections</h3></div>
-        {% for section in sections %}
-        <div class="{{threecolbreak}}">
-            <div class="card">
-                <div class="card-body">
-                    {% if section.course %}
-                    {{section.course.name}} <br>
-                    {{section.pers}}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    <h3 class="mt-3">
-        My Groups
-        <a href="/newgroup"><img width="20" src="static/new.png"></a>
-    </h3>
-    <div class="row"> <!--Groups-->
-        <div class="col-12">
-            {% if groups %}
-            {% for group in groups %}
-            <a data-bs-toggle="collapse" href="#collapse{{loop.index}}" role="button" aria-expanded="false" aria-controls="collapse{{loop.index}}">
-                <img width="20" src="static/collapse.png">
-            </a>
-                {% set ns = namespace(emails="") %}
-                {% for stu in group.students %}
-                    {% set ns.emails = ns.emails + stu.otemail + ", " %}
-                {% endfor %}
-                <a data-toggle="tooltip" data-placement="top" title="Send a txt msg to everyone" href="/groupmsgto/{{group.id}}"><img width="20" src="static/txt.png"></a>
-                <a data-toggle="tooltip" data-placement="top" title="Delete this group" href="/deletegroup/{{group.id}}"><img width="20" src="static/delete.png"></a>
-                <a data-toggle="tooltip" data-placement="top" title="Get Parent Emails" href="/groupaddresses?emails={{ns.emails}}">P's</a> | 
-                <b>{{group.name}} ({{group.students|length}}):</b> {{group.desc}} <br>
-                <div class="collapse" id="collapse{{loop.index}}">
-                {{ns.emails}}
-                <br>
-            </div>
-            {% endfor %}
-            {% else %}
-            No Groups Yet. make some --> <a href="/newgroup"><img width="20" src="static/new.png"></a>
-            {% endif %}
-            <hr>
-        </div>
-    </div>
-
-</div>
+{% if session.audience.lower() == "community" %}
+    {% include 'profile/communityprofile.html' %}
+{% elif currUser.role.lower() == "teacher" %}
+    {% include 'profile/teacherprofile.html' %}
 
 <div>{% elif currUser.role.lower() == "student" %}
 
@@ -348,6 +291,23 @@
                 You can designate any/all of these adults as "preferred" and add notes about each of them.</span>
             </small></p>
         {% endif %}
+
+        {% if currUser.this_students_parents %}
+            <div class="{{threecolbreak}}">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Adults with Accounts on OTData
+                            <p class="card-text">
+                            {% for parent in currUser.this_students_parents %}
+                                {{parent.fname}} {{parent.lname}} {{parent.otemail}} <br>
+                            {% endfor %}
+                            </p>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
         {% if currUser.adults %}
         {% for adult in currUser.adults %}
         <div class="{{threecolbreak}}">

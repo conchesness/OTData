@@ -302,7 +302,7 @@ def getCourseWork(gclassid):
     gclassroom.update(courseworkdict = assignmentsAll)
     return True
 
-def getmissing(gid, aeriesid, gclassid, gclassname ):
+def getmissing(gid, aeriesid, gclassid):
     missStudSubsAll = []
     pageToken=None 
 
@@ -316,17 +316,13 @@ def getmissing(gid, aeriesid, gclassid, gclassname ):
 
     while True:
         try:
-            # TODO get ALL submissions and then find the missing ones.
-            # missing is: Today is past due date, grade is blank, 
             missStudSubs = classroom_service.courses().courseWork().studentSubmissions().list(
-                    userId = gid,
-                    courseId=gclassid,
-                    courseWorkId='-',
-                    late = "LATE_ONLY",
-                    states = ["NEW", "CREATED"],
-                    pageToken=pageToken,
-                    ).execute()
-
+                userId = gid,
+                courseId=gclassid,
+                courseWorkId='-',
+                late = "LATE_ONLY",
+                pageToken=pageToken
+                ).execute()
         except RefreshError:
             return "AUTHORIZE"
 
@@ -349,12 +345,35 @@ def getmissing(gid, aeriesid, gclassid, gclassname ):
                 return "LOGIN"
             elif errorDict['error']['status'] == "PERMISSION_DENIED":
                 print(f"Got Error: {errorDict}")
-                flash(f"You do not have permission to access {gclassname} for this student.")
+                flash(f"You do not have permission to access this class for this student.")
                 return "PERMISSION_DENIED"
             else:
                 flash(f"Got unknown Error: {errorDict}")
                 return "UNKNOWN"
+        else:
+            countMissing = 0
+            try:
+                subs = missStudSubs['studentSubmissions']
+            except:
+                pass
+            else:
+                for item in subs:
 
+                    try:
+                        assignedGrade = int(item['assignedGrade']) > 0
+                    except:
+                        assignedGrade = False
+
+                    for subHistoryItem in item['submissionHistory']:
+                        try:
+                            gradeHistory = subHistoryItem['gradeHistory']
+                        except:
+                            gradeHistory = None
+
+                    if (assignedGrade == False and item['state'] != "TURNED_IN"):
+                        missing = True
+                        countMissing += 1
+                        #print(f"Missing: {missing} id: {item['id']} Late: {late} State: {item['state']} courseWorkType: {item['courseWorkType']} AssignedGrade: {assignedGrade} GradeHistory: {gradeHistory}")
         try: 
             missStudSubsAll.extend(missStudSubs['studentSubmissions'])
         # UnboundLocalError happens when missStudSubs does not exist
@@ -370,13 +389,16 @@ def getmissing(gid, aeriesid, gclassid, gclassname ):
 
     missingAsses = {}
     missingAsses['missing'] = missStudSubsAll
-
+    print(len(missingAsses['missing']))
     return missingAsses
 
-@app.route('/listmissing/<gclassid>/<gclassname>/<index>')
-@app.route('/listmissing/<gclassid>/<gclassname>')
-def nummissing(gclassid,gclassname,index=0,gid=None):
+@app.route('/listmissing/<gclassid>/<index>')
+@app.route('/listmissing/<gclassid>')
+def nummissing(gclassid,index=0):
     index=int(index)
+
+    gclass = GoogleClassroom.objects.get(gclassid=gclassid)
+    gclassname = gclass.gclassdict['name']
 
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
@@ -437,7 +459,7 @@ def nummissing(gclassid,gclassname,index=0,gid=None):
             missingAsses = None
         else:
             # Run getmissing function
-            missingAsses = getmissing(gstudent['userId'],otdStudent.aeriesid,gclassid,gclassname)
+            missingAsses = getmissing(gstudent['userId'],otdStudent.aeriesid,gclassid)
 
         if missingAsses == "AUTHORIZE":
             flash("Need to re-authorize with Google to get these assignments.")
@@ -497,7 +519,7 @@ def nummissing(gclassid,gclassname,index=0,gid=None):
             if otdStudent and otdStudentClass:
                 flash(f"{otdStudent.fname} {otdStudent.alname} Missing: {otdStudentClass.nummissing}")
 
-    url = f"/listmissing/{gclassid}/{gclassname}"
+    url = f"/listmissing/{gclassid}"
     
     if numStus > index:
         # elapsedTime = dt.now() - session['startTimeTemp']
@@ -508,7 +530,7 @@ def nummissing(gclassid,gclassname,index=0,gid=None):
 
 
     session['tempGStudents'] = None
-    return redirect(url_for('roster',gclassid=gclassid,gclassname=gclassname))
+    return redirect(url_for('roster',gclassid=gclassid))
 
 @app.route('/missingassignmentsstu/<gid>')
 def missingassignmentsstu(gid):

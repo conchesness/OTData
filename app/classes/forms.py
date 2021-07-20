@@ -87,7 +87,7 @@ class UserForm(FlaskForm):
     ugender = TextAreaField()
     uethnicity = MultiCheckboxField(choices=[("Decline to say","Decline to say"),('American Indian or Alaskan Native','American Indian or Alaskan Native'), ('Asian Indian','Asian Indian'), ('Black or African American','Black or African American'), ('Cambodian','Cambodian'), ('Chinese','Chinese'), ('Filipino','Filipino'), ('Guamanian','Guamanian'), ('Hawaiian','Hawaiian'), ('Hispanic or Latino','Hispanic or Latino'), ('Hmong','Hmong'), ('Japanese','Japanese'), ('Korean','Korean'), ('Laotian','Laotian'), ('Samoan','Samoan'), ('Vietnamese','Vietnamese'), ('White','White')])
     uethnicityother = TextAreaField()
-    shirtsize = SelectField("Unisex Shirt Size", choices=[('','---'),('xs','xs'),('sm','sm'),('med','med'),('lg','lg'),('xl','xl'),('xxl','xxl'),('3xl','3xl'),('4xl','4xl')])
+    shirtsize = SelectField("Unisex Shirt Size", choices=[('','---'),('xs','xs'),('sm','sm'),('med','med'),('lg','lg'),('xl','xl'),('xxl','xxl'),('3xl','3xl'),('4xl','4xl')],validators=[(validators.Optional())])
     linkedin = URLField()
     submit = SubmitField("Submit")
 
@@ -191,7 +191,8 @@ class PlanIdealOutcomeForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class PlanCheckinForm(FlaskForm):
-    todayfocus = SelectField(choices="",validators=[InputRequired()])
+    # todayfocus = SelectField(choices="",validators=[InputRequired()])
+    todayfocus = MultiCheckboxField(choices="",validators=[InputRequired()])
     yesterdayrating = SelectField(choices=[(0,'--'),(4,4),(3,3),(2,2),(1,1)],validate_choice=False)
     yesterdaynarrative = TextAreaField()
     todaynarrative = TextAreaField(validators=[InputRequired()])

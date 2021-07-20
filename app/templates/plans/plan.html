@@ -56,8 +56,18 @@
                     <h3>
                         <span id="settingstf2"> </span> of {{ theme.name }} <br>
                         {% if plan.student.gid == session.gid or session.isadmin %}
+                            {% if theme.idealoutcomes %}
+                                <a class='plancheckin' data-toggle="tooltip" data-placement="top" title="Checkin" href="/plancheckin/{{plan.student.gid}}/{{theme.oid}}">
+                                    <img width="30" src="/static/checkin.png">
+                                </a>
+                
+                                <a class='plancheckinoff' data-toggle="tooltip" data-placement="top" title="You have already checkedin today. You can delete or edit today's checkin.">
+                                    <img width="20" src="/static/checkinoff.png">
+                                </a>
+                            {% endif %}
                             <a href="/planthemeedit/{{plan.id}}/{{theme.oid}}"><img width="30" src="/static/edit.png"></a>
                             <a href="/planthemedelete/{{plan.id}}/{{theme.oid}}"><img width="30" src="/static/delete.png"></a>
+
                         {% endif %}
                     </h3>
                 </div>
@@ -78,15 +88,6 @@
                             <b>{{idealoutcome.name}}</b> <br> <small><b>Example<img width="20" src="/static/checkin.png">:</b> {{idealoutcome.example}}</small>
                             {% if plan.student.gid == session.gid or session.isadmin %}
                             <br>
-
-                            <a class='plancheckin' data-toggle="tooltip" data-placement="top" title="Checkin" href="/plancheckin/{{plan.student.gid}}/{{theme.oid}}/{{idealoutcome.oid}}">
-                                <img width="30" src="/static/checkin.png">
-                            </a>
-
-                            <a class='plancheckinoff' data-toggle="tooltip" data-placement="top" title="You have already checkedin today. You can delete or edit today's checkin.">
-                                <img width="20" src="/static/checkinoff.png">
-                            </a>
-
                             <a data-toggle="tooltip" data-placement="top" title="Edit" href="/planidealoutcomeedit/{{plan.id}}/{{theme.oid}}/{{idealoutcome.oid}}"><img width="30" src="/static/edit.png"></a>
                             <a data-toggle="tooltip" data-placement="top" title="Delete" href="/planidealoutcomedelete/{{plan.id}}/{{theme.oid}}/{{idealoutcome.oid}}"><img width="30" src="/static/delete.png"></a>
                             {% endif %}
@@ -109,23 +110,27 @@
             <div class="col-12">
                 <div class="row">
                     {% if checkins|length > 0 %}
-                    <div class="col-12"><h5>Checkins</h5></div>
+                        <hr>
+                        <div class="col-12"><h5>Checkins</h5></div>
+                        {% for checkin in checkins | sort(attribute='createdate', reverse = True) %}
+                            <div class="col">
+                                <b>{{moment(checkin.createdate).calendar()}}</b> <br>
+                                <b>Focus:</b> 
+                                {% for focus in checkin.todayfocus %}
+                                {{focus}}{% if not loop.last %}, {% endif %} 
+                                {% endfor %} <br>
+                                <b>I said I would:</b> {{checkin.todaynarrative}} <br>
+                                {% if checkin.yesterdayrating %}
+                                <b>Rating of last checkin</b> ({{moment(checkin.previousreference.createdate).calendar()}}): {{checkin.yesterdayrating}} <br>
+                                {% if checkin.yesterdaynarrative %}
+                                <b>Notes on rating:</b> {{checkin.yesterdaynarrative}} <br>
+                                {% endif %}
+                                {% endif %}
+                                <a href="/plancheckindelete/{{checkin.id}}/{{plan.student.gid}}"><img width="30" src="/static/delete.png"></a>
+                                <a href="/plancheckinedit/{{checkin.id}}/{{plan.student.gid}}"><img width="30" src="/static/edit.png"></a>
+                            </div>
+                        {% endfor %}
                     {% endif %}
-                    
-                {% for checkin in checkins %}
-                    <div class="col">
-                        <b>{{moment(checkin.createdate).calendar()}}</b> <br>
-                        <b>Focus:</b> {{checkin.todayfocus}} <br>
-                        <b>I said I would:</b> {{checkin.todaynarrative}} <br>
-                        {% if checkin.yesterdayrating %}
-                        <b>Rating of last checkin:</b> {{checkin.yesterdayrating}} <br>
-                        <b>Notes on rating:</b> {{checkin.yesterdaynarrative}} <br>
-                        {% endif %}
-                        <a href="/plancheckindelete/{{checkin.id}}/{{plan.student.gid}}"><img width="30" src="/static/delete.png"></a>
-                        <a href="/plancheckinedit/{{checkin.id}}/{{plan.student.gid}}"><img width="30" src="/static/edit.png"></a>
-                    </div>
-                    
-                {% endfor %}
                 </div>
                 <h5 class="mt-5"><a id="themevideo"></a>What is a Theme?</h5>
                 <iframe width="450" height="315" src="https://www.youtube.com/embed/NVGuFdX5guE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -155,15 +160,20 @@
 {% include 'plans/planscripts.html' %}
 
 <script type="text/javascript">
-    var yesterday = moment().subtract(1, 'days')
-    var lastCheckin = moment('{{lastCheckin.createdate}}')
-    var fromyesterday = yesterday.diff(lastCheckin)
-    if (fromyesterday <= 0) {
+    //This is accessing the UTC value and generating a new moment object that is timezone aware
+    var lastCheckin = moment(moment.parseZone('{{lastCheckin.createdate}}').format())
+    // set the isUTC value to true
+    lastCheckin = lastCheckin.utc() 
+    console.log(lastCheckin)
+
+    // Allow a checkin if there is no other checkins or the last checkin is not during today 
+    // using the formet() method calculates on local browser time
+    if (lastCheckin.format("DDD") == moment().format("DDD") && lastCheckin.format("YYYY") == moment().format("YYYY") ) {
         $('.plancheckin').hide();
-        $('.plancheckinoff').show();
+        $('.plancheckinoff').show(); 
     } else {
         $('.plancheckin').show();
-        $('.plancheckinoff').hide();        
+        $('.plancheckinoff').hide();       
     }
 </script>
 

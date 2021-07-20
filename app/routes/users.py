@@ -1,6 +1,6 @@
 from app.routes.coursecat import course
 from app import app
-from .scopes import SCOPES
+from .scopes import SCOPESOT, SCOPESCOMMUNITY
 from flask import render_template, redirect, url_for, request, session, flash, Markup
 from app.classes.data import User, CheckIn, Post, Group, Section
 from app.classes.forms import UserForm, AdultForm, CohortForm, PostGradForm
@@ -17,26 +17,44 @@ import re
 
 # List of email addresses for Admin users
 admins = ['stephen.wright@ousd.org','sara.ketcham@ousd.org','jelani.noble@ousd.org']
-courseCatAdmins = ['s_augustus.wright@ousd.org','s_franck.malghamilandou@ousd.org','s_christopher.huang@ousd.org','s_callum.ginsburg@ousd.org','s_cuichang.chen@ousd.org','s_nancy.ooi@ousd.org','s_jacob.thurm@ousd.org']
-# This code is run right after the app starts up and then not again. It defines a few universal things
-# like is the app being run on a local computer and what is the local timezone
-# @app.before_first_request
-# def before_first_request():
+courseCatAdmins = []
 
-    # settings = Config.objects.first()
-    # if not settings:
-    #     settings = Config(devenv=True,localtz='nada')
-    #     settings.save()
-    #     settings.reload()
+# Do not edit anything in this function.  This is just for google authentication
+def credentials_to_dict(credentials):
+    return {'token': credentials.token,
+          'refresh_token': credentials.refresh_token,
+          'token_uri': credentials.token_uri,
+          'client_id': credentials.client_id,
+          'client_secret': credentials.client_secret,
+          'scopes': credentials.scopes
+          }
 
-    # if request.url_root[8:11] == '127' or request.url_root[8:17] == 'localhost':
-    #     #settings.update(devenv = True, localtz='America/Los_Angeles')
-    #     session['devenv'] = True
-    #     session['localtz'] = 'America/Los_Angeles'
-    # else:
-    #     #settings.update(devenv = False, localtz='UTC')
-    #     session['devenv'] = False
-    #     session['localtz'] = 'UTC'
+# Function to format phone numbers before sending to template
+def formatphone(phnum):
+    phnum = str(phnum)
+    phnum = f"({phnum[0:3]}) {phnum[3:6]}-{phnum[6:]}"
+    return phnum
+
+# Function to record edits to user and related adult records
+def userModified(editUser):
+    currUser = User.objects.get(pk = session['currUserId'])
+    editUser.lastedited.append([dt.datetime.utcnow(),currUser]) 
+    if len(editUser.lastedited) > 20:
+        editUser.lastedited.pop(0)
+    editUser.save()
+
+# Function to strip non-numbers from mobile text 
+def phstr2int(phstr):
+    phnum = re.sub("[^0-9]", "", phstr)
+    if len(phnum) == 0:
+        phnum = 0
+    phnum = int(phnum)
+    if phnum > 1000000000 and phnum < 9999999999: 
+        phvalid = True
+    else:
+        phvalid = False
+
+    return (phvalid, phnum)
 
 # This runs before every route and serves to make sure users are using a secure site and can only
 # access pages they are allowed to access
@@ -46,6 +64,7 @@ def before_request():
         if session['isadmin']:
             db = get_db()
             session['db'] = db.name
+            flash(session['db'])
     except:
         pass
 
@@ -60,6 +79,7 @@ def before_request():
     # If you have urls that you want your user to be able to see without logging in add them here.
     # TODO create a decorator or something for this
     unauthPaths = ['/','/home','/authorize','/login','/oauth2callback','/static','/logout','/revoke','/msgreply','/msgstatus']   
+    communityPaths = ['/profile','/editprofile','/findstufromadult','/addstutoadult']
     studentPaths = ['/postgrad','/cc','/plan','/profile','/editprofile','/addadult','/editadult','/deleteadult','/sendstudentemail','/checkin','/deletecheckin','/editgclass','/gclasses','/comp','/missingassignmentsstu'] 
     # this is some tricky code designed to send the user to the page they requested even if they have to first go through
     # a authorization process.
@@ -92,12 +112,17 @@ def before_request():
             session['credentials'] = credentials_to_dict(credentials)
             # reset the return_URL
             session['return_URL'] = request.full_path
-            for studentPath in studentPaths:
-                match = re.match(f"{studentPath}.*", basePath)
-                if match:
-                    return
-            # if session['role'].lower() == 'student' and basePath not in studentPaths:
             if session['role'].lower() == 'student':
+                for studentPath in studentPaths:
+                    match = re.match(f"{studentPath}.*", basePath)
+                    if match:
+                        return
+            if session['role'].lower() == 'community':
+                for communityPath in communityPaths:
+                    match = re.match(f"{communityPath}.*", basePath)
+                    if match:
+                        return
+            if session['role'].lower() != 'teacher':
                 # Send students to their profile page
                 flash(f"Unfortunately, you do not have access to the url '{basePath}'.")
                 return redirect(url_for('profile'))
@@ -128,8 +153,24 @@ def index():
 
 
 # a lot of stuff going on here for the user as they log in including creatin new users if this is their first login
+@app.route('/login/<audience>')
 @app.route('/login')
-def login():
+def login(audience=None):
+
+    # Set audience in the session so the user can be asked for the appropriate privledges from google
+    if audience == "ot":
+        session['audience'] = "ot"
+    elif audience == "community":
+        session['audience'] = "community"
+    else:
+        try:
+            audience = session['audience']
+        except:
+            session['audience'] = None
+
+    if session['audience'] == None:
+        flash(Markup(f'You must designate your community.<br>login as Oakland Tech <br> <a href="/login/ot">Student/Staff</a>  <br>or <br> <a href="/login/community">Parent, Alumni, Community</a>' ))
+        return redirect("/")
 
     # Go and get the users credentials from google. The /authorize and /oauth2callback functions should not be edited.
     # That is where the user is sent if their credentials are not currently stored in the session.  More about sessions below. 
@@ -145,14 +186,23 @@ def login():
         return redirect('/authorize')    
     session['credentials'] = credentials_to_dict(credentials)
     people_service = googleapiclient.discovery.build('people', 'v1', credentials=credentials)
+
     # set data to be the dictionary that contains all the information about the user that google has.  You can see this 
     # information displayed via the current profile template
     data = people_service.people().get(resourceName='people/me', personFields='names,emailAddresses,photos').execute()
+
+
     if data['emailAddresses'][0]['value'][-8:] == "ousd.org":
-        if data['emailAddresses'][0]['value'][0:2] == "s_":
+        if session['audience'].lower() == 'community':
+            flash(f'You have an ousd.org email address but you are logging in as a community member. If you are an Oakland Tech student or staff, logout out and use the OUSD login link.')
+            session['role'] = "Community"
+        elif session['audience'].lower() == 'ot' and data['emailAddresses'][0]['value'][0:2] == "s_":
             session['role'] = 'Student'
-        else:
+        elif session['audience'].lower() == 'ot':
             session['role'] = 'Teacher'
+    else:
+        session['audience'] = "community"
+        session['role'] = 'Community'
 
     if data['emailAddresses'][0]['value'] in admins:
         session['isadmin'] = True
@@ -164,11 +214,27 @@ def login():
     else:
         session['courseCatAdmin'] = False
 
-    try:
-        currUser = User.objects.get(otemail = data['emailAddresses'][0]['value'])
-    except:
-        flash('You are not in the database.  Please contact Steve Wright to get access. stephen.wright@ousd.org')
-        return redirect('/')
+    if session['audience'].lower() == "ot":
+        try:
+            currUser = User.objects.get(otemail = data['emailAddresses'][0]['value'])
+        except:
+            flash('You are not in the database.  Please contact Steve Wright (stephen.wright@ousd.org) to get access or login as community. ')
+            return redirect('/')
+    elif session['audience'].lower() == "community":
+        session['role'] = 'Community'
+        try:
+            currUser = User.objects.get(otemail = data['emailAddresses'][0]['value'])
+        except:
+            currUser = User(
+                otemail=data['emailAddresses'][0]['value'],
+                gid=data['emailAddresses'][0]['metadata']['source']['id'],
+                role=session['role'],
+                afname=data['names'][0]['givenName'],
+                alname=data['names'][0]['familyName'],
+                fname=data['names'][0]['givenName'],
+                lname=data['names'][0]['familyName']
+            )
+            currUser.save()
 
     if not currUser.gid:
         currUser.update(
@@ -210,23 +276,20 @@ def login():
     session['currUserId'] = str(currUser.id)
     session['aeriesid'] = currUser.aeriesid
     session['gid'] = currUser.gid
+    session['fname'] = currUser.fname
+    session['lname'] = currUser.lname
+
     # this stores the entire Google Data object in the session
     session['gdata'] = data
     session['role'] = currUser.role
     session['isadmin'] = currUser.isadmin
     session['email'] = data['emailAddresses'][0]['value']
 
-    flash(f"Hello {session['displayName']}.")
+    flash(f"Hello {session['fname']} {session['lname']}.")
 
     # The return_URL value is set above in the before_request route. This redirects a user to login and then
     # sent to the page they originally asked for.
     return redirect(session['return_URL'])
-
-# Function to format phone numbers before sending to template
-def formatphone(phnum):
-    phnum = str(phnum)
-    phnum = f"({phnum[0:3]}) {phnum[3:6]}-{phnum[6:]}"
-    return phnum
 
 #get the profile page for a designated or the logged in user. Can use either gid or aeriesid.
 #TODO change this to GID instead of AeriesId so Teacher profiles can be accessed
@@ -312,28 +375,7 @@ def profile(aeriesid=None):
     else:
         sections = None
 
-    return render_template("profile.html",groups=groups,currUser=targetUser, data=session['gdata'], form=form, today=dttoday, checkins=checkins, sections=sections)
-
-# Function to record edits to user and related adult records
-def userModified(editUser):
-    currUser = User.objects.get(pk = session['currUserId'])
-    editUser.lastedited.append([dt.datetime.utcnow(),currUser]) 
-    if len(editUser.lastedited) > 20:
-        editUser.lastedited.pop(0)
-    editUser.save()
-
-# Function to strip non-numbers from mobile text 
-def phstr2int(phstr):
-    phnum = re.sub("[^0-9]", "", phstr)
-    if len(phnum) == 0:
-        phnum = 0
-    phnum = int(phnum)
-    if phnum > 1000000000 and phnum < 9999999999: 
-        phvalid = True
-    else:
-        phvalid = False
-
-    return (phvalid, phnum)
+    return render_template("profile/profile.html",groups=groups,currUser=targetUser, data=session['gdata'], form=form, today=dttoday, checkins=checkins, sections=sections)
 
 # to get an in depth description of how creating, editing and deleting database recodes work check
 # out the feedback.py file.
@@ -468,7 +510,7 @@ def editprofile(aeriesid=None):
     form.shirtsize.data = editUser.shirtsize
 
     # render the editprofile template and send the pre-populated form object.
-    return render_template('editprofile.html', form=form, editUser=editUser)
+    return render_template('profile/editprofile.html', form=form, editUser=editUser)
 
 @app.route('/findemail/<email>')
 def findemail(email):
@@ -483,6 +525,39 @@ def findphnum(phnum):
     user = User.objects.get(query)
     flash(f"{user.fname} {user.lname}")
     return redirect(url_for('profile', aeriesid = user.aeriesid))   
+
+@app.route('/findstufromadult')
+def findstufromadult():
+    communityUser = User.objects.get(gid=session['gid'])
+    students = User.objects(role__iexact = 'student')
+    for student in students:
+        if student.aadultemail == communityUser.otemail:
+            flash(Markup(f'Student {student.fname} {student.lname} has an adult listed in Aeries with your email. <a href="/addstutoadult/{student.id}">This is my student.</a>'))
+        for adult in student.adults:
+            if communityUser.otemail == adult.email or communityUser.otemail == adult.altemail:
+                flash(Markup(f'Student {student.fname} {student.lname} has added an adult listed with your email. <a href="/addstutoadult/{student.id}">This is my student.</a>'))
+    return redirect("/profile")
+
+@app.route('/addstutoadult/<stuid>')
+def addstutoadult(stuid):
+    communityUser = User.objects.get(gid=session['gid'])
+    student = User.objects.get(pk=stuid)
+    communityUser.update(
+        role = "parent"
+        )
+
+    # Associate the student to the parent
+    communityUser.this_parents_students.append(student)
+    communityUser.this_parents_students = list(set(communityUser.this_parents_students))
+    communityUser.save()
+
+    # Associate the parent to the student
+    student.this_students_parents.append(communityUser)
+    student.this_students_parents = list(set(student.this_students_parents))
+    student.save()
+
+    flash(f"Student {student.fname} {student.lname} was added to Community User {communityUser.fname} {communityUser.lname} and vice versa.")
+    return redirect("/profile")
 
 @app.route('/addadult/<aeriesid>', methods=['GET', 'POST'])
 def addadult(aeriesid):
@@ -717,9 +792,26 @@ def postgraddelete(uid,pgid):
 # Do not edit anything in this route.  This is just for google authentication
 @app.route('/authorize')
 def authorize():
-    # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
-    # flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES)
 
+    # Log user in with the appropriate privledges / scopes from google based on the audience they belong to.
+    try:
+        audience = session['audience']
+    except:
+        session['audience'] = None
+        print("No audience")
+    else:
+        if session['audience'] == 'ot':
+            flash(f"you have logged in as OT")
+            SCOPES = SCOPESOT
+        elif session['audience'] == 'community':
+            flash(f"You have logged in as Community")
+            SCOPES = SCOPESCOMMUNITY
+        else:
+            flash(f"You have not designated an audience (OT or Community).")
+            print(f"You have not designated an audience (OT or Community).")
+            return redirect('/')
+
+    # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
         client_config=GOOGLE_CLIENT_CONFIG,
         scopes=SCOPES)
@@ -738,8 +830,8 @@ def authorize():
         # Force the Google Account picker even if there is only one account. This is 
         # because a user can login as a non-ousd user but not be allowed access to anything
         # so it becomes difficult to login with an OUSD account after that if you have one.
-        #prompt='select_account consent'
-        prompt='select_account'
+        prompt='select_account consent'
+        # prompt='select_account'
         )
 
     # Store the state so the callback can verify the auth server response.
@@ -751,6 +843,19 @@ def authorize():
 # Do not edit anything in this route.  This is just for google authentication
 @app.route("/oauth2callback")
 def oauth2callback():
+
+    try:
+        if session['audience'] == 'ot':
+            SCOPES = SCOPESOT
+        elif session['audience'] == 'community':
+            SCOPES = SCOPESCOMMUNITY
+        else:
+            flash(f"You have not designated an audience (OT or Community).")
+            print(f"You have not designated an audience (OT or Community).")
+    except:
+        session['audience'] = None
+        flash("No audience")
+
     # Specify the state when creating the flow in the callback so that it can
     # verified in the authorization server response.
     state = session['state']
@@ -795,9 +900,11 @@ def revoke():
     status_code = getattr(revoke, 'status_code')
     if status_code == 200:
         session['revokereq']=1
-        return redirect('/logout')
+        flash(Markup(f"Revoke request has been processed. You can now <a href='/logout'>logout.</a>"))
+        return redirect('/')
+        #return redirect('/logout')
     else:
-        flash('An error occurred.')
+        flash('An error occurred when trying to revoke the privledges you granted to Google.')
         return redirect('/')
 
 
@@ -806,16 +913,6 @@ def logout():
     session.clear()
     flash('Session has been cleared and user logged out.')
     return redirect('/')
-
-# Do not edit anything in this function.  This is just for google authentication
-def credentials_to_dict(credentials):
-    return {'token': credentials.token,
-          'refresh_token': credentials.refresh_token,
-          'token_uri': credentials.token_uri,
-          'client_id': credentials.client_id,
-          'client_secret': credentials.client_secret,
-          'scopes': credentials.scopes
-          }
 
 @app.route('/privacy')
 def privacy():

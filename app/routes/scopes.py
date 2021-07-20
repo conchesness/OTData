@@ -8,7 +8,7 @@
 # anothr possible email scope if we want to manage a Label for the user
 # 'https://www.googleapis.com/auth/gmail.labels'
 
-SCOPES = [
+SCOPESOT = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
     'openid',
@@ -23,3 +23,8 @@ SCOPES = [
     'https://www.googleapis.com/auth/classroom.guardianlinks.students'
     ]
  
+SCOPESCOMMUNITY = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid'
+    ]

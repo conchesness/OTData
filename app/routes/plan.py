@@ -277,6 +277,7 @@ def planidealoutcomedelete(planid,themeid, idealoutcomeid):
     return redirect(url_for('plan',gid=editPlan.student.gid))
 
 @app.route('/plancheckin/<gid>/<themeoid>/<iooid>', methods=['GET', 'POST'])
+@app.route('/plancheckin/<gid>/<themeoid>', methods=['GET', 'POST'])
 def plancheckin(gid,themeoid,iooid=None):
 
     planUser=User.objects.get(gid=gid)
@@ -328,14 +329,26 @@ def plancheckin(gid,themeoid,iooid=None):
             flash("You need to choose a 1 - 4 rating of your last checkin.")
             return redirect(url_for('plancheckin', gid=gid, themeoid=themeoid, iooid=iooid))
 
-        newPlanCheckin = PlanCheckin(
-            createdate = d.datetime.utcnow(),
-            plan = userPlan,
-            todayfocus = form.todayfocus.data,
-            yesterdayrating = form.yesterdayrating.data,
-            yesterdaynarrative = form.yesterdaynarrative.data,
-            todaynarrative = form.todaynarrative.data
-        )
+        if lastCheckin:
+            newPlanCheckin = PlanCheckin(
+                createdate = d.datetime.utcnow(),
+                plan = userPlan,
+                todayfocus = form.todayfocus.data,
+                yesterdayrating = form.yesterdayrating.data,
+                yesterdaynarrative = form.yesterdaynarrative.data,
+                todaynarrative = form.todaynarrative.data,
+                previousreference = lastCheckin
+            )
+        else:
+            newPlanCheckin = PlanCheckin(
+                createdate = d.datetime.utcnow(),
+                plan = userPlan,
+                todayfocus = form.todayfocus.data,
+                yesterdayrating = form.yesterdayrating.data,
+                yesterdaynarrative = form.yesterdaynarrative.data,
+                todaynarrative = form.todaynarrative.data
+            )
+
         newPlanCheckin.save()
         return redirect(url_for("plan",gid=gid))
 
@@ -366,13 +379,10 @@ def plancheckinedit(plancheckinid,gid=None):
     userPlan = Plan.objects.get(student=planUser)
     userTheme = userPlan.themes.get(old=False)
     
-    lastCheckin = None
-    checkins = PlanCheckin.objects(plan = userPlan).order_by("-createdate")
-
-    for i,checkin in enumerate(checkins):
-        if i==1:
-            lastCheckin = checkin
-            break
+    if plancheckin.previousreference:
+        lastCheckin = plancheckin.previousreference
+    else:
+        lastCheckin = None
 
     form=PlanCheckinForm()
     choices = []

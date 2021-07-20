@@ -1,0 +1,29 @@
+<div id="Community">
+    <div class="row">
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Basic Info <a href="/editprofile"><img width="20" src="/static/edit.png"></a></a></h5>
+                    <h6 class="card-subtitle mb-2 text-muted">In Progress...</h6>
+                    <p class="card-text">
+                        email: {{currUser.otemail}} <br>
+                        mobile: {{formatphone(currUser.mobile)}} <br>
+                        {% if currUser.role.lower() == "parent" and currUser.this_parents_students %}
+                            Students: 
+                            {% for student in currUser.this_parents_students %}
+                            {{student.fname}} {{student.lname}}
+                            {% endfor %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="{{threecolbreak}}">
+            <div class="card">
+                <div class="card-body">
+                    Are you a parent or gaurdian? <a href="/findstufromadult">Find your student.</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

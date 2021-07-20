@@ -185,7 +185,7 @@ class User(Document):
     lastlogin = DateTimeField()
     casemanager = StringField(required=False)
     linkedin = StringField()
-    shirtsize = StringField()
+    shirtsize = StringField(required=False)
 
     # Borrowed Computer
     compequiptype = StringField()
@@ -202,6 +202,10 @@ class User(Document):
     tdept = StringField()
     taeriesname = StringField()
     trmphone = StringField()
+
+    # if this is a parent
+    this_parents_students = ListField(ReferenceField('User'))
+    this_students_parents = ListField(ReferenceField('User'))
 
     # Related Data
     # Sections and enrollments are not currently used
@@ -266,10 +270,11 @@ class Plan(Document):
 class PlanCheckin(Document):
     plan=ReferenceField('Plan')
     createdate = DateTimeField()
-    todayfocus = StringField()
+    todayfocus = ListField()
     yesterdayrating = IntField()
     yesterdaynarrative = StringField()
     todaynarrative = StringField()
+    previousreference = ReferenceField('self')
 
 class GoogleClassroom(Document):
     gteacherdict = DictField()

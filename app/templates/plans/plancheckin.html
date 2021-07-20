@@ -8,36 +8,36 @@
         {% for field in form.errors %}
             {% for error in form.errors[field] %}
                 <div class="alert alert-error">
-                    <strong>Error!</strong>{{field}}: {{error}}
+                    <strong>Error!</strong> {{field}}: {{error}}
                 </div>
             {% endfor %}
         {% endfor %}
 
         <div class="row">
-
             <div class="col-md-6 col-xl-4 border py-3">
                 <form method=post>
                     {{ form.hidden_tag() }}
                     Today's Focus<font color="red">*</font>: <br>{{form.todayfocus()}} <br>
                     I Will<font color="red">*</font>:<br> {{form.todaynarrative(cols="40",rows="4",placeholder="Required: Name one concrete thing you will do today that is informed by this focus.")}} <br>
-                    {% if lastcheckin %}
-                    Last Checkin Rating<font color="red">*</font>: {{form.yesterdayrating()}} <br>
-                    <small><em>Take a look at your last checkin and give a rating for how you think you did.</em></small> <br>
-                    Last Checkin Narrative:<br> {{form.yesterdaynarrative(cols="40",rows="4",placeholder="Optional: Why did you give that rating? Really helpful when you review your checkins.")}} <br>
-                    {% endif %}
-                    {{form.submit()}}
-                </form>
             </div>
-
-            <div class="col-md-6 col-xl-8">
-                {% if lastcheckin %}
+            {% if lastcheckin %}
+            <div class="col-md-6 col-xl-4 border py-3">
                 <h3>Last Checkin</h3>
                 {{moment(lastcheckin.createdate).calendar()}} <br>   
-                Focus: {{lastcheckin.todayfocus}} <br>
-                I said I would: {{lastcheckin.todaynarrative}} <br>
-                {% endif %}
+                Focus: 
+                {% for focus in lastcheckin.todayfocus %}
+                {{focus}}{% if not loop.last %}, {% endif %} 
+                {% endfor %}
+                <br>
+                I said I would: {{lastcheckin.todaynarrative}} 
+                <hr>
+                Last Checkin Rating<font color="red">*</font>: {{form.yesterdayrating()}} <br>
+                &nbsp;&nbsp;&nbsp;<small><em>4 = I did what I said I would.</em></small> <br> <br>
+                Last Checkin Narrative:<br> {{form.yesterdaynarrative(cols="40",rows="4",placeholder="Optional: Why did you give that rating? Really helpful when you review your checkins.")}} <br>
             </div>
+            {% endif %}
         </div>
-
+        {{form.submit()}}
+    </form>
     </div>
 {% endblock %}

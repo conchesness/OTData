@@ -44,7 +44,7 @@ def checkin():
         # All dates retrieved from the DB are in UTC
         if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date():
              flash('It looks like you already checkin today? If so, please delete one of the checkins.')
-        #     return redirect(url_for('checkin'))
+        #      return redirect(url_for('checkin'))
 
         if len(form.status.data) == 0:
             flash('"How are you" is a required field')
@@ -80,8 +80,9 @@ def checkin():
             synchronous = synchronous,
             cameraoff = cameraoff,
             cameraoffreason = form.cameraoffreason.data,
-            cameraoffreasonother = form.cameraoffreasonother.data
-        )
+            cameraoffreasonother = form.cameraoffreasonother.data            
+            )
+        
         checkin.save()
         flash(f"CheckIn for {currUser.fname} {currUser.lname} saved.")
 

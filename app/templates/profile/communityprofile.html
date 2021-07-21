@@ -11,7 +11,9 @@
                         {% if currUser.role.lower() == "parent" and currUser.this_parents_students %}
                             Students: 
                             {% for student in currUser.this_parents_students %}
-                            {{student.fname}} {{student.lname}}
+                            <a href="/profile/{{student.gid}}">
+                                {{student.fname}} {{student.lname}}
+                            </a>
                             {% endfor %}
                         {% endif %}
                     </p>

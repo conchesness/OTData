@@ -1,13 +1,10 @@
-from contextlib import redirect_stderr
 from app import app
-import os
 from flask import render_template, redirect, url_for, flash, session, Markup, request
 from app.classes.data import Plan, User, PlanSettings, PlanCheckin
 from app.classes.forms import PlanThemeForm, PlanIdealOutcomeForm, PlanSettingsForm, PlanCheckinForm
 from bson.objectid import ObjectId
 import mongoengine.errors
 import datetime as d
-import time
 
 @app.route('/plansettings', methods=["GET","POST"])
 def plansettings():
@@ -197,7 +194,7 @@ def planthemedelete(planid,planthemeid):
     theme = editPlan.themes.get(oid=planthemeid)
 
     if len(theme.idealoutcomes) > 0:
-        flash("You can't delete a Theme while it has Ideal Outcomes. Delete the Ideal Outcomes first.")
+        flash("You can't delete a Theme while it has Ideal Outcomes. Delete the Ideal Outcomes first or set the Theme to 'old' by editing it and choosing 'This is old and should be hidden.'.")
         return redirect(url_for('plan',gid=editPlan.student.gid))
 
     canEdit = checkPlanEditPriv(editPlan.student.gid)

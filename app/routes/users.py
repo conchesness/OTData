@@ -117,12 +117,12 @@ def before_request():
                     match = re.match(f"{studentPath}.*", basePath)
                     if match:
                         return
-            if session['role'].lower() == 'community':
+            if session['role'].lower() in ['community','parent']:
                 for communityPath in communityPaths:
                     match = re.match(f"{communityPath}.*", basePath)
                     if match:
                         return
-            if session['role'].lower() != 'teacher':
+            if session['role'].lower() == 'student':
                 # Send students to their profile page
                 flash(f"Unfortunately, you do not have access to the url '{basePath}'.")
                 return redirect(url_for('profile'))
@@ -300,9 +300,12 @@ def profile(aeriesid=None):
     if aeriesid == 'None':
         aeriesid = None 
 
-    if session['role'].lower() == "student":
+    if session['role'].lower() != "teacher":
         targetUser = User.objects.get(id = session['currUserId'])
         groups=None
+        if aeriesid and aeriesid != targetUser.gid:
+            flash('You can only view your own profile.')
+            return redirect(url_for('profile'))
 
     elif aeriesid and len(aeriesid) < 7:
         try:
@@ -542,9 +545,7 @@ def findstufromadult():
 def addstutoadult(stuid):
     communityUser = User.objects.get(gid=session['gid'])
     student = User.objects.get(pk=stuid)
-    communityUser.update(
-        role = "parent"
-        )
+
 
     # Associate the student to the parent
     communityUser.this_parents_students.append(student)
@@ -555,6 +556,11 @@ def addstutoadult(stuid):
     student.this_students_parents.append(communityUser)
     student.this_students_parents = list(set(student.this_students_parents))
     student.save()
+
+    # set the communityUser as a parent
+    communityUser.update(
+        role = "parent"
+        )
 
     flash(f"Student {student.fname} {student.lname} was added to Community User {communityUser.fname} {communityUser.lname} and vice versa.")
     return redirect("/profile")

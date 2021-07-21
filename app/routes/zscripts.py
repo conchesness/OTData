@@ -1,11 +1,10 @@
 from flask.helpers import url_for
 from app import app
 from flask import render_template, redirect, flash
-from app.classes.data import User, Section, Config, Section, Course, GoogleClassroom, Plan
+from app.classes.data import User, Section, Config, Section, Course, Plan
 import pandas as pd
 import time
-from mongoengine.errors import NotUniqueError
-from bson import ObjectId
+# from mongoengine.errors import NotUniqueError
 
 @app.route('/unsetplans')
 def unsetplans():
@@ -51,45 +50,6 @@ def fixnames():
             )
             print(f"{i}:{count} Stored new name for {fname} {lname}")
     return redirect(url_for('index'))
-
-# @app.route('/importsections')
-# def importsections():
-#     df_sections = pd.read_csv('csv/sections.csv', encoding = "ISO-8859-1")
-#     df_sections.fillna('', inplace=True)
-#     sections = df_sections.to_dict(orient='records')
-
-#     badcnums=[]
-#     length=len(sections)
-#     for i,section in enumerate(sections):
-#         try:
-#             course=Course.objects.get(aeriesnum=section['cnum'])
-#         except:
-#             badcnums.append((section['cnum'],section['cname']))
-#             print(section['cname'])
-#         else:
-#             try:
-#                 teacher=User.objects.get(tnum=section['tnum'])
-#             except:
-#                 teacher=None
-#             pers=str(section['pers'])
-#             newSection=Section(
-#                 course=course,
-#                 teacher=teacher
-#             )
-#             for per in pers:
-#                 newSection.pers.append(per)
-#             try:
-#                 newSection.save()
-#             except NotUniqueError:
-#                 pass
-#         print(f"{i}/{length}")
-
-#     badcnums=set(badcnums)
-#     print(badcnums)
-
-#     pass
-
-
 
 @app.route('/unsetsectionsoncourse')
 def unsetsectionsoncourse():

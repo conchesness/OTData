@@ -1,11 +1,9 @@
 from app import app
-# import os
 from flask import render_template, redirect, url_for, session, flash
 from app.classes.data import User, Section, Course
 from app.classes.forms import CourseForm, SectionForm
 import datetime as d
 from mongoengine import Q
-# from collections import Counter
 
 @app.route("/ccteachers/<sort>")
 @app.route("/ccteachers")

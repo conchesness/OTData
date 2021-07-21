@@ -7,7 +7,6 @@ from flask import render_template, redirect, url_for, request, session, flash, M
 from mongoengine import Q
 from app.classes.data import User, Message, Group
 from app.classes.forms import TxtMessageForm
-from datetime import datetime
 import datetime as d
 import pytz
 # This is for the Twilio Credentials

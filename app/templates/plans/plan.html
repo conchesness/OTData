@@ -21,7 +21,7 @@
                 {% elif status == 1 %}
                 <font color="orange"><br>Add at least 3 Ideal Outcomes</font>
                 {% elif status == 0 %}
-                    <br>Create a Theme and add at least 3 Ideal Outcomes
+                <font color="orange"><br><a href="/planthemenew/{{plan.id}}">Create a Theme</a> and add at least 3 Ideal Outcomes</font>
                 {% endif %}
                 {% if numActiveThemes > 1 %}
                     <br><br><font color="Orange"><i>You have more than one active theme. Please please edit old themes.</i></font>
@@ -132,28 +132,36 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                <h5 class="mt-5"><a id="themevideo"></a>What is a Theme?</h5>
-                <iframe width="450" height="315" src="https://www.youtube.com/embed/NVGuFdX5guE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-                <h5>Old Themes:</h5>
-                {% for theme in plan.themes %}
-                    {% if theme.old %}
-                        {% if plan.student.gid == session.gid or session.isadmin %}
-                            <a href="/planthemeedit/{{plan.id}}/{{theme.oid}}"><img width="30" src="/static/edit.png"></a>
-                            <a href="/planthemedelete/{{plan.id}}/{{theme.oid}}"><img width="30" src="/static/delete.png"></a>
-                        {% endif %}
-                        {{ theme.timeframe }} of {{ theme.name }}
-                        {% if theme.idealoutcomes %}
-                        --> Ideal Outcomes:
-                            {% for io in theme.idealoutcomes %}
-                                {{io.name}} |
-                            {% endfor %}
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
+                <hr>
+                <div class="row">
+                    <div class="col">
+                        <h5>Old Themes:</h5>
+                        {% for theme in plan.themes %}
+                            {% if theme.old %}
+                                {% if plan.student.gid == session.gid or session.isadmin %}
+                                    <a href="/planthemeedit/{{plan.id}}/{{theme.oid}}"><img width="30" src="/static/edit.png"></a>
+                                    <a href="/planthemedelete/{{plan.id}}/{{theme.oid}}"><img width="30" src="/static/delete.png"></a>
+                                {% endif %}
+                                {{ theme.timeframe }} of {{ theme.name }}
+                                {% if theme.idealoutcomes %}
+                                --> Ideal Outcomes:
+                                    {% for io in theme.idealoutcomes %}
+                                        {{io.name}} |
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
 
         {% endif %}
+        <div class="row">
+            <div class="col">
+                <h5 class="mt-5"><a id="themevideo"></a>What is a Theme?</h5>
+                <iframe width="450" height="315" src="https://www.youtube.com/embed/NVGuFdX5guE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>        
+            </div>
+        </div>
     </div>
 </div>
 

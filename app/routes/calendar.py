@@ -85,7 +85,7 @@ def calen(month, year):
 # this is the code that is run when the user requests a specific day
 @app.route('/day/<day>/<month>/<year>', methods=['GET', 'POST'])
 def day(day, month, year):
-
+    
     if 'credentials' not in session:
         flash('You must be logged in to access that page')
         return redirect('/authorize')

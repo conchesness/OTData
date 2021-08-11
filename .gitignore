@@ -143,3 +143,5 @@ appengine_config.py
 notes.py
 cleaning.py
 CloudRunNotes.txt
+zscripts.py
+/scripts

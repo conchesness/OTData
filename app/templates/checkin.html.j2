@@ -292,15 +292,15 @@
     $(".today").html(today);
 
     //if it is after 4pm or the weekend then hide the form
-    if (today.getHours() >= 18 || today.getDay() == 0 || today.getDay() == 6) {
-      $(".synchOutput").html("Check In is Closed For Today."); 
-      $('.checkinform').hide();
+//    if (today.getHours() >= 18 || today.getDay() == 0 || today.getDay() == 6) {
+//      $(".synchOutput").html("Check In is Closed For Today."); 
+//      $('.checkinform').hide();
     // if it is Wed then async after 12 noon
     } else if(today.getDay() == 3) {
         if(today.getHours() >= 12 ) {
           $(".synchOutput").html("Aynchronous"); 
           $('#synchronous').val("asynchronous");
-          $('.synch').hide();
+         $('.synch').hide();
           $('.cameraoff').hide();
           $('#cameraoff').val("off")
         }

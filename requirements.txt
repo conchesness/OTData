@@ -20,3 +20,4 @@ gunicorn==20.0.4
 pandas==0.25.3
 twilio==6.44.0
 email-validator==1.1.2
+cython==0.29.24

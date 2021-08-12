@@ -144,7 +144,7 @@ class FeedbackForm(FlaskForm):
 
 class CohortForm(FlaskForm):
     cohort = SelectField("Cohort", choices=[("","Unknown"),('No Academy','No Academy'),('Oakland Tech - Computer Academy','Oakland Tech - Computer Academy'),('Oakland Tech-Engineering Academy','Oakland Tech-Engineering Academy'),('Oakland Tech - Fashion, Art and Design Academy (All)','Oakland Tech - Fashion, Art and Design Academy (All)'),('Oakland Tech - Fashion, Arts, & Design Academy (CPA)','Oakland Tech - Fashion, Arts, & Design Academy (CPA)'),('Oakland Tech - Health Academy','Oakland Tech - Health Academy'),('Oakland Tech - Race, Policy and Law Academy','Oakland Tech - Race, Policy and Law Academy'),('Oakland Tech-9th Grade Janus','Oakland Tech-9th Grade Janus'),('Oakland Tech-9th Grade Neptune','Oakland Tech-9th Grade Neptune'),('Oakland Tech-9th Grade Sol','Oakland Tech-9th Grade Sol')])
-    casemanager = SelectField(choices=[('','---'),('Jelani Noble', 'Jelani Noble')])
+    casemanager = SelectField(choices=[('',''),('Jelani Noble', 'Jelani Noble')])
     submit = SubmitField('Submit')
 
 class ListQForm(FlaskForm):

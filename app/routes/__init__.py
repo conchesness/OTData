@@ -13,3 +13,4 @@ from .equipment import *
 from .equity import *
 from .plan import *
 from .coursecat import *
+from .ztemp import *

@@ -139,7 +139,9 @@
                         <b>Ethnicity</b> {{currUser.aethnicity}} <br>
                         <b>Language Fluency:</b> {{currUser.langflu}} <br>
                         {% if currUser.sped %}<b>SPED:</b> {{currUser.sped}}<br>{% endif %}
-                        <b>AGPA:</b> {{currUser.gpa}} <br>
+                        {% if currUser.gpa > 0 %}
+                            <b>AGPA:</b> {{currUser.gpa}} <br>
+                        {% endif %}
                         <b>Academy/House:</b> {{currUser.cohort}} <br>
                         {% if session.isadmin %}
                         {% if currUser.casemanager %}

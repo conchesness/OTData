@@ -41,6 +41,7 @@ def userModified(editUser):
     editUser.lastedited.append([dt.datetime.utcnow(),currUser]) 
     if len(editUser.lastedited) > 20:
         editUser.lastedited.pop(0)
+    print(editUser.casemanager)
     editUser.save()
 
 # Function to strip non-numbers from mobile text 
@@ -343,12 +344,12 @@ def profile(aeriesid=None):
     form.cohort.choices = cohortslist
 
     casemanagers = User.objects().distinct(field="casemanager")
-    casemanagerslist = [("","None")]
+    casemanagerslist = [("","---")]
     for casemanager in casemanagers:
         if len(cohort) > 0:
-            cohortslist.append((casemanager,casemanager))
+            casemanagerslist.append((casemanager,casemanager))
             
-    form.cohort.casemanager = casemanagerslist
+    form.casemanager.choices = casemanagerslist
     
     if form.validate_on_submit():
         if len(form.casemanager.data) > 0:

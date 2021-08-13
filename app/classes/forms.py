@@ -52,14 +52,14 @@ class StudentForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class CheckInForm(FlaskForm):
-    desc = TextAreaField("What are you working on?",validators=[InputRequired()])
+    desc = TextAreaField("What are you working on?")
     gclassid = SelectField(choices=[],validators=[InputRequired()])
     gclassname = StringField()
     status = SelectField("How are you?",choices=[('','---'),('5','Great'),('4','Good'),('3','OK'),('2','Bad'),('1', 'Horrible')])
-    synchronous = SelectField(id="synchronous",choices=[('synchronous','synchronous'),('asynchronous','asynchronous')])
-    camera = SelectField(id="cameraoff",choices=[("on","on"),("off","off")])
-    cameraoffreason = SelectField("Why do you want your camera off today for this class?",id="cameraoffreason",choices=[('','---'),('poor bandwidth','poor bandwidth'),('zoom fatigue','zoom fatigue'),('visual distraction','visual distraction'),('my current environment','current environment'),('other','other')])
-    cameraoffreasonother = TextAreaField(id="cameraoffreasonother")
+    #synchronous = SelectField(id="synchronous",choices=[('synchronous','synchronous'),('asynchronous','asynchronous')])
+    #camera = SelectField(id="cameraoff",choices=[("on","on"),("off","off")])
+    #cameraoffreason = SelectField("Why do you want your camera off today for this class?",id="cameraoffreason",choices=[('','---'),('poor bandwidth','poor bandwidth'),('zoom fatigue','zoom fatigue'),('visual distraction','visual distraction'),('my current environment','current environment'),('other','other')])
+    #cameraoffreasonother = TextAreaField(id="cameraoffreasonother")
     submit = SubmitField('Submit')
 
 class GClassForm(FlaskForm):

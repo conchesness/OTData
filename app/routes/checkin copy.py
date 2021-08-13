@@ -55,12 +55,32 @@ def checkin():
                 gclassname = gclass[1]
                 break
 
+        if form.synchronous.data.lower() == "synchronous" and form.camera.data.lower() == "off" and len(form.cameraoffreason.data) == 0:
+            flash('Please include a reason for why your camera will be off.')
+            return redirect(url_for('checkin'))
+
+        if form.synchronous.data.lower() == "synchronous" and form.camera.data.lower() == "off" and form.cameraoffreason.data.lower() == "other" and len(form.cameraoffreasonother.data) == 0:
+            flash("Your camera off reason was 'Other' but you didn't include the reason. Please include the reason.")
+            return redirect(url_for('checkin'))
+
+        synchronous = True
+        if form.synchronous.data.lower() == "asynchronous":
+            synchronous = False
+
+        cameraoff = False
+        if form.camera.data.lower() == "off":
+            cameraoff=True
+
         checkin = CheckIn(
             gclassid = form.gclassid.data,
             gclassname = gclassname,
             student = currUser,
             desc = form.desc.data,
-            status = form.status.data         
+            status = form.status.data,
+            synchronous = synchronous,
+            cameraoff = cameraoff,
+            cameraoffreason = form.cameraoffreason.data,
+            cameraoffreasonother = form.cameraoffreasonother.data            
             )
         
         checkin.save()
@@ -69,6 +89,9 @@ def checkin():
         form.gclassid.data = None
         form.desc.data = None
         form.status.data = None
+        form.synchronous.data = None
+        form.camera.data = None
+        form.cameraoffreason.data = None
 
     if currUser.role.lower() == 'student':
         checkins = CheckIn.objects(student=currUser).order_by('-createdate').limit(10)

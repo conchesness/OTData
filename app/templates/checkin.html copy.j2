@@ -10,14 +10,16 @@
       <h1>Check In</h1>
       <span class="today"><!--Script will insert date time--></span>
       <h4>
-        {% for field in form.errors %}
-            {% for error in form.errors[field] %}
-                <div class="alert alert-error">
-                    <strong>Error!</strong>{{field}}: {{error}}
-                </div>
-            {% endfor %}
-        {% endfor %}
       <table class="table">
+          <tr>
+            <td colspan="2" class="synchOutput">
+
+            </td>
+          </tr>
+        <tr class="synch">
+          <td align="right">{{form.synchronous()}}</td>
+          <td></td>
+        </tr>
         <tr>
           <td align="right">
             Which Class<font color="red">*</font>:
@@ -32,7 +34,19 @@
           <td align="right">How are you?<font color="red">*</font>:</td><td>{{form.status()}}</td>
         </tr>
         <tr>
-          <td align="right">What are you<br>working on?:</td><td>{{form.desc(cols = "40")}}</td>
+          <td align="right">What are you<br>working on?<font color="red">*</font>:</td><td>{{form.desc(cols = "40")}}</td>
+        </tr>
+        <tr class="cameraoff">
+          <td align="right">BETA --> Camera<font color="red">*</font>:</td>
+          <td>{{ form.camera() }} </td>
+        </tr>
+        <tr class="cameraoffreason">
+          <td align="right">Camera off reason<font color="red">*</font>:</td>
+          <td>{{form.cameraoffreason()}}</td>
+        </tr>
+        <tr class="cameraoffreasonother">
+          <td align="right">Other<font color="red">*</font>:</td>
+          <td>{{form.cameraoffreasonother()}}</td>
         </tr>
         <tr>
           <td align="right">{{form.submit()}}</td><td></td>
@@ -271,13 +285,19 @@
 <script type="text/javascript">
 
   jQuery(document).ready(function() {
+    $('.cameraoffreason').hide();
+    $('.cameraoffreasonother').hide();
     var today = new Date();
     //var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     $(".today").html(today);
 
-
-    if(today.getDay() == 3 or today.getDay() == 5) {
-        if(today.getHours()*60 + today.getMinutes() >= 895 ) {
+    //if it is after 4pm or the weekend then hide the form
+//    if (today.getHours() >= 18 || today.getDay() == 0 || today.getDay() == 6) {
+//      $(".synchOutput").html("Check In is Closed For Today."); 
+//      $('.checkinform').hide();
+    // if it is Wed then async after 12 noon
+    } else if(today.getDay() == 3) {
+        if(today.getHours() >= 12 ) {
           $(".synchOutput").html("Aynchronous"); 
           $('#synchronous').val("asynchronous");
          $('.synch').hide();
@@ -286,7 +306,7 @@
         }
     //if it is M,Tu,Th,Fr then asynch after 12:20
     } else {
-      if(today.getHours()*60 + today.getMinutes() >= 940) {
+      if(today.getHours()*60 + today.getMinutes() >= 740) {
         $(".synchOutput").html("Asynchronous"); 
         $('#synchronous').val("asynchronous");
         $('.synch').hide();
@@ -294,6 +314,37 @@
         $('#cameraoff').val("off")
       }
     }
+    
+    $("#synchronous").change(function() {
+      if($(this).val().toLowerCase() == 'asynchronous') {
+        $('.cameraoff').hide();
+        $('#cameraoff').val("off")
+        $('#cameraoffreason').val("")
+        $('.cameraoffreason').hide();
+        $('.cameraoffreasonother').hide();
+      } else {
+        $('#cameraoff').val("on");
+        $('.cameraoff').show();
+      }
+    });
+
+    $("#cameraoff").change(function() {
+      if($(this).val().toLowerCase() == 'off') {
+        $('.cameraoffreason').show();
+      } else {
+        $('#cameraoffreason').val("")
+        $('.cameraoffreason').hide();
+        $('.cameraoffreasonother').hide();
+      }
+    });
+
+    $("#cameraoffreason").change(function() {
+      if($(this).val().toLowerCase() == 'other') {
+        $('.cameraoffreasonother').show();
+      } else {
+        $('.cameraoffreasonother').hide();
+      }
+    });
 
   });
 </script>

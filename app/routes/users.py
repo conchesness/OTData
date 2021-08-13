@@ -176,7 +176,6 @@ def login(audience=None):
     # Go and get the users credentials from google. The /authorize and /oauth2callback functions should not be edited.
     # That is where the user is sent if their credentials are not currently stored in the session.  More about sessions below. 
     if 'credentials' not in session:
-        # send a msg to the user
         # send the user to get authenticated by google
         return redirect(url_for('authorize'))
 
@@ -192,15 +191,22 @@ def login(audience=None):
     # information displayed via the current profile template
     data = people_service.people().get(resourceName='people/me', personFields='names,emailAddresses,photos').execute()
 
-
+    #TODO there is def a more efficient way to do this!
     if data['emailAddresses'][0]['value'][-8:] == "ousd.org":
         if session['audience'].lower() == 'community':
-            flash(f'You have an ousd.org email address but you are logging in as a community member. If you are an Oakland Tech student or staff, logout out and use the OUSD login link.')
-            session['role'] = "Community"
+            session['audience'] = "ot"
+            if data['emailAddresses'][0]['value'][0:2] == "s_":
+                session['role'] = 'Student'
+                flash(f'You have an ousd.org email address but you are logging in as a community member. Switching you to OT and Student role.')
+            else:
+                session['role'] = 'Teacher'
+                flash(f'You have an ousd.org email address but you are logging in as a community member. Switching you to OT and Teacher role.')
         elif session['audience'].lower() == 'ot' and data['emailAddresses'][0]['value'][0:2] == "s_":
             session['role'] = 'Student'
+            session['audience'] = "ot"
         elif session['audience'].lower() == 'ot':
             session['role'] = 'Teacher'
+            session['audience'] = "ot"
     else:
         session['audience'] = "community"
         session['role'] = 'Community'
@@ -241,7 +247,13 @@ def login(audience=None):
         currUser.update(
             gid=data['emailAddresses'][0]['metadata']['source']['id'],
             role=session['role'],
-            isadmin=session['isadmin'] 
+            isadmin=session['isadmin']
+        )
+        currUser.reload()
+
+    if not currUser.role == session['role']:
+        currUser.update(
+            role = session['role']
         )
         currUser.reload()
     

@@ -618,8 +618,8 @@ def editrostersortorder(gclassid,sort=None):
     form=SortOrderCohortForm()
 
     if form.validate_on_submit():
-        flash('valid')
-        otStudent = User.objects.get(gid = form.gid.data)
+        #otStudent = User.objects.get(gid = form.gid.data)
+        otStudent = User.objects.get(otemail = form.gmail.data)
 
         try:
             otStudent.gclasses.get(gclassid = form.gclassid.data)
@@ -647,6 +647,7 @@ def editrostersortorder(gclassid,sort=None):
 
 
     for i in range(len(groster['roster'])):
+
         try:
             sortOrderCohort = groster['roster'][i]['sortCohort']
         except KeyError:
@@ -654,6 +655,7 @@ def editrostersortorder(gclassid,sort=None):
 
         sortForms['form'+str(i)]=SortOrderCohortForm()
         sortForms['form'+str(i)].gid.data = groster['roster'][i]['userId']
+        sortForms['form'+str(i)].gmail.data = groster['roster'][i]['profile']['emailAddress']
         sortForms['form'+str(i)].gclassid.data = groster['roster'][i]['courseId']
         sortForms['form'+str(i)].sortOrderCohort.data = sortOrderCohort
         if gclassroom.sortcohorts:

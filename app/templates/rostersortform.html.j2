@@ -16,6 +16,7 @@
             <td>
                 {{groster.roster[i].profile.name.fullName}}
                 {% if groster.roster[i].updateGClasses.lower() == "true" %}(u){% endif %}
+                
                 <form method=post>
                 {{forms["form"+i|string].hidden_tag()}}
             </td>
@@ -24,6 +25,7 @@
             </td>
             <td>
                 {{forms["form"+i|string].gid()}}
+                {{forms["form"+i|string].gmail()}}
                 {{forms["form"+i|string].gclassid()}}
                 {{forms["form"+i|string].order()}}
                 {{forms["form"+i|string].submit(value=i|string)}}

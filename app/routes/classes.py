@@ -8,12 +8,12 @@ import google.oauth2.credentials
 import googleapiclient.discovery
 from google.auth.exceptions import RefreshError
 
-@app.route('/addgclass/<gid>/<gclassid>/<gclassname>')
-def addgclass(gclassid,gid,gclassname):
+@app.route('/addgclass/<gmail>/<gclassid>/<gclassname>')
+def addgclass(gmail,gclassid,gclassname):
 
     try:
-        stu = User.objects.get(gid=gid)
-    except :
+        stu = User.objects.get(otemail=gmail)
+    except Exception as error:
         flash(f"Got an error: {error}")
         flash("I can't find this user in OTData.")
         return redirect(url_for('roster',gclassid=gclassid, gclassname=gclassname))

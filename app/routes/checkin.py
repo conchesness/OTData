@@ -213,7 +213,11 @@ def checkinsfor(gclassid,sndrmdr=0):
                 # TODO check these id's back against the students 
                 for stu in students:
                     if stu['userId'] == notcheckedingid and stu['profile']['emailAddress'][:2]=='s_':
-                        temp = User.objects.get(otemail = stu['profile']['emailAddress'])
+                        try:
+                            temp = User.objects.get(otemail = stu['profile']['emailAddress'])
+                        except Exception as error:
+                            flash(f"Unknown error for {stu['profile']['emailAddress']}: {error}")
+                            break
                         notcheckedstus.append(temp)
                         notcheckedstuschoices.append((temp.aeriesid,Markup(f'{temp.lname}, {temp.fname}<a href="/profile/{temp.aeriesid}">&#128279;</a>')))
                         break

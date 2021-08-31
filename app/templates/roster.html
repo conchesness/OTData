@@ -129,15 +129,15 @@
             <h3>{{otdstus[0][0].sortCohort}}</h3>
             {% for stu in otdstus %}
                 {% if stu[0].sortCohort != cohort.currCohort %}
-                <h3>{{stu[0].sortCohort}}</h3>
-                {% do cohort.update({'currCohort' : stu[0].sortCohort}) %}
-            {% endif %}
+                    <h3>{{stu[0].sortCohort}}</h3>
+                    {% do cohort.update({'currCohort' : stu[0].sortCohort}) %}
+                {% endif %}
                 {% if stu[1] and stu[1].adults %}
                     {% for adult in stu[1].adults %}
                         {{ adult.email }}, 
                     {% endfor %}
                 {% elif stu[1] and stu[1].aadultemail %}
-                    {{stu[1].aadultemail}}
+                    {{stu[1].aadultemail}},
                 {% endif %}
             {% endfor %}        
         </div>

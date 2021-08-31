@@ -48,17 +48,22 @@ def roster(gclassid,gclassname=None):
                 otdstu = User.objects.get(otemail=stu['profile']['emailAddress'])
                 # If they are in OTData get any missing assignment data
             # TODO find the right error for does not exist
-            except Exception as error:
+            except mongoengine.errors.DoesNotExist as error:
                 flash(f"Possibly, {stu['profile']['emailAddress']} is not in OTData")
                 flash(f"the exact error was: {error}")
                 if error == "User matching query does not exist":
                     stu['numMissing'] = 0
                     stu['numMissingUpdate'] = None
+            except Exception as error:
+                flash(f'unknown error occured: {error}')
             try:
                 otdStuClass = otdstu.gclasses.get(gclassid=gclassid)
             except mongoengine.errors.DoesNotExist:
+                flash(f"A Mongoengine DoesNotExist error occured: {error}")
                 stu['updateGClasses'] = "True"
                 otdstus.append([stu,otdstu])
+            except Exception as error:
+                flash(f"An unknown error occured: {error}")
             else:
                 stu['updateGClasses'] = "False"
                 try:

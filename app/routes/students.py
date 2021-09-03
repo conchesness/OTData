@@ -58,6 +58,13 @@ def sendstudentemail(aeriesid):
         # This would only happen if they typed the aeries id in to the url themselves and got it wrong.
         flash('The student you are trying to find does not exist.')
         return redirect('/')
+
+    # TODO Need to check for gmail auth here
+    if google.oauth2.credentials.Credentials(**session['credentials']).valid:
+        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    else:
+        flash('Needed to refresh your credentials before sending email.')
+        return redirect('/authorize')   
     
     emailList = []
     
@@ -113,10 +120,11 @@ def sendstudentemail(aeriesid):
     form.cc.choices = emailList
 
     if form.validate_on_submit():
-        if google.oauth2.credentials.Credentials(**session['credentials']).valid:
-            credentials = google.oauth2.credentials.Credentials(**session['credentials'])
-        else:
-            return redirect('/authorize')
+        # moved this to the top so that it happens BEFORE the form is submitted
+        # if google.oauth2.credentials.Credentials(**session['credentials']).valid:
+        #     credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+        # else:
+        #     return redirect('/authorize')
 
         session['credentials'] = credentials_to_dict(credentials)
         service = build('gmail', 'v1', credentials=credentials)
@@ -145,12 +153,16 @@ def sendstudentemail(aeriesid):
         message = {'raw' : b64_string}
         
         try:
+            print(f"in try loop for gmail api")
             message = (service.users().messages().send(userId='me', body=message).execute())
             flash("Email was sent. You can see the email in your GMail outbox and also below on this page in the 'Activities' secion.")
-        except RefreshError:
-            flash('Something went wrong. The problem is likely that you need to tell Google that this app is autorized to send emails. Hopefully that is fixed now')
+        except RefreshError as error:
+            flash(f"Credential Refresh Error happened: {error}. You were sent to reauthorize.")
             return redirect('/authorize')
             # return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
+        except Exception as error:
+            flash(f"Error happened: {error}. You were sent to reauthorize.")
+            return redirect('/authorize')
 
         currUser = User.objects.get(id=session['currUserId'])
         # If the student was included in the email or the student sent the email it should not be tagged confidential

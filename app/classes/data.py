@@ -95,6 +95,8 @@ class CheckIn(Document):
     status = StringField()
     synchronous = BooleanField()
     createdBy = ReferenceField('User') # Only present if not created by student
+
+    
     cameraoff = BooleanField()
     cameraoffreason = StringField()
     cameraoffreasonother = StringField()
@@ -186,6 +188,7 @@ class User(Document):
     casemanager = StringField(required=False)
     linkedin = StringField()
     shirtsize = StringField(required=False)
+    breakstart = DateTimeField()
 
     # Borrowed Computer
     compequiptype = StringField()

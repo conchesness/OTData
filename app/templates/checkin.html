@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container-fluid me-5">    
+  <div class="row">
+    <!--Checkin Form Column-->
+    <div class="col-lg m-3 border border-3">
+      <h2>Checkin</h2>
+        {% if checkins %}
+            <h5>Currently checkin in to:</h5> 
+            <p class="ms-3 ps-3 border">{{checkins[0].gclassname}} <br/>
+            from  {{moment(checkins[0].createdate).calendar()}}</p>
+        {% endif %}
+        {% if form %}
+          <h5>Checkin Now</h5>
+          
+          {% for field in form.errors %}
+              {% for error in form.errors[field] %}
+                  <div class="alert alert-error">
+                      <strong>Error!</strong>{{field}}: {{error}}
+                  </div>
+              {% endfor %}
+          {% endfor %}
+        <form method=post>
+          {{ form.hidden_tag() }}
+          <p>Which Class<font color="red">*</font>:
+          {{ form.gclassid() }}
+          <img width="20" src="/static/info.png" data-toggle="tooltip" data-placement="top" 
+          title="If you don't see the right classes here, go down to the 'My Google Classes' 
+          section to update and edit your classes"></p>
+        <p>How are you?<font color="red">*</font>: {{form.status()}}</p>
+        <p>What are you working on?:<br>{{form.desc(cols = "40")}}</p>
+        <p>{{form.submit()}}</p>
+      </form>
+    </div>
+    <!--Help Form Column-->
+    <div class="col-lg m-3 border border-3">
+      <h2>Help</h2>
+      {% if helpform %}
+        Helpform
+      {% endif %}
+    </div>
+    <!--Breakstart Form Column-->
+    <div class="col-lg m-3 border border-3">
+      <h2>Break</h2>
+      <div id="breakstarted">
+        Break started: {{moment(currUser.breakstart).format('MM/DD/YYYY, h:mm:ss a')}} <br>
+        <span id="breakover"><!--Time till over goes here by JS--></span>
+      </div>
+      <div id="startbreak">
+        <span id="lastbreak"></span>
+        <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <div class="row">
+  <div class="col-12">
+    {% if currUser.id|string() == session.currUserId|string() %} <br>
+      <a href="/gclasses" class="btn btn-info btn-sm" role="button">Update All My Classes from Google</a> <-- This script takes a little while to run.
+    {% endif %}
+      <h1>My Google Classes</h1>
+    {% if gCourses %}
+      <table class="table">
+        <thead class="thead-light">
+        <tr>
+            <td nowrap>
+              <img width="25" src="/static/edit.png"><b>E</b>dit
+              {% if not session.role.lower() == 'student' %}<br>
+                <img width="25" src="/static/roster.png"><b>R</b>oster<br>
+                <img width="25" src="/static/checkin.png"><b>C</b>heckins
+              {% endif %}
+            </td>
+            <th>
+              Status
+            </th>
+            <th>
+              Link to Google Classroom             
+            </th>
+            <th>
+              Teacher
+            </th>
+            <th>
+              Missing
+              {% if currUser.role.lower() == "student" and currUser.gid == session.gid %}
+                <small>(<a href="/missingassignmentsstu/{{currUser.gid}}">Update</a>)</small>
+              {% endif %}
+            </th>
+        </tr>
+      </thead>
+      {% for class in gCourses %}
+      {% if class.gclassroom and (class.status == "Active" or class.status == "") %}
+        {% if session.role.lower() == 'student' %}
+          <tr>
+            <td nowrap>
+              <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassroom.gclassdict.id}}">
+                <img width="25" src="/static/edit.png">
+              </a> 
+            </td>
+            <td>
+              {% if class.status %}
+                {{ class.status }}
+              {% endif %}
+            </td>
+            <td>
+              {% if class.classname %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+              {% else %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+              {% endif %}          
+            </td>
+            <td>
+              {{class.gclassroom.gteacherdict['name']['fullName']}}
+            </td>
+            <td>
+              {% if class.nummissing|int > 0 %}
+                <a href="{{class.missinglink}}">
+                  {{class.nummissing}}
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        {% elif class.gclassroom and class.status != "Ignore" %} <!--end Student and start not student not Ignore-->
+          <tr>
+            <td nowrap>
+              <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
+                <img width="25" src="/static/edit.png">
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+                <img width="25" src="/static/roster.png">
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+                <img width="25" src="/static/checkin.png">
+              </a>
+            </td>
+            <td>
+              {% if class.status %}
+                {{ class.status }}
+              {% endif %}
+            </td>
+            <td>
+              {% if class.classname %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+              {% else %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+              {% endif %}
+            </td>
+            <td>
+              {{class.gclassroom.gteacherdict['name']['fullName']}}
+            </td>
+          </tr>
+        {% endif %} <!--end student Ignore-->
+      {% endif %} <!--End student-->
+    {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+<!--STudent CheckIn List-->
+<a id="checkins"></a>
+  <div class="col-12">
+    {% if checkins %}
+      <h1>Last 10 Check Ins</h1>
+      <table class="table">
+        <tr>
+          <td></td><th>Class</th><th>A/S</th><th>Date</th><th>Status (1-5)</th><th>Camera Off Reason</th>
+        </tr>
+        {% for checkin in checkins %}
+          <tr>
+            <td><a class="btn btn-primary btn-sm" role="button" href="deletecheckin/{{checkin.id}}">Delete</a></td>
+            <td>
+              {{checkin.gclassname}}
+            </td>
+            <td>
+              {% if checkin.synchronous == True %}
+                S
+              {% else %}
+                A
+              {% endif %}
+              
+            </td>
+            <td>{{moment(checkin.createdate).calendar()}}</td>
+            <td>{{checkin.status}} </td>
+            {% if checkin.synchronous and checkin.cameraoff %}
+              <td class="bg-warning"> 
+            {% else %}
+              <td>
+            {% endif %}
+              {% if checkin.cameraoff %}
+                {% if checkin.cameraoffreason.lower() == "other" %}
+                  {{checkin.cameraoffreasonother}}
+                {% else %}
+                  {{checkin.cameraoffreason}}
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          <tr><th>Working on</th><td colspan="2"> {{checkin.desc}}</td></tr>
+        {% endfor %}
+      </table>
+          
+    {% endif %}
+  </div>
+  <!--In Active Classes-->
+  <h3>My Inactive Classes</h3>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <td>
+          <img width="25" src="/static/edit.png"> <b>E</b>dit
+          {% if not session.role.lower() == 'student' %}<br>
+            <img width="25" src="/static/roster.png"><b>R</b>oster<br>
+            <img width="25" src="/static/checkin.png"><b>C</b>heckins
+          {% endif %}
+        </td>
+        <th>status</th>
+        <th>Classname</th>
+      </tr>
+    </thead>
+    {% for class in gCourses %}
+    {% if class.gclassroom and class.status == "Inactive" %}
+      <tr>
+        <td nowrap>
+          <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
+            <img width="25" src="/static/edit.png">
+          </a>
+          {% if not session.role.lower() == 'student' %}
+            <a data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+              <img width="25" src="/static/roster.png">
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+              <img width="25" src="/static/checkin.png">
+            </a>
+          {% endif %}
+        </td>
+        <td>
+          {{class.status}}
+        </td>
+        <td>
+          {% if not class.classname == "~" %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+          {% else %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% endif %}
+    {% endfor %}
+    <tr class="table-dark"><td colspan = "3"></td></tr>
+    {% for class in gCourses %}
+    {% if class.gclassroom and class.status == "Ignore" %}
+      <tr>
+        <td nowrap>
+          <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
+            <img width="25" src="/static/edit.png">
+          </a>
+          {% if not session.role.lower() == 'student' %}
+            <a data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+              <img width="25" src="/static/roster.png">
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+              <img width="25" src="/static/checkin.png">
+            </a>
+          {% endif %}
+        </td>
+        <td>
+          {{class.status}}
+        </td>
+        <td>
+          {% if not class.classname == "~" %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+          {% else %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% endif %}
+    {% endfor %}
+
+  </table>
+</div>
+</div>
+
+<script type="text/javascript">
+
+  jQuery(document).ready(function() {
+    $('#breakstarted').hide();
+    $('#startbreak').hide();
+    var today = new Date();
+    today = moment(today)
+    //var currTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    //$(".today").html(today)
+    
+
+    if ('{{currUser.breakstart}}' != 'None') {
+      var breakstart = moment.utc('{{currUser.breakstart}}').toDate();
+      breakstart = moment(breakstart).local();
+    } else {
+      breakstart = moment().startOf('day');
+    }
+    var breakends = moment(breakstart).add(10, 'minutes');
+    breakends = moment(breakends).format('MM/DD/YYYY, h:mm:ss a')
+
+    if (moment().diff(breakstart, 'minutes') > 90) {
+      $('#startbreak').show();
+      if ('{{currUser.breakstart != "None"}}') {
+        var lastbreak = "Last break was: " + moment(breakstart).calendar() + "<br>"
+        $("#lastbreak").html(lastbreak)
+      } 
+    } else {
+      $('#breakstarted').show();
+    }
+
+    var difference = moment().diff(breakstart, 'seconds')
+    if (difference > 600) {
+      $("#breakover").html("Break is Over!")
+    } else {
+      $("#breakover").html("Break is over at: " + breakends)
+    }
+
+    
+  });
+</script>
+
+{% endblock %}
+
+

@@ -59,11 +59,13 @@
 <h1>Total students {{total}}</h1>
 <table class="table">
     <tr>
-        <th>name</th><th>cohort</th><th>ethnicity</th><th>grade</th><th>gender</th>
+        <th>ID</th><th>name</th><th>Email</th><th>cohort</th><th>ethnicity</th><th>grade</th><th>gender</th>
     </tr>
 {% for user in users | sort(attribute="lname,fname") %}
     <tr>
+        <td>{{user.aeriesid}}</td>
         <td><a href="/profile/{{user.aeriesid}}">{{user.fname}} {{user.lname}}</a></td>
+        <td>{{user.otemail}}</td>
         <td>{{user.cohort}}</td>
         <td>{{user.aethnicity}}</td>
         <td>{{user.grade}}</td>

@@ -76,7 +76,15 @@ def checkin():
         checkins = None
         form = None
 
-    return render_template('checkin.html.j2', gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
+    return render_template('checkin.html', gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
+
+@app.route('/breakstart')
+def breakstart():
+    currUser = User.objects.get(gid=session['gid'])
+    currUser.update(
+        breakstart = dt.now(pytz.timezone('US/Pacific'))
+    )
+    return redirect(url_for('checkin'))
 
 # TODO this function should replace checkinstu route and function below
 def checkinstus(gclassid,gclassname,student,searchdatetime):

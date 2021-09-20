@@ -38,17 +38,17 @@
     <br>
     <b>These students have not checked in</b><br>
     <em><u>To mark students as here, click the checkbox and hit submit.</u></em><br>
-    {% if stuForm %}
-        <form method=post>
-            {{ stuForm.hidden_tag() }} 
-            <div class="row">
-                {% for student in stuForm.student %}
-                    <div class="col-md-6 col-lg-4 col-xl-3">{{loop.index}}: {{ student }} {{ student.label }}</div>
-                {% endfor %}
-            </div>
-            <span class="loadingModal">{{ stuForm.submitStuForm() }}</span>
-        </form>
-    {% endif %}
+        {% if stuForm %}
+            <form method=post>
+                {{ stuForm.hidden_tag() }} 
+                <div class="row">
+                    {% for student in stuForm.student %}
+                        <div class="col-md-6 col-lg-4 col-xl-3">{{loop.index}}: {{ student }} {{ student.label }}</div>
+                    {% endfor %}
+                </div>
+                <span class="loadingModal">{{ stuForm.submitStuForm() }}</span>
+            </form>
+        {% endif %}
 
     <br>
     
@@ -60,23 +60,23 @@
         {% endfor %}
 
     <br> <br> <b>Adult Emails:</b> <br>
-    {% for stu in notcheckedstus | sort(attribute="lname,fname")  %}
-        {% if stu.gid %}
-            {% if stu.adults %}
-                {% for adult in stu.adults %}
-                    {% if adult.email %}
-                        {{adult.email}},
-                    {% elif stu.aadultemail %}
+        {% for stu in notcheckedstus | sort(attribute="lname,fname")  %}
+            {% if stu.gid %}
+                {% if stu.adults %}
+                    {% for adult in stu.adults %}
+                        {% if adult.email %}
+                            {{adult.email}},
+                        {% elif stu.aadultemail %}
+                            {{stu.aadultemail}}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% if stu.aadultemail %}
                         {{stu.aadultemail}}
                     {% endif %}
-                {% endfor %}
-            {% else %}
-                {% if stu.aadultemail %}
-                    {{stu.aadultemail}}
                 {% endif %}
             {% endif %}
-        {% endif %}
-    {% endfor %}
+        {% endfor %}
 
         <table class="table">
             <tr>
@@ -120,16 +120,29 @@
             </tr>
             {% endfor %}
         </table>
+        <br>
+        {% for stu in notcheckedstus %}
+        {{querydate.strftime('%m/%d/%y')}}, {{ stu.fname }} {{ stu.lname }}, {{ stu.aeriesid }}, B <br>
+        {% endfor %}
+        {% for checkin in checkins %}
+        {{querydate.strftime('%m/%d/%y')}}, {{checkin.student.fname}} {{checkin.student.lname}}, {{checkin.student.aeriesid}}, E <br>
+        {% endfor %}
     {% else %}
         <br> <h3>No checkins yet for this class on this date.</h3>
+        <h2>All students</h2>
+        {% if stuForm %}
+            <form method=post>
+                {{ stuForm.hidden_tag() }} 
+                <div class="row">
+                    {% for student in stuForm.student %}
+                        <div class="col-md-6 col-lg-4 col-xl-3">{{loop.index}}: {{ student }} {{ student.label }}</div>
+                    {% endfor %}
+                </div>
+                <span class="loadingModal">{{ stuForm.submitStuForm() }}</span>
+            </form>
+        {% endif %}
+
     {% endif %}
-    <br>
-    {% for stu in notcheckedstus %}
-    {{querydate.strftime('%m/%d/%y')}}, {{ stu.fname }} {{ stu.lname }}, {{ stu.aeriesid }}, B <br>
-    {% endfor %}
-    {% for checkin in checkins %}
-    {{querydate.strftime('%m/%d/%y')}}, {{checkin.student.fname}} {{checkin.student.lname}}, {{checkin.student.aeriesid}}, E <br>
-    {% endfor %}
 
 
 

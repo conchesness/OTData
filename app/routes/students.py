@@ -2,7 +2,7 @@ from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, url_for, session, flash, Markup
 from app.classes.data import User
-from app.classes.forms import StudentForm, SendemailForm, StudentNoteForm
+from app.classes.forms import NewStudentForm, StudentForm, SendemailForm, StudentNoteForm
 from mongoengine import Q
 from googleapiclient.discovery import build
 import google.oauth2.credentials
@@ -48,6 +48,40 @@ def findstudent():
         return render_template('findstudent.html', form=form, students=students)
 
     return render_template('findstudent.html', form=form)
+
+@app.route('/newstudent', methods=['GET','POST'])
+def newstudent():
+    form = NewStudentForm()
+
+    if form.validate_on_submit():
+        if not isinstance(form.grade.data, int):
+            try:
+                grade = int(form.grade.data)
+            except:
+                flash(f"You must select a grade.")
+                return render_template('newstudent.html', form=form)
+
+        newStudent = User(
+            afname = form.afname.data,
+            alname = form.alname.data,
+            fname = form.afname.data,
+            lname = form.alname.data,
+            aeriesid = form.aeriesid.data,
+            grade = grade,
+            otemail = form.otemail.data,
+            role = 'student',
+            gpa = 0
+        )
+        try:
+            newStudent.save()
+        except Exception as error:
+            flash(f"There was an error when we tried to save: {error}")
+            return render_template('newstudent.html', form=form)
+
+        return redirect(url_for('profile',aeriesid=form.aeriesid.data))
+
+    return render_template('newstudent.html', form=form)
+
 
 @app.route('/sendstudentemail/<aeriesid>', methods=['GET','POST'])
 def sendstudentemail(aeriesid):

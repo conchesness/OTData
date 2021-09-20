@@ -1,4 +1,5 @@
 from typing import Text
+from flask.app import Flask
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import URLField, DateField, DateTimeField, EmailField
 from wtforms.widgets.core import Select
@@ -49,6 +50,16 @@ class StudentForm(FlaskForm):
     fname = StringField("First Name")
     lname = StringField("Last Name")
     aeriesid = IntegerField(validators=[(validators.Optional()),(NumberRange(min=100000, max=999999, message="Must be a 6 digit number."))])
+    otemail = EmailField()
+    grade = IntegerField(validators=[(validators.Optional()),(NumberRange(min=100000, max=999999, message="Must be a 6 digit number."))])
+    submit = SubmitField("Submit")
+
+class NewStudentForm(FlaskForm):
+    afname = StringField("First Name",validators=[InputRequired()])
+    alname = StringField("Last Name",validators=[InputRequired()])
+    aeriesid = IntegerField("6 digit Aeries ID", validators=[InputRequired(),(NumberRange(min=100000, max=999999, message="Must be a 6 digit number."))])
+    otemail = EmailField('OUSD Email',validators=[InputRequired(),(Email())])
+    grade = SelectField('Grade', choices=[(None,'-'),(9,9),(10,10),(11,11),(12,12)],validators=[InputRequired()])
     submit = SubmitField("Submit")
 
 class CheckInForm(FlaskForm):

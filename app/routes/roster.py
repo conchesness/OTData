@@ -58,7 +58,7 @@ def roster(gclassid,gclassname=None):
                 flash(f'unknown error occured: {error}')
             try:
                 otdStuClass = otdstu.gclasses.get(gclassid=gclassid)
-            except mongoengine.errors.DoesNotExist:
+            except mongoengine.errors.DoesNotExist as error:
                 flash(f"A Mongoengine DoesNotExist error occured: {error}")
                 stu['updateGClasses'] = "True"
                 otdstus.append([stu,otdstu])

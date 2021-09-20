@@ -57,7 +57,7 @@
 
   <div class="row">
     <div class="col">
-      <h1>People on breaks</h1>
+      <h1>Breaks in the Last 90 Mins</h1>
       {% if breaks %}
         {% for break in breaks | sort(attribute="breakstart",reverse=True) %}
           {{break.fname}} {{break.lname}} {{moment(break.breakstart).calendar()}} <br>
@@ -330,6 +330,8 @@
     if (difference < 600) {
       $("#breakover").html("Break is over at: " + breakends)
     }
+
+    if (moment().diff(breakstart, 'minutes') < 90) {
     // Countdown Timer!!
     // Set the date we're counting down to
     var countDownDate = new Date(breakends);
@@ -364,6 +366,7 @@
         document.getElementById("demo").innerHTML = "Break is Over";
       }
     }, 1000);
+  }
 
     
   });

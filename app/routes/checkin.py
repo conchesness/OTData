@@ -76,7 +76,7 @@ def checkin():
         checkins = None
         form = None
 
-    query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=10))
+    query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
 
     try:
         breaks = User.objects(query)

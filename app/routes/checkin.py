@@ -76,7 +76,14 @@ def checkin():
         checkins = None
         form = None
 
-    return render_template('checkin.html', gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
+    query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=10))
+
+    try:
+        breaks = User.objects(query)
+    except:
+        breaks = None
+
+    return render_template('checkin.html', breaks=breaks, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
 
 @app.route('/breakstart')
 def breakstart():

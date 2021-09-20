@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="container-fluid me-5">    
+<div class="container-fluid">    
   <div class="row">
     <!--Checkin Form Column-->
     <div class="col-lg m-3 border border-3">
@@ -13,7 +13,6 @@
         {% endif %}
         {% if form %}
           <h5>Checkin Now</h5>
-          
           {% for field in form.errors %}
               {% for error in form.errors[field] %}
                   <div class="alert alert-error">
@@ -21,17 +20,18 @@
                   </div>
               {% endfor %}
           {% endfor %}
-        <form method=post>
-          {{ form.hidden_tag() }}
-          <p>Which Class<font color="red">*</font>:
-          {{ form.gclassid() }}
-          <img width="20" src="/static/info.png" data-toggle="tooltip" data-placement="top" 
-          title="If you don't see the right classes here, go down to the 'My Google Classes' 
-          section to update and edit your classes"></p>
-        <p>How are you?<font color="red">*</font>: {{form.status()}}</p>
-        <p>What are you working on?:<br>{{form.desc(cols = "40")}}</p>
-        <p>{{form.submit()}}</p>
-      </form>
+          <form method=post>
+            {{ form.hidden_tag() }}
+            <p>Which Class<font color="red">*</font>:
+            {{ form.gclassid() }}
+            <img width="20" src="/static/info.png" data-toggle="tooltip" data-placement="top" 
+            title="If you don't see the right classes here, go down to the 'My Google Classes' 
+            section to update and edit your classes"></p>
+            <p>How are you?<font color="red">*</font>: {{form.status()}}</p>
+            <p>What are you working on?:<br>{{form.desc(cols = "40")}}</p>
+            <p>{{form.submit()}}</p>
+          </form>
+        {% endif %}
     </div>
     <!--Help Form Column-->
     <div class="col-lg m-3 border border-3">
@@ -45,7 +45,7 @@
       <h2>Break</h2>
       <div id="breakstarted">
         Break started: {{moment(currUser.breakstart).format('MM/DD/YYYY, h:mm:ss a')}} <br>
-        <span id="breakover"><!--Time till over goes here by JS--></span>
+        <p id="breakover"><!--Time till over goes here by JS--></p>
       </div>
       <div id="startbreak">
         <span id="lastbreak"></span>
@@ -53,13 +53,28 @@
       </div>
     </div>
   </div>
-  {% endif %}
+
+  <div class="row">
+    <div class="col">
+      <h1>People on breaks</h1>
+      {% if breaks %}
+        {% for break in breaks | sort(attribute="breakstart",reverse=True) %}
+          {{break.fname}} {{break.lname}} {{moment(break.breakstart).calendar()}} <br>
+        {% endfor %}
+      {% else %}
+        <h3>No One Currently on break</h3>
+      {% endif %}
+    </div>
+  </div>
+
   <div class="row">
   <div class="col-12">
     {% if currUser.id|string() == session.currUserId|string() %} <br>
       <a href="/gclasses" class="btn btn-info btn-sm" role="button">Update All My Classes from Google</a> <-- This script takes a little while to run.
     {% endif %}
-      <h1>My Google Classes</h1>
+
+
+    <h1>My Google Classes</h1>
     {% if gCourses %}
       <table class="table">
         <thead class="thead-light">

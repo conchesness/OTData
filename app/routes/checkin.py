@@ -1,7 +1,7 @@
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, request, Markup
-from app.classes.data import User, CheckIn, GoogleClassroom
+from app.classes.data import User, CheckIn, GoogleClassroom, Help
 from app.classes.forms import CheckInForm, DateForm, StudentWasHereForm
 from datetime import datetime as dt
 from datetime import timedelta
@@ -83,7 +83,12 @@ def checkin():
     except:
         breaks = None
 
-    return render_template('checkin.html', breaks=breaks, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
+    try:
+        helps = Help.objects(requester=currUser)
+    except:
+        helps = None
+
+    return render_template('checkin.html', breaks=breaks, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
 
 @app.route('/breakstart')
 def breakstart():
@@ -92,6 +97,7 @@ def breakstart():
         breakstart = dt.now(pytz.timezone('US/Pacific'))
     )
     return redirect(url_for('checkin'))
+    
 
 # TODO this function should replace checkinstu route and function below
 def checkinstus(gclassid,gclassname,student,searchdatetime):

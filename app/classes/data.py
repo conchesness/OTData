@@ -231,6 +231,18 @@ class User(Document):
         'ordering': ['+glname', '+gfname']
     }
 
+class Help(Document):
+    requester = ReferenceField('User')
+    status = StringField() # asked, offered, confirmed
+    helper = ReferenceField('User')
+    created = DateTimeField(default=d.datetime.utcnow)
+    offered = DateTimeField()
+    confirmed = DateTimeField()
+
+    meta = {
+        'ordering': 'created'
+    }
+
 class IdealOutcome(EmbeddedDocument):
     oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
     name = StringField()

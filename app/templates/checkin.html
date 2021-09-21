@@ -35,10 +35,15 @@
     </div>
     <!--Help Form Column-->
     <div class="col-lg m-3 border border-3">
-      <h2>Help</h2>
-      {% if helpform %}
-        Helpform
+      <h2>My Open Helps</h2>
+      {% if helps %}
+      <p>
+      {% for help in helps %}
+        {{moment(help.created).calendar()}} {{help.status}} <br>
+      {% endfor %}
+      </p>
       {% endif %}
+      <p> <a href="/createhelp" class="btn btn-info btn-sm" role="button">New Help</a></p>
     </div>
     <!--Breakstart Form Column-->
     <div class="col-lg m-3 border border-3">
@@ -58,7 +63,7 @@
       </div>
       <div id="startbreak">
         <p id="lastbreak"></p>
-       <p> <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start</a></p>
+       <p> <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start Break</a></p>
       </div>
     </div>
   </div>
@@ -365,12 +370,13 @@
         seconds = "0"+seconds;
       }
       document.getElementById("countdown").innerHTML = "<b>Timer " + minutes + ":" + seconds +"</b>";
-
+      document.title = minutes + ":" + seconds
 
       // If the count down is finished, write some text
       if (distance < 0) {
         clearInterval(x);
         document.getElementById("countdown").innerHTML = "Break is Over";
+        document.title = "Break is Over"
       }
     }, 1000);
   }

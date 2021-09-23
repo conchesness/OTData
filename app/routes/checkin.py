@@ -28,6 +28,7 @@ def checkin():
         if gCourse.gclassroom:
             tempname = gCourse.gclassroom.gclassdict['name']
             if not gCourse.status:
+                
                 gCourse.status = ""
 
             # a list of tuples for the form

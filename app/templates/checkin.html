@@ -27,8 +27,8 @@
             <img width="20" src="/static/info.png" data-toggle="tooltip" data-placement="top" 
             title="If you don't see the right classes here, go down to the 'My Google Classes' 
             section to update and edit your classes"></p>
-            <p>How are you?<font color="red">*</font>: {{form.status()}}</p>
-            <p>What are you working on?:<br>{{form.desc(cols = "40")}}</p>
+            <p>Were you productive since last class?<font color="red">*</font>: {{form.status()}}</p>
+            <p>What is your goal for class today?:<br>{{form.desc(cols = "40")}}</p>
             <p>{{form.submit()}}</p>
           </form>
         {% endif %}
@@ -36,14 +36,14 @@
     <!--Help Form Column-->
     <div class="col-lg m-3 border border-3">
       <h2>My Open Helps</h2>
-      {% if helps %}
+      <!--{% if helps %}
       <p>
       {% for help in helps %}
         {{moment(help.created).calendar()}} {{help.status}} <br>
       {% endfor %}
       </p>
       {% endif %}
-      <p> <a href="/createhelp" class="btn btn-info btn-sm" role="button">New Help</a></p>
+      <p> <a href="/createhelp" class="btn btn-info btn-sm" role="button">New Help</a></p-->
     </div>
     <!--Breakstart Form Column-->
     <div class="col-lg m-3 border border-3">
@@ -89,9 +89,9 @@
             
             document.getElementById("isover{{loop.index}}").innerHTML = breakEndTemp.isBefore(moment().local());
             if (breakEndTemp.isBefore(moment().local())) {
-              document.getElementById("isover{{loop.index}}").style.backgroundColor='#ff0000';
-            } else {
               document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
+            } else {
+              document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
             }
           </script>
         </tr>
@@ -214,7 +214,7 @@
       <h1>Last 10 Check Ins</h1>
       <table class="table">
         <tr>
-          <td></td><th>Class</th><th>A/S</th><th>Date</th><th>Status (1-5)</th><th>Camera Off Reason</th>
+          <td></td><th>Class</th><th>Date</th><th>Were You Productive?</th>
         </tr>
         {% for checkin in checkins %}
           <tr>
@@ -222,29 +222,8 @@
             <td>
               {{checkin.gclassname}}
             </td>
-            <td>
-              {% if checkin.synchronous == True %}
-                S
-              {% else %}
-                A
-              {% endif %}
-              
-            </td>
             <td>{{moment(checkin.createdate).calendar()}}</td>
             <td>{{checkin.status}} </td>
-            {% if checkin.synchronous and checkin.cameraoff %}
-              <td class="bg-warning"> 
-            {% else %}
-              <td>
-            {% endif %}
-              {% if checkin.cameraoff %}
-                {% if checkin.cameraoffreason.lower() == "other" %}
-                  {{checkin.cameraoffreasonother}}
-                {% else %}
-                  {{checkin.cameraoffreason}}
-                {% endif %}
-              {% endif %}
-            </td>
           </tr>
           <tr><th>Working on</th><td colspan="2"> {{checkin.desc}}</td></tr>
         {% endfor %}

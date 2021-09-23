@@ -26,5 +26,9 @@
         {% for login in logins %}
             {{login.otemail}}, 
         {% endfor %}
+        <h3>Personal emails</h3>
+        {% for login in logins %}
+            {{login.personalemail}}, 
+        {% endfor %}
     </div>
 {% endblock %}

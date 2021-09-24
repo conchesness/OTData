@@ -28,7 +28,7 @@ def checkin():
         if gCourse.gclassroom:
             tempname = gCourse.gclassroom.gclassdict['name']
             if not gCourse.status:
-                
+
                 gCourse.status = ""
 
             # a list of tuples for the form
@@ -191,6 +191,7 @@ def checkinsfor(gclassid,sndrmdr=0):
 
     query = (Q(gclassid = gclassid) & (Q(createdate__gt = searchdatetime) & Q(createdate__lt = searchdatetime + timedelta(days=1))) )
     checkins = CheckIn.objects(query)
+    print(len(f"checkins"))
 
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
@@ -223,7 +224,7 @@ def checkinsfor(gclassid,sndrmdr=0):
     # This is a list of gids for of students on the google roster but not in the checked in
     notcheckedingids = [rostergid for rostergid in rostergids if rostergid not in checkingids]
     
-    # If there are student's who did not checkin get a list of all their user objects
+    # If there are students who did not checkin get a list of all their user objects
     notcheckedstus = []
     notcheckedstuschoices = []
     if notcheckedingids:

@@ -70,7 +70,8 @@
 
   <div class="row">
     <div class="col-6">
-      <h1>Breaks in the Last 90 Mins</h1>
+      <h1 class="mb-0 text-center">Breaks in the Last 90 Mins</h1>
+      <p class="mt-0 text-center"><small>refresh page to update</small></p>
       {% if breaks %}
       <table class="table table-small">
         <tr>
@@ -92,6 +93,7 @@
               document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
             } else {
               document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
+              document.getElementById("isover{{loop.index}}").style.color='#ffffff';
             }
           </script>
         </tr>
@@ -383,13 +385,16 @@
         document.title = "Break is Over";
       }
     }, 1000);
+
   }
-  if ('{{breaks}}'.length > 2) {
+
+  if ('{{breaks}}'.length > 2 && '{{currUser.role.lower()}}'=="teacher") {
     var refreshInterval = setInterval(function() {
       location.reload();
     }, 30000);
   }
-  });
+ });
+
 </script>
 
 {% endblock %}

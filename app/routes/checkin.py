@@ -78,18 +78,25 @@ def checkin():
         form = None
 
     query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
-
     try:
         breaks = User.objects(query)
     except:
         breaks = None
 
+    query = Q(requester=currUser) | Q(helper=currUser)
     try:
-        helps = Help.objects(requester=currUser)
+        myHelps = Help.objects(query)
     except:
-        helps = None
+        myHelps = None
 
-    return render_template('checkin.html', breaks=breaks, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
+    query = Q(requester__ne = currUser) & Q(helper__ne = currUser) & (Q(status="asked") | Q(status="offered"))
+    helps = Help.objects(query)
+    try:
+        helps = Help.objects(query)
+    except:
+        helps=None
+
+    return render_template('checkin.html', breaks=breaks, myHelps=myHelps, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
 
 @app.route('/breakstart')
 def breakstart():
@@ -97,8 +104,7 @@ def breakstart():
     currUser.update(
         breakstart = dt.now(pytz.timezone('US/Pacific'))
     )
-    return redirect(url_for('checkin'))
-    
+    return redirect(url_for('checkin')) 
 
 # TODO this function should replace checkinstu route and function below
 def checkinstus(gclassid,gclassname,student,searchdatetime):
@@ -122,31 +128,6 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
                 )
     newCheckIn.save()
     return flash(f" {student.fname} {student.lname} was just checked in by {currUser.fname} {currUser.lname}. ")
-
-
-# TODO create a seperate function that is called on form submit from the checkinsfor route
-# @app.route('/checkinstu/<gclassid>/<gclassname>/<aeriesid>/<searchdatetime>')
-# def checkinstu(gclassid,gclassname,aeriesid,searchdatetime):
-#     if session['role'].lower == "student":
-#         flash("Students can't checkin other studnets.")
-#         return redirect('index.html')
-#     currUser = User.objects.get(id=session['currUserId'])
-#     stu=User.objects.get(aeriesid=aeriesid)
-#     #searchdatetime = dt.strptime(searchdatetime,%Y-%m-%d %H:%M:%S-%z)
-#     searchdatetime = dt.strptime(searchdatetime, '%Y-%m-%d %H:%M:%S%z')
-#     searchdatetime = searchdatetime + timedelta(hours=12)
-#     newCheckIn = CheckIn(
-#                     createdate = searchdatetime,
-#                     gclassname = gclassname,
-#                     student = stu,
-#                     createdBy = currUser,
-#                     gclassid = gclassid,
-#                     desc = f"Check in created by {currUser.fname} {currUser.lname}"
-#                 )
-#     newCheckIn.save()
-
-#     return redirect(url_for('checkinsfor',gclassid=gclassid,gclassname=gclassname))
-
 
 @app.route('/deletecheckin/<checkinid>/<gclassid>/<gclassname>')
 @app.route('/deletecheckin/<checkinid>')

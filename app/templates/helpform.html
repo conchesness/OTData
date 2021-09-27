@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Create Help Request</h1>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <form method=post>
+            {{ form.hidden_tag() }}
+            {{form.gclassid}}
+            {{form.submit()}}
+        </form>
+        
+    </div>
+{% endblock %}

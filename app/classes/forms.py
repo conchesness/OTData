@@ -26,6 +26,10 @@ class StudentWasHereForm(FlaskForm):
     student = MultiCheckboxField('Students:')
     submitStuForm = SubmitField("Submit",id="submitStuForm")
 
+class ActiveClassesForm(FlaskForm):
+    gclassid = SelectField(choices=[])
+    submit = SubmitField("Submit")
+
 class SendemailForm(FlaskForm):
     to = MultiCheckboxField(choices=[])
     cc = MultiCheckboxField(choices=[])
@@ -84,7 +88,6 @@ class UserForm(FlaskForm):
     image = FileField("Image")
     ufname = StringField("First Name")
     ulname = StringField("Last Name")
-    #pronouns = SelectField(choices=[('---','---'),('He/Him', 'He/Him'),('She/Her','She/Her'),('They/Them','They/Them'),('Any/All','Any/All')])
     pronouns = StringField()
     birthdate = DateField()
     personalemail = EmailField('Personal Email',validators=[(validators.Optional()),(Email())])

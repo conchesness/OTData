@@ -189,6 +189,7 @@ class User(Document):
     linkedin = StringField()
     shirtsize = StringField(required=False)
     breakstart = DateTimeField()
+    breakclass = StringField()
 
     # Borrowed Computer
     compequiptype = StringField()
@@ -238,6 +239,7 @@ class Help(Document):
     created = DateTimeField(default=d.datetime.utcnow)
     offered = DateTimeField()
     confirmed = DateTimeField()
+    gclass = ReferenceField('GoogleClassroom')
 
     meta = {
         'ordering': 'created'

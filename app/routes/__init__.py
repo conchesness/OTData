@@ -14,4 +14,4 @@ from .equity import *
 from .plan import *
 from .coursecat import *
 from .ztemp import *
-#from .help import *
+from .help import *

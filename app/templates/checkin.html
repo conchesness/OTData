@@ -4,7 +4,7 @@
 <div class="container-fluid">    
   <div class="row">
     <!--Checkin Form Column-->
-    <div class="col-lg m-3 border border-3">
+    <div class="col-lg-11 col-xl-6 m-3 border border-3">
       <h2>Checkin</h2>
         {% if checkins %}
             <h5>Currently checkin in to:</h5> 
@@ -20,62 +20,51 @@
                   </div>
               {% endfor %}
           {% endfor %}
+          <div class="form-group">
           <form method=post>
             {{ form.hidden_tag() }}
-            <p>Which Class<font color="red">*</font>:
-            {{ form.gclassid() }}
-            <img width="20" src="/static/info.png" data-toggle="tooltip" data-placement="top" 
-            title="If you don't see the right classes here, go down to the 'My Google Classes' 
-            section to update and edit your classes"></p>
-            <p>Were you productive since last class?<font color="red">*</font>: {{form.status()}}</p>
-            <p>What is your goal for class today?:<br>{{form.desc(cols = "40")}}</p>
-            <p>{{form.submit()}}</p>
+            <p>Which Class<font color="red">*</font>            
+              <img width="10" src="/static/info.png" data-toggle="tooltip" data-placement="top" 
+              title="If you don't see the right classes here, go down to the 'My Google Classes' 
+              section to update and edit your classes">:
+            {{ form.gclassid(class="form-control") }}</p>
+
+            <p>Were you productive since last class?<font color="red">*</font>: {{form.status(class="form-control")}}</p>
+            <p>
+              What is your goal for class today?: <br>
+              <small>Be specific! Which specific assignment?</small>
+              <br>{{form.desc(class="form-control")}}
+            </p>
+            <p>{{form.submit(class="form-control")}}</p>
           </form>
+          </div>
         {% endif %}
     </div>
-    <!--Help Form Column-->
-    <div class="col-lg m-3 border border-3">
-      <h2>My Open Helps</h2>
-      <!--{% if helps %}
-      <p>
-      {% for help in helps %}
-        {{moment(help.created).calendar()}} {{help.status}} <br>
-      {% endfor %}
-      </p>
-      {% endif %}
-      <p> <a href="/createhelp" class="btn btn-info btn-sm" role="button">New Help</a></p-->
-    </div>
-    <!--Breakstart Form Column-->
-    <div class="col-lg m-3 border border-3">
+    <!--Break Column-->
+    <div class="col-lg-11 col-xl-5 m-3 border border-3">
       <h2>Break</h2>
       {% if checkins %}
         <h5>Currently checked-in in to:</h5> 
         <p class="ms-3 ps-3 border">{{checkins[0].gclassname}} <br/>
         from  {{moment(checkins[0].createdate).calendar()}}</p>
-        <p>Checkin it to the class you are taking a break from!</p>
       {% else %}
-          <p>Please checkin first so we know what class you are taking a break from.</p>
+          <p class="my=0">Please checkin first so we know what class you are taking a break from.</p>
       {% endif %}
       <div id="breakstarted">
-        Break started: {{moment(currUser.breakstart).format('MM/DD/YYYY, h:mm:ss a')}} <br>
-        <p id="breakover"><!--Time till over goes here by JS--></p>
+        Last Break started: {{moment(currUser.breakstart).format('MM/DD/YYYY, h:mm:ss a')}} <br>
+        <p class="my-0" id="breakover"><!--Time till over goes here by JS--></p>
         <p id="countdown"><!--Countdown Timer inserted here by JS.--></p>
       </div>
       <div id="startbreak">
         <p id="lastbreak"></p>
-       <p> <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start Break</a></p>
+        <p> <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start Break</a></p>
       </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-6">
-      <h1 class="mb-0 text-center">Breaks in the Last 90 Mins</h1>
-      <p class="mt-0 text-center"><small>refresh page to update</small></p>
+      <h4 class="mb-0">Breaks in the Last 90 Mins</h4>
+      <p class="mt-0"><small>refresh page to update</small></p>
       {% if breaks %}
       <table class="table table-small">
         <tr>
-          <th>Student</th><th>Break Ends</th><th>Break is over</th>
+          <th>Student</th><th>Break Ends</th><th></th>
         </tr>
         {% for break in breaks | sort(attribute="breakstart",reverse=True) %}
         <tr>
@@ -87,25 +76,100 @@
             breakStartTemp = moment(breakStartTemp).local();
             var breakEndTemp = moment(breakStartTemp).add(10, 'minutes');
             document.getElementById("in10mins{{loop.index}}").innerHTML = breakEndTemp.format('h:mm:ss a');
-            
-            document.getElementById("isover{{loop.index}}").innerHTML = breakEndTemp.isBefore(moment().local());
-            if (breakEndTemp.isBefore(moment().local())) {
-              document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
-            } else {
-              document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
-              document.getElementById("isover{{loop.index}}").style.color='#ffffff';
+            if ('{{currUser.role.lower()}}' == "teacher") {
+              if (breakEndTemp.isBefore(moment().local()) == false) {
+                document.getElementById("isover{{loop.index}}").innerHTML = "On Break";
+              } else {
+                document.getElementById("isover{{loop.index}}").innerHTML = "Back to Work";
+              }
+              if (breakEndTemp.isBefore(moment().local())) {
+                document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
+              } else {
+                document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
+                document.getElementById("isover{{loop.index}}").style.color='#ffffff';
+              }
             }
           </script>
         </tr>
         {% endfor %}
       </table>
       {% else %}
-        <h3>No One Currently on break</h3>
+        <h3>No breaks</h3>
       {% endif %}
     </div>
-    <div class="col-6"></div>
   </div>
+  <div class="row pe-5">
+    <!--Help Column-->
+    <div class="col-11 m-3 border border-3">
+      <h3>My Helps</h3>
+      {% if myHelps %}
+      <p><b>My Requests</b></p>
+      <table class="table table-sm">
+        <tr>
+          <th></th><th>Created</th><th>status</th><th>offered</th><th>class</th>
+        </tr>
+      {% for myHelp in myHelps %}
+        {% if currUser == myHelp.requester %}
+          <tr>
+            <td>
+              <a href="/help/delete/{{myHelp.id}}">Del</a> 
+            </td>
+            <td>
+              {{moment(myHelp.created).calendar()}}
+            </td>
+            <td>
+              {{myHelp.status}}
+            </td>
+            <td>
+              {{myHelp.helper.fname}} {{myHelp.helper.lname}}
+            </td>
+            <td>
+              {{myHelp.gclass.gclassdict['name']}}
+            </td>
+          </tr>
+          {% endif %}
+      {% endfor %}
+      </table>
 
+
+      <p><b>My Offers</b></p>
+      <table class="table table-sm">
+        <tr><th></th><th>Created</th><th>status</th><th>Requester</th><th>Class</th><th>Offered</th></tr>
+      
+      {% for myHelp in myHelps %}
+        {% if currUser == myHelp.helper %}
+          <tr>
+            <td>
+              <a href="/help/recind/{{myHelp.id}}">Rem</a>
+            </td>
+            <td>{{moment(myHelp.created).calendar()}}</td>
+            <td>{{myHelp.status}}</td>            
+            <td>{{myHelp.requester.fname}} {{myHelp.requester.lname}}</td>
+            <td>{{myHelp.gclass.gclassdict['name']}}</td>
+            <td>{{moment(myHelp.offered).calendar()}}</td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+      </table>
+
+      {% endif %}
+      <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">New Help</a></p>
+      {% if helps %}
+      <h3>Requests for Help</h3>
+      <p>
+        {% for help in helps %}
+        {% if not help.helper %} <a href="/help/offer/{{help.id}}">Offer</a> {% endif %}
+          {{moment(help.created).calendar()}} {{help.requester.fname}} {{help.requester.lname}} {{help.status}} for help.
+          {% if help.helper %}
+            {{help.helper}} 
+          {% endif %}
+          <br>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+  </div>
+  
   <div class="row">
   <div class="col-12">
     {% if currUser.id|string() == session.currUserId|string() %} <br>
@@ -375,13 +439,13 @@
       if (seconds < 10) {
         seconds = "0"+seconds;
       }
-      document.getElementById("countdown").innerHTML = "<b>Timer " + minutes + ":" + seconds +"</b>";
-      document.title = minutes + ":" + seconds
+      document.getElementById("countdown").innerHTML = "<font color='blue'><b>Timer " + minutes + ":" + seconds +"</b></font>";
+      document.title = "Break: "+ minutes + ":" + seconds
 
       // If the count down is finished, write some text
       if (distance < 0) {
         clearInterval(countDownInterval);
-        document.getElementById("countdown").innerHTML = "Break is Over";
+        document.getElementById("countdown").innerHTML = "<font color='green'><b>Break ended at "+breakends+"</b></font>";
         document.title = "Break is Over";
       }
     }, 1000);

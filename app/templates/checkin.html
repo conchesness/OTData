@@ -6,11 +6,6 @@
     <!--Checkin Form Column-->
     <div class="col-lg-11 col-xl-6 m-3 border border-3">
       <h2>Checkin</h2>
-        {% if checkins %}
-            <h5>Currently checkin in to:</h5> 
-            <p class="ms-3 ps-3 border">{{checkins[0].gclassname}} <br/>
-            from  {{moment(checkins[0].createdate).calendar()}}</p>
-        {% endif %}
         {% if form %}
           <h5>Checkin Now</h5>
           {% for field in form.errors %}
@@ -31,12 +26,32 @@
 
             <p>Were you productive since last class?<font color="red">*</font>: {{form.status(class="form-control")}}</p>
             <p>
-              What is your goal for class today?: <br>
+              What is your goal for class today?<font color="red">*</font>: <br>
               <small>Be specific! Which specific assignment?</small>
               <br>{{form.desc(class="form-control")}}
             </p>
-            <p>{{form.submit(class="form-control")}}</p>
+            <p>{{form.submit(class="form-control btn-secondary")}}</p>
           </form>
+          {% if checkins %}
+      
+      <table class="table">
+        <tr>
+          <th><h5>Last Check In</h5></th><th>Class</th><th>Date</th><th>Were You Productive?</th>
+        </tr>
+          <tr>
+            <td>
+              <a class="btn btn-primary btn-sm" role="button" href="deletecheckin/{{checkins[0].id}}">Delete</a>
+            </td>
+            <td>
+              {{checkins[0].gclassname}}
+            </td>
+            <td>{{moment(checkins[0].createdate).calendar()}}</td>
+            <td>{{checkins[0].status}} </td>
+          </tr>
+          <tr><th>Working on</th><td colspan="3"> {{checkins[0].desc}}</td></tr>
+      </table>
+          
+    {% endif %}
           </div>
         {% endif %}
     </div>
@@ -98,21 +113,31 @@
       {% endif %}
     </div>
   </div>
+  <!--Help Column-->
   <div class="row pe-5">
-    <!--Help Column-->
     <div class="col-11 m-3 border border-3">
-      <h3>My Helps</h3>
+      <div class="row my-3">
+        <div class="col-2"><h3>My Helps</h3></div>
+        <div class="col"> <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">Request Help</a></p>
+        </div>
+      </div>
+      
       {% if myHelps %}
-      <p><b>My Requests</b></p>
-      <table class="table table-sm">
-        <tr>
-          <th></th><th>Created</th><th>status</th><th>offered</th><th>class</th>
-        </tr>
-      {% for myHelp in myHelps %}
-        {% if currUser == myHelp.requester %}
+        <table class="table table-sm">
+          <tr>
+            <th>My Requests</th><th>Created</th><th>Status</th><th>Helper</th><th>Class</th><th>Offered</th>
+          </tr>
+        {% for myHelp in myHelps | sort(attribute="status,created") %}
           <tr>
             <td>
-              <a href="/help/delete/{{myHelp.id}}">Del</a> 
+              <a href="/help/delete/{{myHelp.id}}">
+                {% if myHelp.status != "confirmed" %}
+                  <img src="/static/delete.png" width="20" alt="">
+                {% endif %}
+              </a> 
+              {% if myHelp.helper and myHelp.status != "confirmed" %}
+                | <a href="/help/confirm/{{myHelp.id}}">Confirm</a>
+              {% endif %}
             </td>
             <td>
               {{moment(myHelp.created).calendar()}}
@@ -121,51 +146,62 @@
               {{myHelp.status}}
             </td>
             <td>
+              {% if myHelp.helper %}
               {{myHelp.helper.fname}} {{myHelp.helper.lname}}
+              {% else %}----{% endif %}
             </td>
             <td>
               {{myHelp.gclass.gclassdict['name']}}
             </td>
+            <td>{% if myHelp.offered %}{{moment(myHelp.offered).calendar()}}{% else %}----{% endif %}</td>
           </tr>
-          {% endif %}
-      {% endfor %}
-      </table>
-
-
-      <p><b>My Offers</b></p>
-      <table class="table table-sm">
-        <tr><th></th><th>Created</th><th>status</th><th>Requester</th><th>Class</th><th>Offered</th></tr>
-      
-      {% for myHelp in myHelps %}
-        {% if currUser == myHelp.helper %}
-          <tr>
-            <td>
-              <a href="/help/recind/{{myHelp.id}}">Rem</a>
-            </td>
-            <td>{{moment(myHelp.created).calendar()}}</td>
-            <td>{{myHelp.status}}</td>            
-            <td>{{myHelp.requester.fname}} {{myHelp.requester.lname}}</td>
-            <td>{{myHelp.gclass.gclassdict['name']}}</td>
-            <td>{{moment(myHelp.offered).calendar()}}</td>
-          </tr>
-        {% endif %}
-      {% endfor %}
-      </table>
-
-      {% endif %}
-      <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">New Help</a></p>
-      {% if helps %}
-      <h3>Requests for Help</h3>
-      <p>
-        {% for help in helps %}
-        {% if not help.helper %} <a href="/help/offer/{{help.id}}">Offer</a> {% endif %}
-          {{moment(help.created).calendar()}} {{help.requester.fname}} {{help.requester.lname}} {{help.status}} for help.
-          {% if help.helper %}
-            {{help.helper}} 
-          {% endif %}
-          <br>
         {% endfor %}
       {% endif %}
+
+      {% if myOffers %}
+        <tr><th colspan="3">My Offers</th><th>Requester</th><th></th><th></th></tr>
+        {% for myOffer in myOffers | sort(attribute="status",reverse=True)  %}
+            <tr>
+              <td>
+                {% if myOffer.status == "offered" %}
+                  <a href="/help/recind/{{myOffer.id}}">un-Offer</a>
+                {% endif %}
+              </td>
+              <td>{{moment(myOffer.created).calendar()}}</td>
+              <td>{{myOffer.status}}</td>            
+              <td>{{myOffer.requester.fname}} {{myOffer.requester.lname}}</td>
+              <td>{{myOffer.gclass.gclassdict['name']}}</td>
+              <td>{{moment(myOffer.offered).calendar()}}</td>
+            </tr>
+        {% endfor %}
+      {% endif %}
+     
+
+      {% if helps %}
+      <tr><th colspan="6"><hr></th></tr>
+      <tr>
+        <th colspan="3"><h3>Requests for Help</h3><th><u>Requester/<br>Helper</th></th>
+      </tr>
+      
+      <p>
+        {% for help in helps | sort(attribute="status,created") %}
+        <tr>
+          <td>{% if not help.helper %}<a href="/help/offer/{{help.id}}">Offer</a> {% endif %}</td>
+          <td>{{moment(help.created).calendar()}}</td>
+          <td>{{help.status}}</td>
+          <td>
+            {{help.requester.fname}} {{help.requester.lname}}
+            {% if help.helper %}
+              /<br>{{help.helper.fname}} {{help.helper.lname}} 
+            {% endif %}
+          </td>
+          <td>{{help.gclass.gclassdict['name']}}</td>
+          <td>{% if help.offered %}{{moment(help.offered).calendar()}}{% else %}----{% endif %}</td>
+        </tr>
+      
+        {% endfor %}
+      {% endif %}
+    </table>
     </div>
 
   </div>
@@ -284,14 +320,16 @@
         </tr>
         {% for checkin in checkins %}
           <tr>
-            <td><a class="btn btn-primary btn-sm" role="button" href="deletecheckin/{{checkin.id}}">Delete</a></td>
+            <td>
+              <a class="btn btn-primary btn-sm" role="button" href="deletecheckin/{{checkin.id}}">Delete</a>
+            </td>
             <td>
               {{checkin.gclassname}}
             </td>
             <td>{{moment(checkin.createdate).calendar()}}</td>
             <td>{{checkin.status}} </td>
           </tr>
-          <tr><th>Working on</th><td colspan="2"> {{checkin.desc}}</td></tr>
+          <tr><th>Working on</th><td colspan="3"> {{checkin.desc}}</td></tr>
         {% endfor %}
       </table>
           

@@ -87,6 +87,7 @@ class Note(EmbeddedDocument): #Embedded on User Document
 class CheckIn(Document):
     createdate = DateTimeField(default=d.datetime.utcnow)
     gclassid = IntField()
+    googleclass = ReferenceField('GoogleClassroom')
     gclassname = StringField()
     student = ReferenceField('User')
     user_agent = StringField()

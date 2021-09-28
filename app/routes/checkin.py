@@ -43,22 +43,20 @@ def checkin():
 
         # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
         # All dates retrieved from the DB are in UTC
-        if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date():
-             flash('It looks like you already checkin today? If so, please delete one of the checkins.')
-        #      return redirect(url_for('checkin'))
+        if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == int(form.gclassid.data):
+            flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
+            return redirect(url_for('checkin'))
 
         if len(form.status.data) == 0:
             flash('"How are you" is a required field')
             return redirect(url_for('checkin'))
 
-        for gclass in gclasses:
-            if form.gclassid.data == gclass[0]:
-                gclassname = gclass[1]
-                break
+        googleclass = GoogleClassroom.objects.get(gclassid=form.gclassid.data)
 
         checkin = CheckIn(
             gclassid = form.gclassid.data,
-            gclassname = gclassname,
+            googleclass = googleclass,
+            gclassname = googleclass.gclassdict['name'],
             student = currUser,
             desc = form.desc.data,
             status = form.status.data         
@@ -83,11 +81,15 @@ def checkin():
     except:
         breaks = None
 
-    query = Q(requester=currUser) | Q(helper=currUser)
     try:
-        myHelps = Help.objects(query)
+        myHelps = Help.objects(requester=currUser)
     except:
         myHelps = None
+
+    try:
+        myOffers = Help.objects(helper=currUser)
+    except:
+        myOffers = None
 
     query = Q(requester__ne = currUser) & Q(helper__ne = currUser) & (Q(status="asked") | Q(status="offered"))
     helps = Help.objects(query)
@@ -96,7 +98,7 @@ def checkin():
     except:
         helps=None
 
-    return render_template('checkin.html', breaks=breaks, myHelps=myHelps, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
+    return render_template('checkin.html', breaks=breaks, myHelps=myHelps, myOffers=myOffers, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
 
 @app.route('/breakstart')
 def breakstart():

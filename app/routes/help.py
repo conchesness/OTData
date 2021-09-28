@@ -53,7 +53,7 @@ def offerhelp(helpid):
         offerHelp.update(
             helper = currUser,
             status = "offered",
-            offered = dt.datetime.utcnow()
+            offered = dt.utcnow()
         )
     else:
         flash("Can't add you as the helper.")
@@ -74,10 +74,36 @@ def helprecind(helpid):
     else:
         flash("Offer can't be recinded because you are not the Helper.")
 
+    return redirect(url_for('checkin'))
+
+
 @app.route('/help/confirm/<helpid>')
 def confirmhelp(helpid):
-     
-    pass
+        
+    confirmHelp = Help.objects.get(pk=helpid)
+    currUser = User.objects.get(gid=session['gid'])
+
+    if confirmHelp.requester != currUser:
+        flash('You can only confirm a hep that you have requested.')
+        return redirect(url_for('checkin'))
+
+    if not confirmHelp.helper:
+        flash('You can only confirm a help where there is a helper.')
+        return redirect(url_for('checkin'))
+
+    if confirmHelp.status == "confirmed":
+        flash('This help is already confirmed.')
+        return redirect(url_for('checkin'))
+
+    confirmHelp.update(
+        confirmed = dt.utcnow(),
+        status = "confirmed"
+    )
+
+    return redirect(url_for('checkin'))
+
+    
+    
 
 @app.route('/help/delete/<helpid>')
 def deletehelp(helpid):
@@ -85,10 +111,16 @@ def deletehelp(helpid):
     delHelp = Help.objects.get(pk=helpid)
     currUser = User.objects.get(gid=session['gid'])
 
-    if currUser == delHelp.requester:
-        delHelp.delete()
-        flash('Your requested Help is deleted.')
-    else:
+
+    if currUser != delHelp.requester:
         flash('You are not the requester of the help so you cannot delete it.')
+        return redirect(url_for('checkin'))
+
+    if delHelp.status == "confirmed":
+        flash("You can't delete a confirmed help.")
+        return redirect(url_for('checkin'))
+
+    delHelp.delete()
+    flash('Your requested Help is deleted.')
 
     return redirect(url_for('checkin'))

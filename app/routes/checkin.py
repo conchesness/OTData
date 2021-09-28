@@ -81,13 +81,15 @@ def checkin():
     except:
         breaks = None
 
+    query = Q(requester=currUser) & Q(status__ne = "confirmed")
     try:
-        myHelps = Help.objects(requester=currUser)
+        myHelps = Help.objects(query)
     except:
         myHelps = None
 
+    query = Q(helper=currUser) & Q(status__ne = "confirmed")
     try:
-        myOffers = Help.objects(helper=currUser)
+        myOffers = Help.objects(query)
     except:
         myOffers = None
 

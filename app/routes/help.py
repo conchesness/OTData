@@ -49,14 +49,21 @@ def offerhelp(helpid):
 
     offerHelp = Help.objects.get(pk=helpid)
     currUser = User.objects.get(gid=session['gid'])
-    if currUser != offerHelp.requester and not offerHelp.helper:
-        offerHelp.update(
-            helper = currUser,
-            status = "offered",
-            offered = dt.utcnow()
-        )
-    else:
-        flash("Can't add you as the helper.")
+
+    if currUser == offerHelp.requester:
+        flash("You can't be the helper AND the help requester.")
+        return redirect(url_for('checkin'))
+
+    if offerHelp.helper:
+        flash("There is already a helper for this help.")
+        return redirect(url_for('checkin'))
+
+    offerHelp.update(
+        helper = currUser,
+        status = "offered",
+        offered = dt.utcnow()
+    )
+
  
     return redirect(url_for('checkin'))
 
@@ -64,6 +71,7 @@ def offerhelp(helpid):
 def helprecind(helpid):
     recindHelp = Help.objects.get(pk=helpid)
     currUser = User.objects.get(gid=session['gid'])
+
     if currUser == recindHelp.helper:
         recindHelp.update(
             helper = None,
@@ -82,6 +90,18 @@ def confirmhelp(helpid):
         
     confirmHelp = Help.objects.get(pk=helpid)
     currUser = User.objects.get(gid=session['gid'])
+
+    if currUser.role.lower() == "teacher":
+        if not confirmHelp.helper:
+            confirmHelp.update(
+                helper = currUser
+            )
+        confirmHelp.update(
+            confirmed = dt.utcnow(),
+            status = "confirmed"
+            )
+
+    return redirect(url_for('checkin'))
 
     if confirmHelp.requester != currUser:
         flash('You can only confirm a hep that you have requested.')
@@ -110,6 +130,11 @@ def deletehelp(helpid):
 
     delHelp = Help.objects.get(pk=helpid)
     currUser = User.objects.get(gid=session['gid'])
+
+    if currUser.role.lower() == "teacher":
+        delHelp.delete()
+        flash('The requested Help is deleted.')
+        return redirect(url_for('checkin'))
 
 
     if currUser != delHelp.requester:

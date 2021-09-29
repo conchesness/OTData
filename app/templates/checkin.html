@@ -161,15 +161,9 @@
     </div>
     <!--Break Column-->
     <div class="col-lg-11 col-xl-4 my-3 border border-3">
-      <h2>Break</h2>
-      {% if checkins %}
-        <h5>Currently checked-in in to:</h5> 
-        <p class="ms-3 ps-3 border">{{checkins[0].gclassname}} <br/>
-        from  {{moment(checkins[0].createdate).calendar()}}</p>
-      {% else %}
-          <p class="my=0">Please checkin first so we know what class you are taking a break from.</p>
-      {% endif %}
-      <div id="breakstarted">
+      <h2 class="mb=0">Break</h2>
+      <p class="my-0">Please checkin first.</p>
+      <div class="m-0" id="breakstarted">
         Last Break started: {{moment(currUser.breakstart).format('MM/DD/YYYY, h:mm:ss a')}} <br>
         <p class="my-0" id="breakover"><!--Time till over goes here by JS--></p>
         <p id="countdown"><!--Countdown Timer inserted here by JS.--></p>
@@ -178,9 +172,9 @@
         <p id="lastbreak"></p>
         <p> <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start Break</a></p>
       </div>
+      {% if breaks %}
       <h4 class="mb-0">Breaks in the Last 90 Mins</h4>
       <p class="mt-0"><small>refresh page to update</small></p>
-      {% if breaks %}
       <table class="table table-small">
         <tr>
           <th>Student</th><th>Break Ends</th><th></th>
@@ -212,8 +206,6 @@
         </tr>
         {% endfor %}
       </table>
-      {% else %}
-        <h3>No breaks</h3>
       {% endif %}
     </div>
   </div>

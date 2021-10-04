@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Computers</h1>
+
+<a href="/comp/new" class="btn btn-primary btn-sm" role="button">New Computer Record</a> <br>
+
+<table class="table">
+    <tr>
+        <th></th><th>Type</th><th>Location</th><th>Uid</th><th>Sticker</th><th>Status</th><th>Date</th>
+    </tr>
+{% for computer in computers %}
+    <tr>
+        <td>
+            <a href="/comp/del/{{computer.id}}"><img width="20" src="/static/delete.png"></a>
+        </td>
+        <td>{{computer.type}}</td>
+        <td>{{computer.location}}</td>
+        <td>{{computer.uid}}</td>
+        <td>{{computer.stickernum}}</td>
+        <td>{{computer.status}}</td>
+        <td>{{moment(computer.editdate).calendar()}}</td>
+    </tr>
+    <tr>
+        <td colspan="2"></td>
+        <td colspan="5">{{computer.statusdesc}}</td>
+    </tr>
+{% endfor %}
+</table>
+
+
+{% endblock %}

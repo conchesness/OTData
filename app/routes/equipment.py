@@ -1,12 +1,56 @@
+from flask.helpers import url_for
 from app import app
 from flask import render_template, redirect, session, flash
-from app.classes.data import User
-from app.classes.forms import CompBorrowForm
-from datetime import date
+from app.classes.data import Equipment, User
+from app.classes.forms import ComputerForm
+from  datetime import datetime, date
+
+@app.route('/comp/list')
+def complist():
+    computers = Equipment.objects()
+    print(computers)
+    return (render_template('computers.html', computers = computers))
+
+@app.route('/comp/new', methods=['GET', 'POST'])
+def compnew():
+    form = ComputerForm()
+
+    if form.validate_on_submit():
+
+        if not form.status.data.lower() == "working" and len(form.statusdesc.data) == 0:
+            flash(f"With status of {form.status.data} you must include a ststus description.")
+            return redirect(url_for('compnew'))
+
+        compNew = Equipment(
+            type = form.equiptype.data,
+            location = form.location.data,
+            uid = form.idnum.data,
+            stickernum = str(form.stickernum.data),
+            statusdesc = form.statusdesc.data,
+            status = form.status.data,
+            editdate = datetime.utcnow()
+        )
+
+        compNew.save()
+
+        return redirect(url_for('complist'))
+
+    return render_template('computerform.html', form=form)
+
+@app.route('/comp/del/<compid>')
+def compdel(compid):
+
+    compDel = Equipment.objects.get(pk=compid)
+
+    compDel.delete()
+    flash(f"The record for computer ID#: {compDel.uid} has been deleted.")
+
+    return redirect(url_for('complist'))
+
 
 @app.route('/compborrow/<aeriesid>', methods=['GET', 'POST'])
 def compborrow(aeriesid):
-    form = CompBorrowForm()
+    form = ComputerForm()
 
     # make sure a student can't check out a computer to another student and
     # a teacher can
@@ -18,13 +62,13 @@ def compborrow(aeriesid):
     if form.validate_on_submit():
         if form.equiptype.data == "Thinkpad" and len(form.idnum.data) != 10:
             flash('Unique ID for a Thinkpad must be 10 characters long')
-            return render_template('compborrowform.html',form=form,currUser=currUser)
+            return render_template('ComputerForm.html',form=form,currUser=currUser)
         if form.equiptype.data[:4] == "Dell" and len(form.idnum.data) != 7:
             flash('Unique ID for a Dell must be 7 characters long')
-            return render_template('compborrowform.html',form=form,currUser=currUser)
+            return render_template('ComputerForm.html',form=form,currUser=currUser)
 
         if not currUser.compdateout:
-            dateout = date.today()
+            dateout = datetime.utcnow().date()
         else:
             dateout = None
 
@@ -44,7 +88,7 @@ def compborrow(aeriesid):
     form.statusdesc.data = currUser.compstatusdesc
     form.status.data = currUser.compstatus
 
-    return render_template('compborrowform.html',form=form,currUser=currUser)
+    return render_template('ComputerForm.html',form=form,currUser=currUser)
 
 @app.route('/compdelete/<aeriesid>')
 def compdelete(aeriesid):

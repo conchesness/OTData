@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Computer Status Form</h1>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error! --> {{error}}</strong>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <form method=post>
+            {{ form.hidden_tag() }}
+            <table class="table">
+            <tr><th>Type</th><th>{{form.equiptype()}}</th></tr>
+            <tr><th>Location</th><th>{{form.location()}}</th></tr>
+            <tr><th>Unique ID <br> <small>See images below</small></th><th>{{form.idnum()}}</th></tr>
+            <tr><th>Sticker Number <br> <small>Only for the Dell computers</small></th><th>{{form.stickernum()}}</th></tr>
+            <tr><th>Status</th><th>{{form.status()}}</th></tr>
+            <tr><th>Status Description</th><th>{{form.statusdesc()}}</th></tr>
+            <tr><td colspan="2">{{form.submit()}}</td></tr>
+            </table>
+        </form>
+
+        <div class="row">
+            <div class="col">
+                <h3>Thinkpad</h3>
+                If you have a Thinkpad use the ID number on the back of the computer that is circled in this picture. <br>
+                <img width="300" src="/static/thinkpad.jpg"> <br>
+                There is no sticker number on the Thinkpads
+            </div>
+            <div class="col">
+                <h3>Dell Latitude</h3>
+                If you have a Dell Latitude from Ms. Ong's classroom room 104 or Ms. 
+                Ketcham's room, 105, use the Service Tag from the back of the computer as the ID Number. <br>
+                <img width="300" src="/static/dell-latitude.jpg"> <br>
+                The Sticker Number is the number written by hand on a sticker on the front of the computer.
+            </div>
+            <div class="col">
+                <h3>Dell Precision</h3>
+                If you have a Dell Precision it is from Mr. Wright's classroom, 102. 
+                Use the Service Tag from the back of the computer as the ID Number. <br>
+                <img width="300" src="/static/dell-precision.jpg"> <br>
+                The Sticker Number is the number written by hand on a sticker on the front of the computer.
+            </div>
+        </div>
+    
+    </div>
+{% endblock %}

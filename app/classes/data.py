@@ -4,7 +4,7 @@ from flask_mongoengine import Document
 from bson.objectid import ObjectId
 import datetime as d
 
-from wtforms.fields.core import SelectField
+from wtforms.fields.core import IntegerField, SelectField
 
 class Adult(EmbeddedDocument):
     preferredcontact = BooleanField()
@@ -231,6 +231,19 @@ class User(Document):
 
     meta = {
         'ordering': ['+glname', '+gfname']
+    }
+
+class Equipment(Document):
+    type = StringField(required=True)
+    location = StringField(required=True)
+    uid = StringField(required=True, unique=True)
+    stickernum = IntField()
+    status = StringField(required=True)
+    statusdesc = StringField()
+    editdate = DateTimeField()
+
+    meta = {
+        'ordering': ['location','stickernum']
     }
 
 class Help(Document):

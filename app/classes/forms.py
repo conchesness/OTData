@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms.fields.html5 import URLField, DateField, DateTimeField, EmailField
 from wtforms.widgets.core import Select
 from wtforms_components import TimeField
-from wtforms.validators import URL, NumberRange, Email, Optional, InputRequired
+from wtforms.validators import URL, NumberRange, Email, Optional, InputRequired, ValidationError
 from wtforms import widgets, SelectMultipleField, StringField, SubmitField, validators, TextAreaField, HiddenField, IntegerField, SelectField, FileField, BooleanField
 import datetime as d
 import pytz
@@ -123,13 +123,18 @@ class AdultForm(FlaskForm):
     needstranslation = BooleanField()
     submit = SubmitField("Submit")
 
-class CompBorrowForm(FlaskForm):
-    equiptype = SelectField(choices=[(None,'---'),('Thinkpad','Thinkpad'),('Dell102','Dell Room 102 (Wright)'),('Dell104','Dell Room 104 (Ong)'),('Dell105','Dell Room 105 (Ketcham)')],validators=[InputRequired()])
+class ComputerForm(FlaskForm):
+    equiptype = SelectField(choices=[('','---'),('Thinkpad','Thinkpad'),('Dell102','Dell Room 102 (Wright)'),('Dell104','Dell Room 104 (Ong)'),('Dell105','Dell Room 105 (Ketcham)')],validators=[InputRequired()])
     idnum = StringField('ID Number on the Equipment:',validators=[InputRequired()])
+    location = SelectField(choices=[('','---'),(102,102),(104,104),(105,105)],validators=[InputRequired()])
     stickernum = IntegerField('Number on a sticker:',validators=[(validators.Optional())])
-    statusdesc = TextAreaField('Description',validators=[(validators.Optional())])
-    status = SelectField(choices=[(None,'---'),('Working','Working'),('Problem','Problem'),('Not Working','Not Working')])
+    statusdesc = TextAreaField('Description')
+    status = SelectField(choices=[('','---'),('Working','Working'),('Problem','Problem'),('Not Working','Not Working')],validators=[InputRequired()])
     submit = SubmitField('Submit')
+
+    def validate_statusdesc(self,status):
+        if self.status.data != "Working" and len(self.statusdesc.data) == 0:
+            raise ValidationError("Status Description: You need to have a status description of the status isn't 'Working'.")
 
 class CommentForm(FlaskForm):
     content = TextAreaField("Comment")

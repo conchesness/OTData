@@ -191,6 +191,7 @@ class User(Document):
     shirtsize = StringField(required=False)
     breakstart = DateTimeField()
     breakclass = StringField()
+    breakduration = IntField()
 
     # Borrowed Computer
     compequiptype = StringField()
@@ -266,6 +267,8 @@ class Token(Document):
     giver = ReferenceField('User', required=True)
     transaction = DateTimeField(default=d.datetime.utcnow)
     amt = IntField(default=1)
+    # This is the objectid from the origin record
+    help = ReferenceField('Help')
 
 class IdealOutcome(EmbeddedDocument):
     oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)

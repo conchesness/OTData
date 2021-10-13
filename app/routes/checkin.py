@@ -77,7 +77,7 @@ def checkin():
 
     query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
     try:
-        breaks = User.objects(query)
+        breaks = User.objects(query).limit(4)
     except:
         breaks = None
 
@@ -103,8 +103,6 @@ def checkin():
         tokens = Token.objects(owner = currUser).count()
     except:
         tokens = None
-
-    print(tokens)
 
     return render_template('checkin.html', breaks=breaks, myHelps=myHelps, myOffers=myOffers, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser, tokens=tokens)
 

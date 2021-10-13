@@ -1,6 +1,7 @@
 from typing import Text
 from flask.app import Flask
 from flask_wtf import FlaskForm
+from mongoengine.fields import IntField
 from wtforms.fields.html5 import URLField, DateField, DateTimeField, EmailField
 from wtforms.widgets.core import Select
 from wtforms_components import TimeField
@@ -122,6 +123,11 @@ class AdultForm(FlaskForm):
     primarylang = StringField()
     needstranslation = BooleanField()
     submit = SubmitField("Submit")
+
+class BreakForm(FlaskForm):
+    gclassid = SelectField(choices=[])
+    duration = IntegerField()
+    submit = SubmitField('Submit')
 
 class ComputerForm(FlaskForm):
     equiptype = SelectField(choices=[('','---'),('Thinkpad','Thinkpad'),('Dell102','Dell Room 102 (Wright)'),('Dell104','Dell Room 104 (Ong)'),('Dell105','Dell Room 105 (Ketcham)')],validators=[InputRequired()])

@@ -114,23 +114,31 @@ def confirmhelp(helpid):
         status = "confirmed"
     )
     banker = User.objects.get(otemail='stephen.wright@ousd.org')
-
-    Token(
+    # give the help requester a Token for requesting a help that is now confirmed
+    requester1 = Token(
         giver = banker,
-        owner = confirmHelp.requester
-    ).save()
+        owner = confirmHelp.requester,
+        help = confirmHelp
+    )
+    requester1.save()
 
-    if currUser.role.lower() != "teacher":
-        Token(
+    # If the help was confirmed by the requester, give them another token
+    if currUser == confirmHelp.requester:
+        requester2 = Token(
             giver = banker,
-            owner = confirmHelp.requester
-        ).save()
+            owner = confirmHelp.requester,
+            help = confirmHelp
+        )
+        requester2.save()
 
+    # If the helper is a student, give them a token
     if confirmHelp.helper.role.lower() == "student":
-        Token(
+        helper1 = Token(
             giver = banker,
-            owner = confirmHelp.helper
-        ).save()
+            owner = confirmHelp.helper,
+            help = confirmHelp
+        )
+        helper1.save()
 
     return redirect(url_for('checkin'))
 

@@ -2,7 +2,7 @@ from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, request, Markup
 from app.classes.data import User, CheckIn, GoogleClassroom, Help, Token
-from app.classes.forms import CheckInForm, DateForm, StudentWasHereForm
+from app.classes.forms import BreakForm, CheckInForm, DateForm, StudentWasHereForm
 from datetime import datetime as dt
 from datetime import timedelta
 from mongoengine import Q
@@ -106,13 +106,49 @@ def checkin():
 
     return render_template('checkin.html', breaks=breaks, myHelps=myHelps, myOffers=myOffers, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser, tokens=tokens)
 
-@app.route('/breakstart')
+@app.route('/breakstart', methods=['GET', 'POST'])
 def breakstart():
     currUser = User.objects.get(gid=session['gid'])
-    currUser.update(
-        breakstart = dt.now(pytz.timezone('US/Pacific'))
-    )
-    return redirect(url_for('checkin')) 
+    form = BreakForm()
+    gCourses = currUser.gclasses
+    gclasses = []
+
+    for gCourse in gCourses:
+        if gCourse.gclassroom:
+            tempname = gCourse.gclassroom.gclassdict['name']
+            if not gCourse.status:
+                gCourse.status = ""
+            # a list of tuples for the form
+            if gCourse.status == "Active":
+                gclasses.append((gCourse.gclassroom.gclassid, tempname))
+
+    form.gclassid.choices = gclasses
+
+    try:
+        tokencount = Token.objects(owner = currUser).count()
+        tokens = Token.objects(owner = currUser)
+    except:
+        tokencount = 0
+        tokens = None
+
+    if form.validate_on_submit():
+        if form.duration.data > 10:
+            spend = form.duration.data - 10
+            if spend > tokencount:
+                flash(f"You are trying to spend {spend} tokens but you only have {tokencount}.")
+                return redirect(url_for('checkin'))
+            for i,token in enumerate(tokens):
+                if i+1 <= spend:
+                    token.delete()
+
+        currUser.update(
+            breakstart = dt.now(pytz.timezone('US/Pacific')),
+            breakduration = form.duration.data,
+            breakclass = form.gclassid.data
+        )
+        return redirect(url_for('checkin')) 
+    
+    return render_template('breakstart.html',tokencount=tokencount, form=form)
 
 # TODO this function should replace checkinstu route and function below
 def checkinstus(gclassid,gclassname,student,searchdatetime):

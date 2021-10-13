@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Break Start</h1>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        {% if tokencount > 5 %}
+            {% set breakmax = 15 %}
+        {% else %}    
+            {% set breakmax = 10 + tokencount %}
+        {% endif %}
+        <h5>You have {{tokencount}} tokens. You can do a break of up to {{breakmax}} mins </h5>
+        <form method=post>
+            {{ form.hidden_tag() }}
+            <table class="table">
+            <tr><th>Class</th><th>{{form.gclassid}}</th></tr>
+            <tr><th>Duration</th><th>{{form.duration}}</th></tr>
+            <tr><td colspan="2">{{form.submit()}}</td></tr>
+            </table>
+        </form>
+    </div>
+    <!-- <script type="text/javascript">
+
+        jQuery(document).ready(function() {
+            
+        });
+      
+    </script> -->
+      
+{% endblock %}

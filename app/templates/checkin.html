@@ -194,7 +194,7 @@
           <script type="text/javascript">
             var breakStartTemp = moment.utc('{{break.breakstart}}').toDate();
             breakStartTemp = moment(breakStartTemp).local();
-            var breakEndTemp = moment(breakStartTemp).add(10, 'minutes');
+            var breakEndTemp = moment(breakStartTemp).add('{{break.breakduration}}', 'minutes');
             document.getElementById("in10mins{{loop.index}}").innerHTML = breakEndTemp.format('h:mm:ss a');
             if ('{{currUser.role.lower()}}' == "teacher") {
               if (breakEndTemp.isBefore(moment().local()) == false) {
@@ -417,7 +417,7 @@
     } else {
       breakstart = moment().startOf('day');
     }
-    var breakends = moment(breakstart).add(10, 'minutes');
+    var breakends = moment(breakstart).add('{{currUser.breakduration}}', 'minutes');
     breakends = moment(breakends).format('MM/DD/YYYY, h:mm:ss a')
 
     if (moment().diff(breakstart, 'minutes') > 90) {

@@ -1,7 +1,7 @@
 from app.classes.forms import ActiveClassesForm
 from app import app
 from flask import render_template, redirect, session, flash, url_for
-from app.classes.data import GoogleClassroom, User, Help
+from app.classes.data import GoogleClassroom, User, Help, Token
 from app.classes.forms import ActiveClassesForm
 from datetime import datetime as dt
 from datetime import timedelta
@@ -91,20 +91,14 @@ def confirmhelp(helpid):
     confirmHelp = Help.objects.get(pk=helpid)
     currUser = User.objects.get(gid=session['gid'])
 
-    if currUser.role.lower() == "teacher":
-        if not confirmHelp.helper:
-            confirmHelp.update(
-                helper = currUser
-            )
+    if currUser.role.lower() == "teacher" and not confirmHelp.helper:
         confirmHelp.update(
-            confirmed = dt.utcnow(),
-            status = "confirmed"
-            )
+            helper = currUser
+        )
+        confirmHelp.reload()
 
-    return redirect(url_for('checkin'))
-
-    if confirmHelp.requester != currUser:
-        flash('You can only confirm a hep that you have requested.')
+    if confirmHelp.requester != currUser and currUser.role.lower() != "teacher":
+        flash('You can only confirm a help that you have requested.')
         return redirect(url_for('checkin'))
 
     if not confirmHelp.helper:
@@ -114,16 +108,32 @@ def confirmhelp(helpid):
     if confirmHelp.status == "confirmed":
         flash('This help is already confirmed.')
         return redirect(url_for('checkin'))
-
+    
     confirmHelp.update(
         confirmed = dt.utcnow(),
         status = "confirmed"
     )
+    banker = User.objects.get(otemail='stephen.wright@ousd.org')
+
+    Token(
+        giver = banker,
+        owner = confirmHelp.requester
+    ).save()
+
+    if currUser.role.lower() != "teacher":
+        Token(
+            giver = banker,
+            owner = confirmHelp.requester
+        ).save()
+
+    if confirmHelp.helper.role.lower() == "student":
+        Token(
+            giver = banker,
+            owner = confirmHelp.helper
+        ).save()
 
     return redirect(url_for('checkin'))
 
-    
-    
 
 @app.route('/help/delete/<helpid>')
 def deletehelp(helpid):
@@ -135,7 +145,6 @@ def deletehelp(helpid):
         delHelp.delete()
         flash('The requested Help is deleted.')
         return redirect(url_for('checkin'))
-
 
     if currUser != delHelp.requester:
         flash('You are not the requester of the help so you cannot delete it.')

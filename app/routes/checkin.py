@@ -1,7 +1,7 @@
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, request, Markup
-from app.classes.data import User, CheckIn, GoogleClassroom, Help
+from app.classes.data import User, CheckIn, GoogleClassroom, Help, Token
 from app.classes.forms import CheckInForm, DateForm, StudentWasHereForm
 from datetime import datetime as dt
 from datetime import timedelta
@@ -99,8 +99,14 @@ def checkin():
         helps = Help.objects(query)
     except:
         helps=None
+    try:
+        tokens = Token.objects(owner = currUser).count()
+    except:
+        tokens = None
 
-    return render_template('checkin.html', breaks=breaks, myHelps=myHelps, myOffers=myOffers, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser)
+    print(tokens)
+
+    return render_template('checkin.html', breaks=breaks, myHelps=myHelps, myOffers=myOffers, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser, tokens=tokens)
 
 @app.route('/breakstart')
 def breakstart():

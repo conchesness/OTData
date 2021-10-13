@@ -11,6 +11,16 @@ import googleapiclient.discovery
 from google.auth.exceptions import RefreshError
 import ast
 
+@app.route("/roster/saved/<gclassid>", methods=['GET','POST'])
+def rostersaved(gclassid):
+
+    gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    gclassname = gclassroom.gclassdict['name']
+
+    print(gclassroom.groster)
+
+    return render_template('roster.html',gclassname=gclassname, gclassid=gclassid, otdstus=gclassroom.groster)
+
 @app.route("/roster/<gclassid>/<gclassname>", methods=['GET','POST'])
 @app.route("/roster/<gclassid>", methods=['GET','POST'])
 def roster(gclassid,gclassname=None):
@@ -66,17 +76,17 @@ def roster(gclassid,gclassname=None):
                 flash(f"An unknown error occured: {error}")
             else:
                 stu['updateGClasses'] = "False"
+                stu['missingLink'] = otdStuClass.missinglink
+
                 try:
                     len(otdStuClass.missingasses['missing']) > 0
                 except KeyError:
                     stu['numMissing'] = 0
                     stu['numMissingUpdate'] = None
-                    stu['missingLink'] = None
                 else:
                     if len(otdStuClass.missingasses['missing']) > 0:
                         stu['numMissing'] = otdStuClass.nummissing
                         stu['numMissingUpdate'] = otdStuClass.nummissingupdate.date().strftime("%m/%d/%Y")
-                        stu['missingLink'] = otdStuClass.missinglink
                 try:
                     if otdStuClass.sortcohort:
                         stu['sortCohort'] = otdStuClass.sortcohort
@@ -327,7 +337,7 @@ def getmissing(gid, aeriesid, gclassid):
                 courseWorkId='-',
                 late = "LATE_ONLY",
                 pageToken=pageToken
-                ).execute()
+            ).execute()
         except RefreshError:
             return "AUTHORIZE"
 
@@ -369,11 +379,11 @@ def getmissing(gid, aeriesid, gclassid):
                     except:
                         assignedGrade = False
 
-                    for subHistoryItem in item['submissionHistory']:
-                        try:
-                            gradeHistory = subHistoryItem['gradeHistory']
-                        except:
-                            gradeHistory = None
+                    # for subHistoryItem in item['submissionHistory']:
+                    #     try:
+                    #         gradeHistory = subHistoryItem['gradeHistory']
+                    #     except:
+                    #         gradeHistory = None
 
                     if (assignedGrade == False and item['state'] != "TURNED_IN"):
                         missing = True
@@ -496,16 +506,23 @@ def nummissing(gclassid,index=0):
                 except KeyError:
                     missinglink = None
                 else:
-                    if len(otdStuClass.missingasses['missing']) > 0:
-                        beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
-                        end = otdStuClass.missingasses['missing'][0]['alternateLink']
-                        print(end)
-                        inverseEnd = end[::-1]
-                        indexFromEnd = inverseEnd.index('/')
-                        end = end[indexFromEnd*-1:]
-                        missinglink = f"{beginning}/sp/{end}/m"
-                    else:
-                        missinglink = None
+                    beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
+                    end = otdStuClass.missingasses['missing'][0]['alternateLink']
+                    print(end)
+                    inverseEnd = end[::-1]
+                    indexFromEnd = inverseEnd.index('/')
+                    end = end[indexFromEnd*-1:]
+                    missinglink = f"{beginning}/sp/{end}/m"
+                    # if len(otdStuClass.missingasses['missing']) > 0:
+                    #     beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
+                    #     end = otdStuClass.missingasses['missing'][0]['alternateLink']
+                    #     print(end)
+                    #     inverseEnd = end[::-1]
+                    #     indexFromEnd = inverseEnd.index('/')
+                    #     end = end[indexFromEnd*-1:]
+                    #     missinglink = f"{beginning}/sp/{end}/m"
+                    # else:
+                    #     missinglink = None
 
                 otdStudent.gclasses.filter(gclassid = gclassid).update(
                     nummissing = str(numMissStudSubs),
@@ -542,7 +559,7 @@ def missingassignmentsstu(gid):
     student = User.objects.get(gid=gid)
     for gclass in student.gclasses:
         if gclass.status and gclass.status.lower() == 'active':
-            missingAsses = getmissing(student.gid,student.aeriesid,gclass.gclassid,gclass.gclassroom.gclassdict['name'])
+            missingAsses = getmissing(student.gid,student.aeriesid,gclass.gclassid)
             if missingAsses == "AUTHORIZE":
                 flash("Need to re-authorize with Google to get these assignments.")
                 return redirect(url_for('authorize'))
@@ -579,25 +596,26 @@ def missingassignmentsstu(gid):
 
     return redirect(url_for('profile',aeriesid=student.aeriesid))
 
-@app.route('/missingassignmentslist/<aeriesid>')
+@app.route('/assignments/list/<aeriesid>')
 def missingassignmentslist(aeriesid):
     stu = User.objects.get(aeriesid=aeriesid)
-    # for gclass in stu.gclasses:
-    #     if gclass.missingasses:
-    #         for missingAss in gclass.missingasses:
-    #             if missingAss in 
-    #     # update the assignment list if there is none
-    #     if gclass.status and gclass.status.lower() == "active" and not gclass.gclassroom.courseworkdict:
-    #         getCourseWorkResult = getCourseWork(gclass.gclassid)
-    #         print(f"Result: {getCourseWorkResult}")
-    #         if getCourseWorkResult == "AUTHORIZE":
-    #             return redirect(url_for('authorize'))
-    #         elif getCourseWorkResult == "PERMISSION_DENIED":
-    #             flash(f"You do not have permission to access {gclass.gclassroom.gclassdict['name']} for this student.")
-    #         elif not getCourseWorkResult:
-    #             flash(f"An error occured. I was unable to update the assignment list for {gclass.gclassroom.gclassdict['name']}.")
-    #         elif getCourseWorkResult:
-    #             flash(f"Saved assignment list for {gclass.gclassroom.gclassdict['name']}")
+    for gclass in stu.gclasses:
+        # if gclass.missingasses:
+        #     for missingAss in gclass.missingasses:
+        #         if missingAss in 
+        # update the assignment list if there is none
+        if gclass.status and gclass.status.lower() == "active":
+            getCourseWorkResult = getCourseWork(gclass.gclassid)
+            print(f"Result: {getCourseWorkResult}")
+            if getCourseWorkResult == "AUTHORIZE":
+                return redirect(url_for('authorize'))
+            elif getCourseWorkResult == "PERMISSION_DENIED":
+                flash(f"You do not have permission to access {gclass.gclassroom.gclassdict['name']} for this student.")
+            elif not getCourseWorkResult:
+                flash(f"An error occured. I was unable to update the assignment list for {gclass.gclassroom.gclassdict['name']}.")
+            elif getCourseWorkResult:
+                flash(f"Saved assignment list for {gclass.gclassroom.gclassdict['name']}")
+
     # # TODO iterate through each missing assingment which are saved at gclass.missingasses. If it doesn't exist update the list
 
 

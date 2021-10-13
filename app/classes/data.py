@@ -3,8 +3,8 @@ from mongoengine import EmbeddedDocumentListField, DictField, ObjectIdField, Ema
 from flask_mongoengine import Document
 from bson.objectid import ObjectId
 import datetime as d
-
-from wtforms.fields.core import IntegerField, SelectField
+# from wtforms import validators
+# from wtforms.fields.core import IntegerField, SelectField
 
 class Adult(EmbeddedDocument):
     preferredcontact = BooleanField()
@@ -253,11 +253,19 @@ class Help(Document):
     created = DateTimeField(default=d.datetime.utcnow)
     offered = DateTimeField()
     confirmed = DateTimeField()
+    #helpdesc = StringField()
     gclass = ReferenceField('GoogleClassroom')
+    tokensAwarded = DateTimeField()
 
     meta = {
         'ordering': 'created'
     }
+
+class Token(Document):
+    owner = ReferenceField('User', required=True)
+    giver = ReferenceField('User', required=True)
+    transaction = DateTimeField(default=d.datetime.utcnow)
+    amt = IntField(default=1)
 
 class IdealOutcome(EmbeddedDocument):
     oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)

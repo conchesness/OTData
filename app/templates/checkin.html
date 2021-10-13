@@ -61,7 +61,13 @@
     <div class="col-lg-11 col-xl-8 my-3 border-3 border-top border-bottom border-start">
       <div class="row my-3">
         <div class="col-2"><h3>Help</h3></div>
-        <div class="col"> <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">Request Help</a></p>
+        <div class="col-2"> <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">Request Help</a></p></div>
+        <div class='col'>
+          {% if tokens and tokens > 1%}
+            You have earned {{tokens}} tokens.
+          {% else %}
+            You have earned {{tokens}} token.
+          {% endif %}
         </div>
       </div>
 
@@ -162,6 +168,7 @@
     <!--Break Column-->
     <div class="col-lg-11 col-xl-4 my-3 border border-3">
       <h2 class="mb=0">Break</h2>
+
       <p class="my-0">Please checkin first.</p>
       <div class="m-0" id="breakstarted">
         Last Break started: {{moment(currUser.breakstart).format('MM/DD/YYYY, h:mm:ss a')}} <br>
@@ -427,8 +434,6 @@
     if (difference < 600) {
       $("#breakover").html("Break is over at: " + breakends)
     }
-
-   
 
     if (moment().diff(breakstart, 'minutes') < 90) {
     // Countdown Timer!!

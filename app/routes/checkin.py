@@ -77,7 +77,7 @@ def checkin():
 
     query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
     try:
-        breaks = User.objects(query).limit(4)
+        breaks = User.objects(query)
     except:
         breaks = None
 

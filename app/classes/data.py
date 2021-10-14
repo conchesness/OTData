@@ -256,7 +256,9 @@ class Help(Document):
     confirmed = DateTimeField()
     #helpdesc = StringField()
     gclass = ReferenceField('GoogleClassroom')
+    confirmdesc = StringField()
     tokensAwarded = DateTimeField()
+
 
     meta = {
         'ordering': 'created'

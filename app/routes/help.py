@@ -1,4 +1,4 @@
-from app.classes.forms import ActiveClassesForm
+from app.classes.forms import ActiveClassesForm, SimpleForm
 from app import app
 from flask import render_template, redirect, session, flash, url_for
 from app.classes.data import GoogleClassroom, User, Help, Token
@@ -85,11 +85,12 @@ def helprecind(helpid):
     return redirect(url_for('checkin'))
 
 
-@app.route('/help/confirm/<helpid>')
+@app.route('/help/confirm/<helpid>', methods=['GET', 'POST'])
 def confirmhelp(helpid):
         
     confirmHelp = Help.objects.get(pk=helpid)
     currUser = User.objects.get(gid=session['gid'])
+    form = SimpleForm()
 
     if currUser.role.lower() == "teacher" and not confirmHelp.helper:
         confirmHelp.update(
@@ -108,10 +109,14 @@ def confirmhelp(helpid):
     if confirmHelp.status == "confirmed":
         flash('This help is already confirmed.')
         return redirect(url_for('checkin'))
+
+    if currUser.role.lower() == 'student' and not form.validate_on_submit():
+        return render_template('confirmform.html',form=form)
     
     confirmHelp.update(
         confirmed = dt.utcnow(),
-        status = "confirmed"
+        status = "confirmed",
+        confirmdesc = form.field.data
     )
     banker = User.objects.get(otemail='stephen.wright@ousd.org')
     # give the help requester a Token for requesting a help that is now confirmed

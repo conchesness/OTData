@@ -11,10 +11,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='local.css') }}"  type="text/css" />
     <!--Bootstrap links go here-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-    <!--script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script-->
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">    <!--script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script-->
     <!--script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script-->
     
     <!--This is some javascript tools for displaying date and time-->
@@ -53,47 +50,52 @@
     </div>
     <!-- Button trigger modal -->
     <span class="modalSpan">
-        <button id="modal" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-            Launch demo modal
-        </button>
+      <button id="modal" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Launch demo modal
+      </button>
     </span>
-  
+
   <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Working...</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <h5 class="loadMsg"></h5>
-          <img src="/static/loading.gif">
-        </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Working...</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h5 class="loadMsg"></h5>
+        <img src="/static/loading.gif">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
-    <script type="text/javascript">
-        jQuery(document).ready(function() {
-          var today = new Date();
-          //var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-          $("#today").html(today.toLocaleDateString());
-            $("#modal").hide();
-            $(".loadingModal").click(function() {
-                $("#modal").click();
-            });
-            $("a").click(function() {
-                if ($(this).attr("class") != undefined) {
-                    if($(this).attr("class").indexOf('dropdown-toggle') < 0) {
-                        $("#modal").click();
-                    };
-                } else {
-                    $("#modal").click();
-                };
-            });
-        });
-    </script>
+</div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>  <script type="text/javascript">
+      jQuery(document).ready(function() {
+        var today = new Date();
+        //var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        $("#today").html(today.toLocaleDateString());
+          $("#modal").hide();
+          $(".loadingModal").click(function() {
+              $("#modal").click();
+          });
+          $("a").click(function() {
+              if ($(this).attr("class") != undefined) {
+                  if($(this).attr("class").indexOf('dropdown-toggle') < 0) {
+                      $("#modal").click();
+                  };
+              } else {
+                  $("#modal").click();
+              };
+          });
+      });
+  </script>
 </body>
 </html>

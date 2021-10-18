@@ -100,7 +100,7 @@ def checkin():
     except:
         helps=None
     try:
-        tokens = Token.objects(owner = currUser).count()
+        tokens = Token.objects(owner = currUser).sum('amt')
     except:
         tokens = None
 

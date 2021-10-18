@@ -259,7 +259,6 @@ class Help(Document):
     confirmdesc = StringField()
     tokensAwarded = DateTimeField()
 
-
     meta = {
         'ordering': 'created'
     }

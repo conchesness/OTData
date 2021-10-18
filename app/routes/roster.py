@@ -130,8 +130,14 @@ def getgaurdians(gclassid,gclassname,index=0):
     
     session['credentials'] = credentials_to_dict(credentials)
     classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
-        
-    if not session['tempGStudents']:
+
+    try:
+        session['tempGStudents']
+    except:
+        session['tempGStudents'] = []
+
+    if len(session['tempGStudents'])==0:
+
         gstudents = []
         pageToken = None
         #students_results = classroom_service.courses().students().list(courseId = gclassid,pageToken=pageToken).execute()
@@ -147,7 +153,6 @@ def getgaurdians(gclassid,gclassname,index=0):
             if not pageToken:
                 break
             students_results = classroom_service.courses().students().list(courseId = gclassid,pageToken=pageToken).execute()
-
         session['tempGStudents'] = gstudents
 
     # Remove students without s_ at the beginning of their address
@@ -206,7 +211,7 @@ def getgaurdians(gclassid,gclassname,index=0):
         # This is the url for the loading page to call back
         url = f"/getguardians/{gclassid}/{gclassname}"
 
-        return render_template ('loading.html', url=url, nextIndex=index, total=numStus, timeLeft = timeLeft)
+        return render_template ('loading.html', url=url, nextIndex=index, total=numStus)
 
     session['tempGStudents'] = None
     return redirect(url_for('roster',gclassid=gclassid,gclassname=gclassname))

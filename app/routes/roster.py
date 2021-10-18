@@ -136,8 +136,7 @@ def getgaurdians(gclassid,gclassname,index=0):
     except:
         session['tempGStudents'] = []
 
-    if len(session['tempGStudents'])==0:
-
+    if not session['tempGStudents'] or len(session['tempGStudents'])==0:
         gstudents = []
         pageToken = None
         #students_results = classroom_service.courses().students().list(courseId = gclassid,pageToken=pageToken).execute()
@@ -164,7 +163,7 @@ def getgaurdians(gclassid,gclassname,index=0):
     session['tempGStudents'] = studentsOnly
     
     numStus = len(session['tempGStudents'])  
-    numIterations = 4
+    numIterations = 2
     iterator = 0
 
     for student in session['tempGStudents'][index:]:
@@ -511,23 +510,17 @@ def nummissing(gclassid,index=0):
                 except KeyError:
                     missinglink = None
                 else:
-                    beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
-                    end = otdStuClass.missingasses['missing'][0]['alternateLink']
-                    print(end)
-                    inverseEnd = end[::-1]
-                    indexFromEnd = inverseEnd.index('/')
-                    end = end[indexFromEnd*-1:]
-                    missinglink = f"{beginning}/sp/{end}/m"
-                    # if len(otdStuClass.missingasses['missing']) > 0:
-                    #     beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
-                    #     end = otdStuClass.missingasses['missing'][0]['alternateLink']
-                    #     print(end)
-                    #     inverseEnd = end[::-1]
-                    #     indexFromEnd = inverseEnd.index('/')
-                    #     end = end[indexFromEnd*-1:]
-                    #     missinglink = f"{beginning}/sp/{end}/m"
-                    # else:
-                    #     missinglink = None
+                    try:
+                        end = otdStuClass.missingasses['missing'][0]['alternateLink']
+                    except:
+                        missinglink = None
+                    else:
+                        beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
+                        print(end)
+                        inverseEnd = end[::-1]
+                        indexFromEnd = inverseEnd.index('/')
+                        end = end[indexFromEnd*-1:]
+                        missinglink = f"{beginning}/sp/{end}/m"
 
                 otdStudent.gclasses.filter(gclassid = gclassid).update(
                     nummissing = str(numMissStudSubs),

@@ -2,24 +2,21 @@
 
 {% block body %}
 <div class="container">
-    <center><h1>Working</h1>
-    <img src="/static/loading.gif"></center><br>
-
-    <table class="table table-bordered ">
-        <tr>
-            {% for i in range(total) %}
-            <td class="{% if i < nextIndex %}table-success{% else %}table-active{% endif %}">
-                
-            </td>
-            {% endfor %}
-        </tr>
-    </table>
+    <center>
+        <h1>Working</h1>
+        <img src="/static/loading.gif">
+    </center>
+    <br>
+    <div class="row">
+        {% for i in range(total) %}
+            <div class="col-1 border {% if i < nextIndex %}bg-success{% else %}bg-secondary{% endif %}"><br></div>
+        {% endfor %}
+    </div>
     <center>
         <h1>{{nextIndex}} / {{total}}</h1>
     </center>
     <br>
 </div>
-
 
 
 

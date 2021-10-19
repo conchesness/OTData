@@ -65,7 +65,6 @@ def before_request():
         if session['isadmin']:
             db = get_db()
             session['db'] = db.name
-            flash(session['db'])
     except:
         pass
 

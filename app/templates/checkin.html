@@ -291,10 +291,10 @@
               <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
                 <img width="25" src="/static/edit.png">
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
                 <img width="25" src="/static/roster.png">
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
                 <img width="25" src="/static/checkin.png">
               </a>
             </td>
@@ -344,10 +344,10 @@
             <img width="25" src="/static/edit.png">
           </a>
           {% if not session.role.lower() == 'student' %}
-            <a data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
               <img width="25" src="/static/roster.png">
             </a>
-            <a data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
               <img width="25" src="/static/checkin.png">
             </a>
           {% endif %}
@@ -374,10 +374,10 @@
             <img width="25" src="/static/edit.png">
           </a>
           {% if not session.role.lower() == 'student' %}
-            <a data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
               <img width="25" src="/static/roster.png">
             </a>
-            <a data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
               <img width="25" src="/static/checkin.png">
             </a>
           {% endif %}
@@ -403,6 +403,12 @@
 <script type="text/javascript">
 
   jQuery(document).ready(function() {
+
+    $(".waitMsg").click(function() {
+      console.log('Roster')
+      $(".loadMsg").html("<em>Will take a min for a large class.</em>"); 
+    });
+
     $('#breakstarted').hide();
     $('#startbreak').hide();
     var today = new Date();

@@ -70,11 +70,12 @@
           {% endif %}
         </div>
       </div>
-
+      
       <table class="table table-sm">
       {% if myHelps %}
+          <tr><th colspan=6> My Helps </th></tr>
           <tr>
-            <th>My Requests</th><th>Created</th><th>Status</th><th>Helper</th><th>Class</th><th>Offered</th>
+            <td></td><th>Created</th><th>Status</th><th>Helper</th><th>Class</th><th>Notes</th>
           </tr>
         {% for myHelp in myHelps | sort(attribute="status") | sort(reverse=true,attribute="created") %}
           <tr>
@@ -102,7 +103,11 @@
             <td>
               {{myHelp.gclass.gclassdict['name']}}
             </td>
-            <td>{% if myHelp.offered %}{{moment(myHelp.offered).calendar()}}{% else %}----{% endif %}</td>
+            <td>
+              {% if myHelp.confirmdesc %}{{myHelp.confirmdesc}}{% endif %}
+              {% if myHelp.confirmdesc and myHelp.note %}<br>{% endif %}
+              {% if myHelp.note %}{{myHelp.note}}{% endif %}
+            </td>
           </tr>
         {% endfor %}
       {% endif %}
@@ -297,6 +302,9 @@
               <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
                 <img width="25" src="/static/checkin.png">
               </a>
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/dashboard/{{class.gclassid}}">
+                <img width="25" src="/static/help.png">
+              </a>
             </td>
             <td>
               {% if class.status %}
@@ -415,7 +423,6 @@
     today = moment(today)
     //var currTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
     //$(".today").html(today)
-    
 
     if ('{{currUser.breakstart}}' != 'None') {
       var breakstart = moment.utc('{{currUser.breakstart}}').toDate();

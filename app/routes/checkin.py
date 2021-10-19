@@ -81,13 +81,14 @@ def checkin():
     except:
         breaks = None
 
-    query = Q(requester=currUser) & Q(status__ne = "confirmed")
+    #query = Q(requester=currUser) & Q(status__ne = "confirmed")
+    query = Q(requester=currUser)
     try:
         myHelps = Help.objects(query)
     except:
         myHelps = None
 
-    query = Q(helper=currUser) & Q(status__ne = "confirmed")
+    query = Q(helper=currUser) & (Q(status = "asked") | Q(status = "offered"))
     try:
         myOffers = Help.objects(query)
     except:
@@ -318,3 +319,4 @@ def checkinsfor(gclassid,sndrmdr=0):
             flash('You can only send checkin reminders for the current day.')
 
     return render_template('checkinsfor.html', querydate= dateForm.querydate.data, checkins=checkins, stuForm=stuForm, dateForm=dateForm, gclassid=gclassid, gclassname=gclassname, notcheckedstus=notcheckedstus, searchdatetime=searchdatetime)
+

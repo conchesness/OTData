@@ -258,6 +258,7 @@ class Help(Document):
     gclass = ReferenceField('GoogleClassroom')
     confirmdesc = StringField()
     tokensAwarded = DateTimeField()
+    note = StringField()
 
     meta = {
         'ordering': 'created'
@@ -270,6 +271,7 @@ class Token(Document):
     amt = IntField(default=1)
     # This is the objectid from the origin record
     help = ReferenceField('Help')
+    note = StringField()
 
 class IdealOutcome(EmbeddedDocument):
     oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)

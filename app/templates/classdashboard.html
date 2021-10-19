@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<table class="table">
+<tr><th></th><th>Helped</th><th>Helper</th><th>Status</th><th>Created</th><th>Description of Help</th></tr>
+{% for help in helps | sort(attribute="created", reverse=true) | sort(attribute="status")%}
+{% if help.requester.role.lower() == 'student' and help.helper.role.lower() == 'student' %}
+    <tr>
+        <td>
+            <a href="/approvehelp/{{help.id}}">Approve</a>
+            /
+            <a href="/rejecthelp/{{help.id}}">Reject</a>
+        </td>
+        <td>{{help.requester.fname}} {{help.requester.lname}}</td>
+        <td>{{help.helper.fname}} {{help.helper.lname}}</td>
+        <td>{{help.status}}</td>
+        <td>{{moment(help.created).calendar()}}</td>
+        <td>{{help.confirmdesc}} {% if help.note %}<br><font color="red">{{help.note}}</font>{% endif %}</td>
+    </tr>
+{% endif %}
+{% endfor %}
+</table>
+
+
+{% endblock %}

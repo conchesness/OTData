@@ -171,3 +171,46 @@ def deletehelp(helpid):
     flash('Your requested Help is deleted.')
 
     return redirect(url_for('checkin'))
+
+@app.route('/dashboard/<gclassid>')
+def dashboard(gclassid):
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    helps = Help.objects(gclass=gClassroom)
+
+    return render_template('classdashboard.html', helps=helps)
+
+@app.route('/approvehelp/<helpid>')
+def approvehelp(helpid):
+    help = Help.objects.get(pk=helpid)
+    help.update(status='approved')
+    
+    return redirect(url_for('dashboard',gclassid=help.gclass.gclassid))
+
+@app.route('/rejecthelp/<helpid>')
+def rejecthelp(helpid):
+    help = Help.objects.get(pk=helpid)
+    help.update(
+        status = 'rejected',
+        note = 'Rejected for bad or missing confirmation description.'
+        )
+    help.reload()
+
+    tokens = Token.objects(owner = help.requester).sum('amt')
+    if tokens > 0:
+        Token.objects(owner = help.requester).first().delete()
+        note=help.note+" One Token was deleted from your account."
+        help.update(note=note)
+    else:
+        note=help.note+" I looked to delete a token from your account but you had none."
+
+    
+    return redirect(url_for('dashboard',gclassid=help.gclass.gclassid))
+
+@app.route('/approveallconfirmed/<gclassid>')
+def approveallconfirmed(gclassid):
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    helps = Help.objects(gclass=gClassroom,status='confirmed')
+    helps.update(status='approved')
+    helps = Help.objects(gclass=gClassroom)
+
+    return render_template('classdashboard.html', helps=helps)

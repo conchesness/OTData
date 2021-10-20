@@ -15,3 +15,4 @@ from .plan import *
 from .coursecat import *
 from .ztemp import *
 from .help import *
+from .sandbox import *

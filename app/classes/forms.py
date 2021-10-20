@@ -11,7 +11,7 @@ import datetime as d
 import pytz
 
 class SimpleForm(FlaskForm):
-    field = TextAreaField()
+    field = TextAreaField(validators=[InputRequired()])
     submit = SubmitField("Submit")
 
 class DateForm(FlaskForm):

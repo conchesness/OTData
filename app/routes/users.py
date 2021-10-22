@@ -813,10 +813,13 @@ def authorize():
 
     # Log user in with the appropriate privledges / scopes from google based on the audience they belong to.
     try:
-        audience = session['audience']
+        session['audience']
     except:
-        session['audience'] = None
-        print("No audience")
+        if session['otemail'][-8:] == 'ousd.org':
+            session['audience'] == 'ot'
+        else:
+            session['audience'] == 'community'
+            print("No audience")
     else:
         if session['audience'] == 'ot':
             flash(f"you have logged in as OT")

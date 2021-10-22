@@ -62,10 +62,10 @@ def compborrow(aeriesid):
     if form.validate_on_submit():
         if form.equiptype.data == "Thinkpad" and len(form.idnum.data) != 10:
             flash('Unique ID for a Thinkpad must be 10 characters long')
-            return render_template('ComputerForm.html',form=form,currUser=currUser)
+            return render_template('computerform.html',form=form,currUser=currUser)
         if form.equiptype.data[:4] == "Dell" and len(form.idnum.data) != 7:
             flash('Unique ID for a Dell must be 7 characters long')
-            return render_template('ComputerForm.html',form=form,currUser=currUser)
+            return render_template('computerform.html',form=form,currUser=currUser)
 
         if not currUser.compdateout:
             dateout = datetime.utcnow().date()
@@ -88,7 +88,7 @@ def compborrow(aeriesid):
     form.statusdesc.data = currUser.compstatusdesc
     form.status.data = currUser.compstatus
 
-    return render_template('ComputerForm.html',form=form,currUser=currUser)
+    return render_template('computerform.html',form=form,currUser=currUser)
 
 @app.route('/compdelete/<aeriesid>')
 def compdelete(aeriesid):

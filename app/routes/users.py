@@ -819,7 +819,6 @@ def authorize():
             session['audience'] == 'ot'
             flash(f"You have logged in as OT")
             SCOPES = SCOPESOT
-
         else:
             session['audience'] == 'community'
             flash(f"You have logged in as Community")

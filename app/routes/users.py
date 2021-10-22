@@ -817,9 +817,13 @@ def authorize():
     except:
         if session['otemail'][-8:] == 'ousd.org':
             session['audience'] == 'ot'
+            flash(f"You have logged in as OT")
+            SCOPES = SCOPESOT
+
         else:
             session['audience'] == 'community'
-            print("No audience")
+            flash(f"You have logged in as Community")
+            SCOPES = SCOPESCOMMUNITY
     else:
         if session['audience'] == 'ot':
             flash(f"you have logged in as OT")

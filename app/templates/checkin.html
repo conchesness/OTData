@@ -97,7 +97,9 @@
             </td>
             <td>
               {% if myHelp.helper %}
-                {{myHelp.helper.fname}} {{myHelp.helper.lname}}
+                offered: {{myHelp.helper.fname}} {{myHelp.helper.lname}}
+              {% elif myHelp.reqhelper %}
+                requested: {{myHelp.reqhelper.fname}} {{myHelp.reqhelper.lname}}
               {% else %}----{% endif %}
             </td>
             <td>

@@ -244,7 +244,7 @@ def checkinsfor(gclassid,sndrmdr=0):
     # This is a list of gids for the students that checked in
     checkingids = [checkin.student.gid for checkin in checkins]
 
-    # This is a list of gids for teh students in the Google Classroom
+    # This is a list of gids for the students in the Google Classroom
     rostergids = [student['userId'] for student in students]
 
     # This is a list of gids for of students on the google roster but not in the checked in

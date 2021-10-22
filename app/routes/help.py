@@ -28,21 +28,34 @@ def createhelp():
                 gclasses.append((gCourse.gclassroom.gclassid, tempname))
 
     form.gclassid.choices = gclasses
-
+    isStuList = False
     if form.validate_on_submit():
-
         gclass = GoogleClassroom.objects.get(gclassid = form.gclassid.data)
 
-        newHelp = Help(
-            requester = currUser,
-            status = 'asked',
-            gclass = gclass
-        )
-        newHelp.save()
+        if not form.students.data:
+            stuGIdList = [('----','Anyone'),(gclass.gteacherdict['id'],f"Mr. {gclass.gteacherdict['name']['familyName']}")]
+            for stu in gclass.groster['roster']:
+                stuName = f"{stu['profile']['name']['givenName']} {stu['profile']['name']['familyName']}"
+                if stu['sortCohort']:
+                    stuName = f"{stu['sortCohort']} {stuName}"
+                stuGIdList.append((stu['userId'],stuName))
+            stuGIdList.sort(key=lambda tup: tup[1]) 
+            form.students.choices = stuGIdList
+            isStuList = True
+        else:
+            newHelp = Help(
+                requester = currUser,
+                status = 'asked',
+                gclass = gclass
+            )
+            newHelp.save()
+            if form.students.data != '----':
+                reqHelper = User.objects.get(gid = form.students.data)
+                newHelp.update(reqhelper = reqHelper)
 
-        return redirect(url_for('checkin'))
+            return redirect(url_for('checkin'))
 
-    return render_template('helpform.html', currUser=currUser, form=form)
+    return render_template('helpform.html', currUser=currUser, form=form, isStuList = isStuList)
 
 @app.route('/help/offer/<helpid>')
 def offerhelp(helpid):

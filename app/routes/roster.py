@@ -47,6 +47,9 @@ def roster(gclassid,gclassname=None):
             break
         students_results = classroom_service.courses().students().list(courseId = gclassid,pageToken=pageToken).execute()
 
+    gclass = GoogleClassroom.objects.get(gclassid=gclassid)
+    gclass.update(groster=gstudents)
+
     otdstus=[]
     stus=[]
     for stu in gstudents:

@@ -29,6 +29,7 @@ class StudentWasHereForm(FlaskForm):
 
 class ActiveClassesForm(FlaskForm):
     gclassid = SelectField(choices=[])
+    students = SelectField(choices=[],validators=[(validators.Optional())],validate_choice=False)
     submit = SubmitField("Submit")
 
 class SendemailForm(FlaskForm):
@@ -133,7 +134,7 @@ class ComputerForm(FlaskForm):
     equiptype = SelectField(choices=[('','---'),('Thinkpad','Thinkpad'),('Dell102','Dell Room 102 (Wright)'),('Dell104','Dell Room 104 (Ong)'),('Dell105','Dell Room 105 (Ketcham)')],validators=[InputRequired()])
     idnum = StringField('ID Number on the Equipment:',validators=[InputRequired()])
     location = SelectField(choices=[('','---'),(102,102),(104,104),(105,105)],validators=[InputRequired()])
-    stickernum = IntegerField('Number on a sticker:',validators=[(validators.Optional())])
+    stickernum = IntegerField('Number on a sticker:',)
     statusdesc = TextAreaField('Description')
     status = SelectField(choices=[('','---'),('Working','Working'),('Problem','Problem'),('Not Working','Not Working')],validators=[InputRequired()])
     submit = SubmitField('Submit')

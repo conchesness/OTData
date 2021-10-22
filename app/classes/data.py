@@ -249,6 +249,7 @@ class Equipment(Document):
 
 class Help(Document):
     requester = ReferenceField('User')
+    reqhelper = ReferenceField('User')
     status = StringField() # asked, offered, confirmed
     helper = ReferenceField('User')
     created = DateTimeField(default=d.datetime.utcnow)

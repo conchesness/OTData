@@ -13,6 +13,10 @@
         <form method=post>
             {{ form.hidden_tag() }}
             {{form.gclassid}}
+            {% if isStuList %}
+                {{form.students}}
+            {% endif %}
+
             {{form.submit()}}
         </form>
         

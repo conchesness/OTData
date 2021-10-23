@@ -13,9 +13,18 @@
     <hr>
     <img src="http://openweathermap.org/img/wn/{{w['weather'][0]['icon']}}@2x.png">
     <hr>
-    Sunrise: {{sunrise.strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <br>
-    Sunrise: {{moment(sunrise).calendar()}} <br>
-    Sunset: {{sunset.strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <br> 
+    <!--When this page is on the server all times are set to UTC.  The moment library
+        is used to translate UTC time to whatever local time the browser is running in
+        but it doesn't work when the page is local. This if statement checks where the 
+        page is running before showing the time.-->
+    {% if request.host == "127.0.0.1:5000" %}
+        Sunrise: {{sunrise.strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <br>
+        Sunset: {{sunset.strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <br> 
+    {% else %}
+        Sunrise: {{moment(sunrise).calendar()}} <br>
+        Sunset: {{moment(sunset).calendar()}} <br>
+    {% endif %}
+    
     <hr>
     <h1 class="display-6">Forecast</h1>
     {% for hour in f.hourly %}

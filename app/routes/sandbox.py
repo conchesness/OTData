@@ -20,7 +20,9 @@ def weather(city,state,country):
     pacific = timezone('US/Pacific')
 
     sunrise = datetime.datetime.fromtimestamp(w['sys']['sunrise'])
+    print(sunrise)
     sunrise = pacific.localize(sunrise)
+    print(sunrise)
 
     sunset = datetime.datetime.fromtimestamp(w['sys']['sunset'])
     sunset = pacific.localize(sunset)

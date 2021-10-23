@@ -29,7 +29,12 @@
     <h1 class="display-6">Forecast</h1>
     {% for hour in f.hourly %}
         <img src="http://openweathermap.org/img/wn/{{hour['weather'][0]['icon']}}@2x.png">
-        {{hour['dt'].strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <b>{{hour['weather'][0]['description']}}</b><br>
+        {% if request.host == "127.0.0.1:5000" %}
+            {{hour['dt'].strftime('%m/%d/%Y %I:%M:%S %p %Z')}}
+        {% else %}
+            {{moment(hour['dt']).calendar()}}
+        {% endif %}
+            <b>{{hour['weather'][0]['description']}}</b><br>
         {{hour}} <hr>
     {%endfor%}
     {{f}}

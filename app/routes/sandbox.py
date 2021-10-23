@@ -15,14 +15,15 @@ def sandbox():
 def weather(city,state,country):
     w = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city},{state},{country}&appid=c9dffd9e0a9b5fcbd79580782d2cf394&units=imperial')
     w=w.json()
-    print(w)
 
+    # When these datetimes are uploaded to the server they will be changed to utc so 
+    # if you convert them on the template to local time (via the moment.js library for example)
+    # they will show up incorrectly on the local server. You can use an if statement on the tmeplate to 
+    # check for the host first and then choose to use Moment when it is on the server and strftime when it is local. 
     pacific = timezone('US/Pacific')
 
     sunrise = datetime.datetime.fromtimestamp(w['sys']['sunrise'])
-    print(sunrise)
     sunrise = pacific.localize(sunrise)
-    print(sunrise)
 
     sunset = datetime.datetime.fromtimestamp(w['sys']['sunset'])
     sunset = pacific.localize(sunset)

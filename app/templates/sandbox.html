@@ -6,14 +6,22 @@
 
 <div class="container">
 
-{% if r %}
+{% if w %}
     <h1 class="display-3">Weather API from Open Weather Maps</h1>
-    {{r.json()}}
+    <h1 class="display-6">Current Weather</h1>
+    {{w}}
     <hr>
-    <img src="http://openweathermap.org/img/wn/{{r.json()['weather'][0]['icon']}}@2x.png">
+    <img src="http://openweathermap.org/img/wn/{{w['weather'][0]['icon']}}@2x.png">
     <hr>
     Sunrise: {{sunrise.strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <br>
-    Sunset: {{sunset.strftime('%m/%d/%Y %I:%M:%S %p %Z')}} 
+    Sunset: {{sunset.strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <br> 
+    <hr>
+    <h1 class="display-6">Forecast</h1>
+    {% for hour in f.hourly %}
+        {{hour['dt'].strftime('%m/%d/%Y %I:%M:%S %p %Z')}} <b>{{hour['weather'][0]['description']}}</b><br>
+        {{hour}} <hr>
+    {%endfor%}
+    {{f}}
 {% endif %}
 <br><br>
 <h1 class="display-3">Charts.js Javascript Library</h1>

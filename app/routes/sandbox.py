@@ -13,14 +13,22 @@ def sandbox():
 
 @app.route('/weather/<city>/<state>/<country>')
 def weather(city,state,country):
-    r = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city},{state},{country}&appid=c9dffd9e0a9b5fcbd79580782d2cf394&units=imperial')
+    w = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city},{state},{country}&appid=c9dffd9e0a9b5fcbd79580782d2cf394&units=imperial')
+    w=w.json()
+    print(w)
 
     pacific = timezone('US/Pacific')
 
-    sunrise = datetime.datetime.fromtimestamp(r.json()['sys']['sunrise'])
+    sunrise = datetime.datetime.fromtimestamp(w['sys']['sunrise'])
     sunrise = pacific.localize(sunrise)
 
-    sunset = datetime.datetime.fromtimestamp(r.json()['sys']['sunset'])
+    sunset = datetime.datetime.fromtimestamp(w['sys']['sunset'])
     sunset = pacific.localize(sunset)
 
-    return render_template('sandbox.html',r=r,sunrise=sunrise,sunset=sunset)
+    f = requests.get(f"https://api.openweathermap.org/data/2.5/onecall?lat={w['coord']['lat']}&lon={w['coord']['lon']}&appid=c9dffd9e0a9b5fcbd79580782d2cf394&units=imperial&exclude=current,minutely")
+    f = f.json()
+    for hour in f['hourly']:
+        timeTemp = datetime.datetime.fromtimestamp(hour['dt'])
+        hour['dt'] = pacific.localize(timeTemp)
+
+    return render_template('sandbox.html',w=w,f=f,sunrise=sunrise,sunset=sunset)

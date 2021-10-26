@@ -192,6 +192,7 @@ def login(audience=None):
 
     #TODO there is def a more efficient way to do this!
     if data['emailAddresses'][0]['value'][-8:] == "ousd.org":
+        session['otemail'] = data['emailAddresses'][0]['value']
         if session['audience'].lower() == 'community':
             session['audience'] = "ot"
             if data['emailAddresses'][0]['value'][0:2] == "s_":
@@ -811,30 +812,22 @@ def postgraddelete(uid,pgid):
 @app.route('/authorize')
 def authorize():
 
-    # Log user in with the appropriate privledges / scopes from google based on the audience they belong to.
     try:
         session['audience']
     except:
-        if session['otemail'][-8:] == 'ousd.org':
-            session['audience'] == 'ot'
-            flash(f"You have logged in as OT")
-            SCOPES = SCOPESOT
-        else:
-            session['audience'] == 'community'
-            flash(f"You have logged in as Community")
-            SCOPES = SCOPESCOMMUNITY
+        session['audience'] = 'ot'
+        flash(f"You have not designated an audience so OT is assumed.")
+        SCOPES = SCOPESOT
     else:
         if session['audience'] == 'ot':
-            flash(f"you have logged in as OT")
             SCOPES = SCOPESOT
         elif session['audience'] == 'community':
-            flash(f"You have logged in as Community")
             SCOPES = SCOPESCOMMUNITY
         else:
-            flash(f"You have not designated an audience (OT or Community).")
-            print(f"You have not designated an audience (OT or Community).")
-            return redirect('/')
-
+            SCOPES = SCOPESOT
+            session['audience'] == 'ot'
+            flash(f"You have not designated an audience so OT is assumed.")
+    
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
     flow = google_auth_oauthlib.flow.Flow.from_client_config(
         client_config=GOOGLE_CLIENT_CONFIG,
@@ -869,16 +862,20 @@ def authorize():
 def oauth2callback():
 
     try:
+        session['audience']
+    except:
+        session['audience'] = 'ot'
+        flash(f"You have not designated an audience so OT is assumed.")
+        SCOPES = SCOPESOT
+    else:
         if session['audience'] == 'ot':
             SCOPES = SCOPESOT
         elif session['audience'] == 'community':
             SCOPES = SCOPESCOMMUNITY
         else:
-            flash(f"You have not designated an audience (OT or Community).")
-            print(f"You have not designated an audience (OT or Community).")
-    except:
-        session['audience'] = None
-        flash("No audience")
+            SCOPES = SCOPESOT
+            session['audience'] == 'ot'
+            flash(f"You have not designated an audience so OT is assumed.")
 
     # Specify the state when creating the flow in the callback so that it can
     # verified in the authorization server response.

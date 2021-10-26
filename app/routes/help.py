@@ -4,10 +4,9 @@ from flask import render_template, redirect, session, flash, url_for
 from app.classes.data import GoogleClassroom, User, Help, Token
 from app.classes.forms import ActiveClassesForm
 from datetime import datetime as dt
-from datetime import timedelta
-from mongoengine import Q
+#from datetime import timedelta
+#from mongoengine import Q
 import mongoengine.errors
-
 
 @app.route('/help/create', methods=['GET', 'POST'])
 def createhelp():
@@ -34,7 +33,8 @@ def createhelp():
         gclass = GoogleClassroom.objects.get(gclassid = form.gclassid.data)
 
         if not form.students.data:
-            stuGIdList = [('----','Anyone'),(gclass.gteacherdict['id'],f"Mr. {gclass.gteacherdict['name']['familyName']}")]
+            stuGIdList = [('----','!Anyone'),(gclass.gteacherdict['id'],f"!Teacher: {gclass.gteacherdict['name']['familyName']}")]
+            print(stuGIdList)
             try:
                 gclass.groster['roster']
             except:
@@ -47,6 +47,7 @@ def createhelp():
                         stuName = f"{stu['sortCohort']} {stuName}"
                     stuGIdList.append((stu['userId'],stuName))
                 stuGIdList.sort(key=lambda tup: tup[1]) 
+                print(stuGIdList)
             form.students.choices = stuGIdList
             isStuList = True
         else:

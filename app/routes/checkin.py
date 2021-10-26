@@ -13,6 +13,46 @@ from google.auth.exceptions import RefreshError
 from twilio.rest import Client
 from .credentials import twilio_account_sid, twilio_auth_token
 
+@app.route("/classdash/<gclassid>")
+def classdash(gclassid):
+    currUser = User.objects.get(pk = session['currUserId'])
+    googleclass = GoogleClassroom.objects.get(gclassid=gclassid)
+    lastCheckIn = CheckIn.objects(student=currUser,gclassid=gclassid).first()
+    form = CheckInForm()
+
+    if form.validate_on_submit() and currUser.role.lower() == 'student':
+
+        lastCheckIn = CheckIn.objects(student=currUser,gclassid=form.gclassid.data).first()
+
+        # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
+        # All dates retrieved from the DB are in UTC
+        if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == int(form.gclassid.data):
+            flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
+            return redirect(url_for('checkin'))
+
+        if len(form.status.data) == 0:
+            flash('"How are you" is a required field')
+            return redirect(url_for('checkin'))
+
+        googleclass = GoogleClassroom.objects.get(gclassid=form.gclassid.data)
+
+        checkin = CheckIn(
+            gclassid = form.gclassid.data,
+            googleclass = googleclass,
+            gclassname = googleclass.gclassdict['name'],
+            student = currUser,
+            desc = form.desc.data,
+            status = form.status.data         
+            )
+        
+        checkin.save()
+        flash(f"CheckIn for {currUser.fname} {currUser.lname} saved.")
+
+        form.gclassid.data = None
+        form.desc.data = None
+        form.status.data = None
+    pass
+
 
 @app.route("/checkin", methods=['GET', 'POST'])
 def checkin():

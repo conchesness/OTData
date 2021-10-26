@@ -6,6 +6,7 @@ from app.classes.forms import ActiveClassesForm
 from datetime import datetime as dt
 from datetime import timedelta
 from mongoengine import Q
+import mongoengine.errors
 
 
 @app.route('/help/create', methods=['GET', 'POST'])
@@ -34,12 +35,18 @@ def createhelp():
 
         if not form.students.data:
             stuGIdList = [('----','Anyone'),(gclass.gteacherdict['id'],f"Mr. {gclass.gteacherdict['name']['familyName']}")]
-            for stu in gclass.groster['roster']:
-                stuName = f"{stu['profile']['name']['givenName']} {stu['profile']['name']['familyName']}"
-                if stu['sortCohort']:
-                    stuName = f"{stu['sortCohort']} {stuName}"
-                stuGIdList.append((stu['userId'],stuName))
-            stuGIdList.sort(key=lambda tup: tup[1]) 
+            try:
+                gclass.groster['roster']
+            except:
+                flash("There is no available roster for this class. This can only\
+                    be created by the teacher.")
+            else:
+                for stu in gclass.groster['roster']:
+                    stuName = f"{stu['profile']['name']['givenName']} {stu['profile']['name']['familyName']}"
+                    if stu['sortCohort']:
+                        stuName = f"{stu['sortCohort']} {stuName}"
+                    stuGIdList.append((stu['userId'],stuName))
+                stuGIdList.sort(key=lambda tup: tup[1]) 
             form.students.choices = stuGIdList
             isStuList = True
         else:
@@ -50,8 +57,14 @@ def createhelp():
             )
             newHelp.save()
             if form.students.data != '----':
-                reqHelper = User.objects.get(gid = form.students.data)
-                newHelp.update(reqhelper = reqHelper)
+                try:
+                    reqHelper = User.objects.get(gid = form.students.data)
+                except mongoengine.errors.DoesNotExist as error:
+                    flash("The user you are looking for does not exist in the database. \
+                           Ask them to sign in which will make them avaialble. The help \
+                           was created but no one was specifically requested as the helper.")
+                else:
+                    newHelp.update(reqhelper = reqHelper)
 
             return redirect(url_for('checkin'))
 

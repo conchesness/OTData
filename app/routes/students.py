@@ -96,6 +96,9 @@ def sendstudentemail(aeriesid):
     # TODO Need to check for gmail auth here
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+        # Calling the service BEFORE the user hits send incase they need to reauthenticate
+        session['credentials'] = credentials_to_dict(credentials)
+        service = build('gmail', 'v1', credentials=credentials)
     else:
         flash('Needed to refresh your credentials before sending email.')
         return redirect('/authorize')   
@@ -120,13 +123,6 @@ def sendstudentemail(aeriesid):
                 emailList.append((adult.email,Markup(f"<b>{adult.relation}:</b> {adult.fname} {adult.lname}<br>({adult.email})")))
             elif adult.altemail:
                 emailList.append((adult.altemail,Markup(f"<b>{adult.relation}</b> (Alt Email): {adult.fname} {adult.lname}<br>({adult.altemail})")))
-
-    if google.oauth2.credentials.Credentials(**session['credentials']).valid:
-        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
-    else:
-        return redirect('/authorize')
-
-    session['credentials'] = credentials_to_dict(credentials)
 
     # add teachers from the gclasses embedded doc
     emailList2=[]
@@ -154,14 +150,6 @@ def sendstudentemail(aeriesid):
     form.cc.choices = emailList
 
     if form.validate_on_submit():
-        # moved this to the top so that it happens BEFORE the form is submitted
-        # if google.oauth2.credentials.Credentials(**session['credentials']).valid:
-        #     credentials = google.oauth2.credentials.Credentials(**session['credentials'])
-        # else:
-        #     return redirect('/authorize')
-
-        session['credentials'] = credentials_to_dict(credentials)
-        service = build('gmail', 'v1', credentials=credentials)
 
         emailToString = ""
         if form.to.data:
@@ -195,9 +183,9 @@ def sendstudentemail(aeriesid):
             return redirect('/authorize')
             # return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
         except Exception as error:
-            flash(f"Error happened: {error}. You were sent to reauthorize.")
-            return redirect('/authorize')
-
+            flash(f"Error happened: {error}. Page was refreshed.")
+            return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
+            
         currUser = User.objects.get(id=session['currUserId'])
         # If the student was included in the email or the student sent the email it should not be tagged confidential
         if student.otemail in form.to.data or student.otemail == session['email']:

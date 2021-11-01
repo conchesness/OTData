@@ -150,15 +150,19 @@ def sendstudentemail(aeriesid):
     form.cc.choices = emailList
 
     try:
-        session['gmailform']
+        session['gmaildict']
     except:
-        session['gmailform'] = None
+        session['gmaildict'] = False
 
-    if form.validate_on_submit() or session['gmailform']:
+    if form.validate_on_submit() or session['gmaildict']:
 
-        if session['gmailform']:
-            form = session['gmailform']
-            session.pop('gmailform', None)
+        if session['gmaildict']:
+            form.subject.data = session['gmaildict']['subject']
+            form.to.data = session['gmaildict']['to']
+            form.cc.data = session['gmaildict']['cc']
+            form.otherto.data = session['gmaildict']['otherto']
+            form.body.data = session['gmaildict']['body']
+            session.pop('gmaildict', None)
 
         emailToString = ""
         if form.to.data:
@@ -190,7 +194,10 @@ def sendstudentemail(aeriesid):
             flash(f"Credential Refresh Error happened: {error} You were sent to reauthorize.")
             # error is: The credentials do not contain the necessary fields need to refresh the access token. 
             # error cont: You must specify refresh_token, token_uri, client_id, and client_secret.
-            session['gmailform'] = form
+            
+            # before reauthorizing the user's credentials, store the form to save the values.
+            gmaildict = {'to':form.to.data,'cc':form.cc.data,'otherto':form.otherto.data,'subject':form.subject.data,'body':form.body.data}
+            session['gmaildict'] = gmaildict
             return redirect('/authorize')
             # return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
         except Exception as error:
@@ -216,8 +223,8 @@ def sendstudentemail(aeriesid):
         )
         student.save()
         return redirect(url_for('profile',aeriesid=aeriesid))
-        
-    session.pop('gmailform', None)
+
+    session.pop('gmaildict', None)
     return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
 
 @app.route('/deletecommunication/<aeriesid>/<commid>')

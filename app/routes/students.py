@@ -149,7 +149,16 @@ def sendstudentemail(aeriesid):
     form.to.choices = emailList
     form.cc.choices = emailList
 
-    if form.validate_on_submit():
+    try:
+        session['gmailform']
+    except:
+        session['gmailform'] = None
+
+    if form.validate_on_submit() or session['gmailform']:
+
+        if session['gmailform']:
+            form = session['gmailform']
+            session.pop('gmailform', None)
 
         emailToString = ""
         if form.to.data:
@@ -175,11 +184,13 @@ def sendstudentemail(aeriesid):
         message = {'raw' : b64_string}
         
         try:
-            print(f"in try loop for gmail api")
             message = (service.users().messages().send(userId='me', body=message).execute())
             flash("Email was sent. You can see the email in your GMail outbox and also below on this page in the 'Activities' secion.")
         except RefreshError as error:
-            flash(f"Credential Refresh Error happened: {error}. You were sent to reauthorize.")
+            flash(f"Credential Refresh Error happened: {error} You were sent to reauthorize.")
+            # error is: The credentials do not contain the necessary fields need to refresh the access token. 
+            # error cont: You must specify refresh_token, token_uri, client_id, and client_secret.
+            session['gmailform'] = form
             return redirect('/authorize')
             # return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
         except Exception as error:
@@ -205,7 +216,8 @@ def sendstudentemail(aeriesid):
         )
         student.save()
         return redirect(url_for('profile',aeriesid=aeriesid))
-
+        
+    session.pop('gmailform', None)
     return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
 
 @app.route('/deletecommunication/<aeriesid>/<commid>')

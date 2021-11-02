@@ -149,19 +149,23 @@ def sendstudentemail(aeriesid):
     form.to.choices = emailList
     form.cc.choices = emailList
 
+    # if the session variable exists then the form was valid before the user was
+    # sent to reauth and the session variable is all that's needed to send the email.
     try:
         session['gmaildict']
     except:
         session['gmaildict'] = False
-
     if form.validate_on_submit() or session['gmaildict']:
 
+        # if the user was send to to reauth, use the session variable to replace the message
         if session['gmaildict']:
             form.subject.data = session['gmaildict']['subject']
             form.to.data = session['gmaildict']['to']
             form.cc.data = session['gmaildict']['cc']
             form.otherto.data = session['gmaildict']['otherto']
             form.body.data = session['gmaildict']['body']
+
+            # delete the session variable
             session.pop('gmaildict', None)
 
         emailToString = ""
@@ -191,15 +195,13 @@ def sendstudentemail(aeriesid):
             message = (service.users().messages().send(userId='me', body=message).execute())
             flash("Email was sent. You can see the email in your GMail outbox and also below on this page in the 'Activities' secion.")
         except RefreshError as error:
-            flash(f"Credential Refresh Error happened: {error} You were sent to reauthorize.")
-            # error is: The credentials do not contain the necessary fields need to refresh the access token. 
-            # error cont: You must specify refresh_token, token_uri, client_id, and client_secret.
-            
-            # before reauthorizing the user's credentials, store the form to save the values.
+            flash(f"Credentials needed to be refreshed. You were sent to reauthorize before the email was sent.")
+
+            # before reauthorizing the user's credentials, store the form values.
             gmaildict = {'to':form.to.data,'cc':form.cc.data,'otherto':form.otherto.data,'subject':form.subject.data,'body':form.body.data}
             session['gmaildict'] = gmaildict
             return redirect('/authorize')
-            # return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
+
         except Exception as error:
             flash(f"Error happened: {error}. Page was refreshed.")
             return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)

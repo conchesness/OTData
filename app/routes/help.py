@@ -131,8 +131,8 @@ def confirmhelp(helpid):
         flash('You can only confirm a help where there is a helper.')
         return redirect(url_for('classdash',gclassid=confirmHelp.gclass.gclassid))
 
-    if confirmHelp.status == "confirmed":
-        flash('This help is already confirmed.')
+    if confirmHelp.status == "confirmed" or confirmHelp.status == "rejected" or confirmHelp.status == "approved":
+        flash('This help is already been confirmed.')
         return redirect(url_for('classdash',gclassid=confirmHelp.gclass.gclassid))
 
     if currUser.role.lower() == 'student' and not form.validate_on_submit():

@@ -7,9 +7,8 @@
 <div class="row">
     <!--Checkin Form Column-->
     <div class="col-12 border border-3">
-      <h2>Checkin</h2>
+        <h3 class="display-5 mb-0">Checkin</h3>
         {% if form %}
-          <h5>Checkin Now</h5>
           {% for field in form.errors %}
               {% for error in form.errors[field] %}
                   <div class="alert alert-error">
@@ -55,9 +54,9 @@
   <div class="row">
     <div class="col-lg-11 col-xl-8 my-3 border-3 border-top border-bottom border-start">
       <div class="row my-3">
-        <div class="col-2"><h3 class="display-5">Help</h3></div>
-        <div class="col-2"> <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">Request Help</a></p></div>
-        <div class='col'>
+        <div class="col-2"><h3 class="display-5 mb-0">Help</h3></div>
+        <div class="col-2 mb-0"> <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">Request Help</a></p></div>
+        <div class='col mb-0'>
           {% if tokens and tokens > 1%}
             You have earned {{tokens}} tokens.
           {% else %}
@@ -75,12 +74,12 @@
         {% for myHelp in myHelps | sort(attribute="status") | sort(reverse=true,attribute="created") %}
           <tr>
             <td>
-              {% if myHelp.status != "confirmed" or currUser.role.lower() == "teacher" %}
+              {% if (myHelp.status != "confirmed" and myHelp.status != "rejected") or currUser.role.lower() == "teacher" %}
               <a href="/help/delete/{{myHelp.id}}">
                   <img src="/static/delete.png" width="20" alt="">
               </a> 
               {% endif %}
-              {% if myHelp.helper and myHelp.status != "confirmed" %}
+              {% if myHelp.helper and myHelp.status != "confirmed" and myHelp.status != "rejected" %}
                 | <a href="/help/confirm/{{myHelp.id}}">Confirm</a>
               {% endif %}
             </td>
@@ -165,7 +164,7 @@
     </div>
     <!--Break Column-->
     <div class="col-lg-11 col-xl-4 my-3 border border-3">
-      <h2 class="mb=0">Break</h2>
+        <h3 class="display-5 mb-0">Break</h3>
 
       <p class="my-0">Please checkin first.</p>
       <div class="m-0" id="breakstarted">

@@ -32,6 +32,12 @@ class ActiveClassesForm(FlaskForm):
     students = SelectField(choices=[],validators=[(validators.Optional())],validate_choice=False)
     submit = SubmitField("Submit")
 
+class TokenForm(FlaskForm):
+    numTokens = SelectField("Number of Tokens",choices=[(1,1)],validators=[InputRequired()])
+    owner = SelectField("To",choices=[],validators=[InputRequired()],validate_choice=False)
+    note = TextAreaField("Note",validators=[InputRequired()])
+    submit = SubmitField("Send")
+
 class SendemailForm(FlaskForm):
     to = MultiCheckboxField(choices=[])
     cc = MultiCheckboxField(choices=[])
@@ -70,8 +76,8 @@ class NewStudentForm(FlaskForm):
 
 class CheckInForm(FlaskForm):
     desc = TextAreaField("What are you working on?",validators=[InputRequired()])
-    gclassid = SelectField(choices=[],validators=[InputRequired()])
-    gclassname = StringField()
+    #gclassid = SelectField(choices=[],validators=[InputRequired()])
+    #gclassname = StringField()
     status = SelectField("How are you?",choices=[('','---'),('5','Very Productive'),('4','Mostly'),('3','Meh'),('2','Not really'),('1', 'Not')],validators=[InputRequired()])
     #synchronous = SelectField(id="synchronous",choices=[('synchronous','synchronous'),('asynchronous','asynchronous')])
     #camera = SelectField(id="cameraoff",choices=[("on","on"),("off","off")])

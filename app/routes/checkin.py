@@ -13,139 +13,162 @@ from google.auth.exceptions import RefreshError
 from twilio.rest import Client
 from .credentials import twilio_account_sid, twilio_auth_token
 
-@app.route("/classdash/<gclassid>")
+@app.route("/classdash/<gclassid>", methods=["GET","POST"])
 def classdash(gclassid):
     currUser = User.objects.get(pk = session['currUserId'])
-    googleclass = GoogleClassroom.objects.get(gclassid=gclassid)
-    lastCheckIn = CheckIn.objects(student=currUser,gclassid=gclassid).first()
-    form = CheckInForm()
-
-    if form.validate_on_submit() and currUser.role.lower() == 'student':
-
-        lastCheckIn = CheckIn.objects(student=currUser,gclassid=form.gclassid.data).first()
-
-        # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
-        # All dates retrieved from the DB are in UTC
-        if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == int(form.gclassid.data):
-            flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
-            return redirect(url_for('checkin'))
-
-        if len(form.status.data) == 0:
-            flash('"How are you" is a required field')
-            return redirect(url_for('checkin'))
-
-        googleclass = GoogleClassroom.objects.get(gclassid=form.gclassid.data)
-
-        checkin = CheckIn(
-            gclassid = form.gclassid.data,
-            googleclass = googleclass,
-            gclassname = googleclass.gclassdict['name'],
-            student = currUser,
-            desc = form.desc.data,
-            status = form.status.data         
-            )
-        
-        checkin.save()
-        flash(f"CheckIn for {currUser.fname} {currUser.lname} saved.")
-
-        form.gclassid.data = None
-        form.desc.data = None
-        form.status.data = None
-    pass
-
-
-@app.route("/checkin", methods=['GET', 'POST'])
-def checkin():
-
-    form = CheckInForm()
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     
-    currUser = User.objects.get(pk = session['currUserId'])
-
-    gCourses = currUser.gclasses
-    
-    gclasses = []
-    for gCourse in gCourses:
-        if gCourse.gclassroom:
-            tempname = gCourse.gclassroom.gclassdict['name']
-            if not gCourse.status:
-
-                gCourse.status = ""
-
-            # a list of tuples for the form
-            if gCourse.status == "Active":
-                gclasses.append((gCourse.gclassroom.gclassid, tempname))
-
-    form.gclassid.choices = gclasses
-    
-    if form.validate_on_submit() and currUser.role.lower() == 'student':
-
-        lastCheckIn = CheckIn.objects(student=currUser,gclassid=form.gclassid.data).first()
-
-        # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
-        # All dates retrieved from the DB are in UTC
-        if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == int(form.gclassid.data):
-            flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
-            return redirect(url_for('checkin'))
-
-        if len(form.status.data) == 0:
-            flash('"How are you" is a required field')
-            return redirect(url_for('checkin'))
-
-        googleclass = GoogleClassroom.objects.get(gclassid=form.gclassid.data)
-
-        checkin = CheckIn(
-            gclassid = form.gclassid.data,
-            googleclass = googleclass,
-            gclassname = googleclass.gclassdict['name'],
-            student = currUser,
-            desc = form.desc.data,
-            status = form.status.data         
-            )
-        
-        checkin.save()
-        flash(f"CheckIn for {currUser.fname} {currUser.lname} saved.")
-
-        form.gclassid.data = None
-        form.desc.data = None
-        form.status.data = None
-
-    if currUser.role.lower() == 'student':
-        checkins = CheckIn.objects(student=currUser).order_by('-createdate').limit(10)
+    # Only get this is the user is a Teacher
+    if currUser.role.lower() == "teacher":
+        approveHelps = Help.objects(gclass=gClassroom,status="confirmed")
     else:
-        checkins = None
-        form = None
+        approveHelps = None
 
-    query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
+    query = Q(gclass=gClassroom) & Q(status="asked") & Q(helper__ne = currUser) & Q(requester__ne = currUser)
+    helps = Help.objects(query)
+    qStatus = ['asked','offered','rejected']
+    query = Q(requester=currUser) & Q(gclass=gClassroom) & Q(status__in = qStatus)
+    myHelps = Help.objects(query)
+    query = Q(helper=currUser) & Q(gclass=gClassroom) & Q(status__in = qStatus)
+    myOffers = Help.objects(query)
+    query = Q(breakclass=gclassid) & Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
+    
     try:
         breaks = User.objects(query)
     except:
         breaks = None
 
-    #query = Q(requester=currUser) & Q(status__ne = "confirmed")
-    query = Q(requester=currUser)
-    try:
-        myHelps = Help.objects(query)
-    except:
-        myHelps = None
-
-    query = Q(helper=currUser) & (Q(status = "asked") | Q(status = "offered"))
-    try:
-        myOffers = Help.objects(query)
-    except:
-        myOffers = None
-
-    query = Q(requester__ne = currUser) & Q(helper__ne = currUser) & (Q(status="asked") | Q(status="offered"))
-    helps = Help.objects(query)
-    try:
-        helps = Help.objects(query)
-    except:
-        helps=None
     try:
         tokens = Token.objects(owner = currUser).sum('amt')
     except:
         tokens = None
 
-    return render_template('checkin.html', breaks=breaks, myHelps=myHelps, myOffers=myOffers, helps=helps, gCourses=gCourses, form=form, checkins=checkins, currUser=currUser, tokens=tokens)
+    form = CheckInForm()
+    lastCheckIn = CheckIn.objects(student=currUser,gclassid=gclassid).first()
+
+    if form.validate_on_submit() and currUser.role.lower() == 'student':
+
+        # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
+        # All dates retrieved from the DB are in UTC
+        if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == int(form.gclassid.data):
+            flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
+            return redirect(url_for('classdash',gclassid=gclassid))
+
+        if len(form.status.data) == 0:
+            flash('"How are you" is a required field')
+            return redirect(url_for('classdash',gclassid=gclassid))
+
+        googleclass = GoogleClassroom.objects.get(gclassid=gclassid)
+
+        checkin = CheckIn(
+            gclassid = gclassid,
+            googleclass = googleclass,
+            gclassname = googleclass.gclassdict['name'],
+            student = currUser,
+            desc = form.desc.data,
+            status = form.status.data         
+            )
+        
+        checkin.save()
+        flash(f"CheckIn for {currUser.fname} {currUser.lname} saved.")
+
+        form.desc.data = None
+        form.status.data = None
+        
+    return render_template('classdash.html',helps=helps, approveHelps=approveHelps, breaks=breaks,tokens=tokens,myHelps=myHelps,myOffers=myOffers, currUser=currUser,gClassroom=gClassroom,lastCheckIn=lastCheckIn,form=form)
+
+
+@app.route("/checkin", methods=['GET', 'POST'])
+def checkin():
+    
+    currUser = User.objects.get(pk = session['currUserId'])
+
+    gCourses = currUser.gclasses
+    
+    # gclasses = []
+    # for gCourse in gCourses:
+    #     if gCourse.gclassroom:
+    #         tempname = gCourse.gclassroom.gclassdict['name']
+    #         if not gCourse.status:
+
+    #             gCourse.status = ""
+
+    #         # a list of tuples for the form
+    #         if gCourse.status == "Active":
+    #             gclasses.append((gCourse.gclassroom.gclassid, tempname))
+
+    # form.gclassid.choices = gclasses
+    
+    # if form.validate_on_submit() and currUser.role.lower() == 'student':
+
+    #     lastCheckIn = CheckIn.objects(student=currUser,gclassid=form.gclassid.data).first()
+
+    #     # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
+    #     # All dates retrieved from the DB are in UTC
+    #     if lastCheckIn and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == int(form.gclassid.data):
+    #         flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
+    #         return redirect(url_for('checkin'))
+
+    #     if len(form.status.data) == 0:
+    #         flash('"How are you" is a required field')
+    #         return redirect(url_for('checkin'))
+
+    #     googleclass = GoogleClassroom.objects.get(gclassid=form.gclassid.data)
+
+    #     checkin = CheckIn(
+    #         gclassid = form.gclassid.data,
+    #         googleclass = googleclass,
+    #         gclassname = googleclass.gclassdict['name'],
+    #         student = currUser,
+    #         desc = form.desc.data,
+    #         status = form.status.data         
+    #         )
+        
+    #     checkin.save()
+    #     flash(f"CheckIn for {currUser.fname} {currUser.lname} saved.")
+
+    #     form.gclassid.data = None
+    #     form.desc.data = None
+    #     form.status.data = None
+
+    # if currUser.role.lower() == 'student':
+    #     checkins = CheckIn.objects(student=currUser).order_by('-createdate').limit(10)
+    # else:
+    #     checkins = None
+    #     form = None
+
+    # query = Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
+    # try:
+    #     breaks = User.objects(query)
+    # except:
+    #     breaks = None
+
+    # #query = Q(requester=currUser) & Q(status__ne = "confirmed")
+    # query = Q(requester=currUser)
+    # try:
+    #     myHelps = Help.objects(query)
+    # except:
+    #     myHelps = None
+
+    # query = Q(helper=currUser) & (Q(status = "asked") | Q(status = "offered"))
+    # try:
+    #     myOffers = Help.objects(query)
+    # except:
+    #     myOffers = None
+
+    # query = Q(requester__ne = currUser) & Q(helper__ne = currUser) & (Q(status="asked") | Q(status="offered"))
+    # helps = Help.objects(query)
+    # try:
+    #     helps = Help.objects(query)
+    # except:
+    #     helps=None
+
+    # try:
+    #     tokens = Token.objects(owner = currUser).sum('amt')
+    # except:
+    #     tokens = None
+
+    return render_template('checkin.html', gCourses=gCourses, currUser=currUser)
 
 @app.route('/breakstart', methods=['GET', 'POST'])
 def breakstart():
@@ -187,7 +210,8 @@ def breakstart():
             breakduration = form.duration.data,
             breakclass = form.gclassid.data
         )
-        return redirect(url_for('checkin')) 
+        #return redirect(url_for('checkin')) 
+        return redirect(url_for('dashboard',gclassid=form.gclassid.data)) 
     
     return render_template('breakstart.html',tokencount=tokencount, form=form)
 
@@ -218,11 +242,16 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
 @app.route('/deletecheckin/<checkinid>')
 def deletecheckin(checkinid,gclassid=None,gclassname=None):
     checkin = CheckIn.objects.get(pk=checkinid)
-    checkin.delete()
+    currUser=User.objects.get(id=session['currUserId'])
+    if currUser == checkin.student:
+        checkin.delete()
+        flash('Checkin deleted')
+    else:
+        flash("can't delete a checkin you don't own.")
     if gclassid and gclassname:
         return redirect(url_for('checkinsfor', gclassid=gclassid,gclassname=gclassname)) 
 
-    return redirect(url_for('checkin'))
+    return redirect(url_for('classdash',gclassid=checkin.googleclass.gclassid))
 
 @app.route('/checkinsfor/<gclassid>/<sndrmdr>', methods=['GET', 'POST'])
 @app.route('/checkinsfor/<gclassid>', methods=['GET', 'POST'])

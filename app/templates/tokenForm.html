@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+
+        <h1>Award Tokens</h1>
+
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <form method=post>
+            {{ form.hidden_tag() }} <br>
+            number of Tokens: <br>{{form.numTokens()}} <br>
+            To: <br>{{form.owner()}} <br>
+            note: <br>
+            <small>Why are you giving these tokens.  Be specific.</small> <br>
+            {{form.note}} <br>
+            {{form.submit()}}
+        </form>
+        
+    </div>
+{% endblock %}

@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container-fluid">    
+  <div class="row">
+    <!--Checkin Form Column-->
+    <div class="col-12 border border-3">
+      <h2>Checkin</h2>
+        {% if form %}
+          <h5>Checkin Now</h5>
+          {% for field in form.errors %}
+              {% for error in form.errors[field] %}
+                  <div class="alert alert-error">
+                      <strong>Error!</strong>{{field}}: {{error}}
+                  </div>
+              {% endfor %}
+          {% endfor %}
+          <div class="form-group">
+          <form method=post>
+            {{ form.hidden_tag() }}
+            <p>Which Class<font color="red">*</font>            
+              <img width="10" src="/static/info.png" data-toggle="tooltip" data-placement="top" 
+              title="If you don't see the right classes here, go down to the 'My Google Classes' 
+              section to update and edit your classes">:
+            {{ form.gclassid(class="form-control") }}</p>
+
+            <p>Were you productive since last class?<font color="red">*</font>: {{form.status(class="form-control")}}</p>
+            <p>
+              What is your goal for class today?<font color="red">*</font>: <br>
+              <small>Be specific! Which specific assignment?</small>
+              <br>{{form.desc(class="form-control")}}
+            </p>
+            <p>{{form.submit(class="form-control btn-primary")}}</p>
+          </form>
+          {% if checkins %}
+      
+      <table class="table">
+        <tr>
+          <th><h5>Last Check In</h5></th><th>Class</th><th>Date</th><th>Were You Productive?</th>
+        </tr>
+          <tr>
+            <td>
+              <a class="btn btn-primary btn-sm" role="button" href="deletecheckin/{{checkins[0].id}}">Delete</a>
+            </td>
+            <td>
+              {{checkins[0].gclassname}}
+            </td>
+            <td>{{moment(checkins[0].createdate).calendar()}}</td>
+            <td>{{checkins[0].status}} </td>
+          </tr>
+          <tr><th>Working on</th><td colspan="3"> {{checkins[0].desc}}</td></tr>
+      </table>
+          
+    {% endif %}
+          </div>
+        {% endif %}
+    </div>
+  </div>
+  <!--Help Column-->
+  <div class="row">
+    <div class="col-lg-11 col-xl-8 my-3 border-3 border-top border-bottom border-start">
+      <div class="row my-3">
+        <div class="col-2"><h3>Help</h3></div>
+        <div class="col-2"> <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">Request Help</a></p></div>
+        <div class='col'>
+          {% if tokens and tokens > 1%}
+            You have earned {{tokens}} tokens.
+          {% else %}
+            You have earned {{tokens}} token.
+          {% endif %}
+        </div>
+      </div>
+      
+      <table class="table table-sm">
+      {% if myHelps %}
+          <tr><th colspan=6> My Helps </th></tr>
+          <tr>
+            <td></td><th>Created</th><th>Status</th><th>Helper</th><th>Class</th><th>Notes</th>
+          </tr>
+        {% for myHelp in myHelps | sort(attribute="status") | sort(reverse=true,attribute="created") %}
+          <tr>
+            <td>
+              {% if myHelp.status != "confirmed" or currUser.role.lower() == "teacher" %}
+              <a href="/help/delete/{{myHelp.id}}">
+                  <img src="/static/delete.png" width="20" alt="">
+              </a> 
+              {% endif %}
+              {% if myHelp.helper and myHelp.status != "confirmed" %}
+                | <a href="/help/confirm/{{myHelp.id}}">Confirm</a>
+              {% endif %}
+            </td>
+            <td>
+              {{moment(myHelp.created).calendar()}}
+            </td>
+            <td>
+              {{myHelp.status}}
+            </td>
+            <td>
+              {% if myHelp.helper %}
+                offered: {{myHelp.helper.fname}} {{myHelp.helper.lname}}
+              {% elif myHelp.reqhelper %}
+                requested: {{myHelp.reqhelper.fname}} {{myHelp.reqhelper.lname}}
+              {% else %}----{% endif %}
+            </td>
+            <td>
+              {{myHelp.gclass.gclassdict['name']}}
+            </td>
+            <td>
+              {% if myHelp.confirmdesc %}{{myHelp.confirmdesc}}{% endif %}
+              {% if myHelp.confirmdesc and myHelp.note %}<br>{% endif %}
+              {% if myHelp.note %}{{myHelp.note}}{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+
+      {% if myOffers %}
+        <tr><th colspan="3">My Offers</th><th>Requester</th><th></th><th></th></tr>
+        {% for myOffer in myOffers | sort(attribute="status",reverse=True) | sort(attribute="created",reverse=true)  %}
+            <tr>
+              <td>
+                {% if myOffer.status == "offered" %}
+                  <a href="/help/recind/{{myOffer.id}}">un-Offer</a>
+                {% endif %}
+                {% if currUser.role.lower() == "teacher" %}
+                  <a href="/help/delete/{{myOffer.id}}">
+                      | <img src="/static/delete.png" width="20" alt="">
+                  </a> 
+                {% endif %}
+              </td>
+              <td>{{moment(myOffer.created).calendar()}}</td>
+              <td>{{myOffer.status}}</td>            
+              <td>{{myOffer.requester.fname}} {{myOffer.requester.lname}}</td>
+              <td>{{myOffer.gclass.gclassdict['name']}}</td>
+              <td>{{moment(myOffer.offered).calendar()}}</td>
+            </tr>
+        {% endfor %}
+      {% endif %}
+     
+
+      {% if helps %}
+      <tr><th colspan="6"><hr></th></tr>
+      <tr>
+        <th colspan="3"><h3>Requests for Help</h3><th><u>Requester/<br>Helper</th></th>
+      </tr>
+      
+      <p>
+        {% for help in helps | sort(attribute="status" | sort(attribute="created", reverse=true)) %}
+        <tr>
+          <td>
+            {% if not help.helper %}<a href="/help/offer/{{help.id}}">Offer</a> {% endif %}
+            {% if currUser.role.lower() == "teacher" %}
+              <a href="/help/delete/{{help.id}}">
+                  | <img src="/static/delete.png" width="20" alt="">
+              </a> 
+              | <a href="/help/confirm/{{help.id}}">Confirm</a>
+            {% endif %}
+          </td>
+          <td>{{moment(help.created).calendar()}}</td>
+          <td>{{help.status}}</td>
+          <td>
+            {{help.requester.fname}} {{help.requester.lname}}
+            {% if help.helper %}
+              /<br>{{help.helper.fname}} {{help.helper.lname}} 
+            {% endif %}
+          </td>
+          <td>{{help.gclass.gclassdict['name']}}</td>
+          <td>{% if help.offered %}{{moment(help.offered).calendar()}}{% else %}----{% endif %}</td>
+        </tr>
+      
+        {% endfor %}
+      {% endif %}
+    </table>
+    </div>
+    <!--Break Column-->
+    <div class="col-lg-11 col-xl-4 my-3 border border-3">
+      <h2 class="mb=0">Break</h2>
+
+      <p class="my-0">Please checkin first.</p>
+      <div class="m-0" id="breakstarted">
+        Last Break started: {{moment(currUser.breakstart).format('MM/DD/YYYY, h:mm:ss a')}} <br>
+        <p class="my-0" id="breakover"><!--Time till over goes here by JS--></p>
+        <p id="countdown"><!--Countdown Timer inserted here by JS.--></p>
+      </div>
+      <div id="startbreak">
+        <p id="lastbreak"></p>
+        <p> <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start Break</a></p>
+      </div>
+      {% if breaks %}
+      <h4 class="mb-0">Breaks in the Last 90 Mins</h4>
+      <p class="mt-0"><small>refresh page to update</small></p>
+      <table class="table table-small">
+        <tr>
+          <th>Student</th><th>Break Ends</th><th></th>
+        </tr>
+        {% for break in breaks | sort(attribute="breakstart",reverse=True) %}
+        <tr>
+          <td>{{break.fname}} {{break.lname}}</td> 
+          <td id="in10mins{{loop.index}}"></td> 
+          <td id="isover{{loop.index}}"></td>
+          <script type="text/javascript">
+            var breakStartTemp = moment.utc('{{break.breakstart}}').toDate();
+            breakStartTemp = moment(breakStartTemp).local();
+            var breakEndTemp = moment(breakStartTemp).add('{{break.breakduration}}', 'minutes');
+            document.getElementById("in10mins{{loop.index}}").innerHTML = breakEndTemp.format('h:mm:ss a');
+            if ('{{currUser.role.lower()}}' == "teacher") {
+              if (breakEndTemp.isBefore(moment().local()) == false) {
+                document.getElementById("isover{{loop.index}}").innerHTML = "On Break";
+              } else {
+                document.getElementById("isover{{loop.index}}").innerHTML = "Back to Work";
+              }
+              if (breakEndTemp.isBefore(moment().local())) {
+                document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
+              } else {
+                document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
+                document.getElementById("isover{{loop.index}}").style.color='#ffffff';
+              }
+            }
+          </script>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="row">
+  <div class="col-12">
+    {% if currUser.id|string() == session.currUserId|string() %} <br>
+      <a href="/gclasses" class="btn btn-info btn-sm" role="button">Update All My Classes from Google</a> <-- This script takes a little while to run.
+    {% endif %}
+
+
+    <h1>My Google Classes</h1>
+    {% if gCourses %}
+      <table class="table">
+        <thead class="thead-light">
+        <tr>
+            <td nowrap>
+              <img width="25" src="/static/edit.png"><b>E</b>dit
+              {% if not session.role.lower() == 'student' %}<br>
+                <img width="25" src="/static/roster.png"><b>R</b>oster<br>
+                <img width="25" src="/static/checkin.png"><b>C</b>heckins
+              {% endif %}
+            </td>
+            <th>
+              Status
+            </th>
+            <th>
+              Link to Google Classroom             
+            </th>
+            <th>
+              Teacher
+            </th>
+            <th>
+              Missing
+              {% if currUser.role.lower() == "student" and currUser.gid == session.gid %}
+                <small>(<a href="/missingassignmentsstu/{{currUser.gid}}">Update</a>)</small>
+              {% endif %}
+            </th>
+        </tr>
+      </thead>
+      {% for class in gCourses %}
+      {% if class.gclassroom and (class.status == "Active" or class.status == "") %}
+        {% if session.role.lower() == 'student' %}
+          <tr>
+            <td nowrap>
+              <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassroom.gclassdict.id}}">
+                <img width="25" src="/static/edit.png">
+              </a> 
+            </td>
+            <td>
+              {% if class.status %}
+                {{ class.status }}
+              {% endif %}
+            </td>
+            <td>
+              {% if class.classname %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+              {% else %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+              {% endif %}          
+            </td>
+            <td>
+              {{class.gclassroom.gteacherdict['name']['fullName']}}
+            </td>
+            <td>
+              {% if class.nummissing|int > 0 %}
+                <a href="{{class.missinglink}}">
+                  {{class.nummissing}}
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        {% elif class.gclassroom and class.status != "Ignore" %} <!--end Student and start not student not Ignore-->
+          <tr>
+            <td nowrap>
+              <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
+                <img width="25" src="/static/edit.png">
+              </a>
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+                <img width="25" src="/static/roster.png">
+              </a>
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+                <img width="25" src="/static/checkin.png">
+              </a>
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Dashboard" href="/classdash/{{class.gclassid}}">
+                D
+              </a>
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Dashboard" href="/approvehelps/{{class.gclassid}}">
+                H
+              </a>
+            </td>
+            <td>
+              {% if class.status %}
+                {{ class.status }}
+              {% endif %}
+            </td>
+            <td>
+              {% if class.classname %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+              {% else %}
+                <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+              {% endif %}
+            </td>
+            <td>
+              {{class.gclassroom.gteacherdict['name']['fullName']}}
+            </td>
+          </tr>
+        {% endif %} <!--end student Ignore-->
+      {% endif %} <!--End student-->
+    {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+  <!--In Active Classes-->
+  <h3>My Inactive Classes</h3>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <td>
+          <img width="25" src="/static/edit.png"> <b>E</b>dit
+          {% if not session.role.lower() == 'student' %}<br>
+            <img width="25" src="/static/roster.png"><b>R</b>oster<br>
+            <img width="25" src="/static/checkin.png"><b>C</b>heckins
+          {% endif %}
+        </td>
+        <th>status</th>
+        <th>Classname</th>
+      </tr>
+    </thead>
+    {% for class in gCourses %}
+    {% if class.gclassroom and class.status == "Inactive" %}
+      <tr>
+        <td nowrap>
+          <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
+            <img width="25" src="/static/edit.png">
+          </a>
+          {% if not session.role.lower() == 'student' %}
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+              <img width="25" src="/static/roster.png">
+            </a>
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+              <img width="25" src="/static/checkin.png">
+            </a>
+          {% endif %}
+        </td>
+        <td>
+          {{class.status}}
+        </td>
+        <td>
+          {% if not class.classname == "~" %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+          {% else %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% endif %}
+    {% endfor %}
+    <tr class="table-dark"><td colspan = "3"></td></tr>
+    {% for class in gCourses %}
+    {% if class.gclassroom and class.status == "Ignore" %}
+      <tr>
+        <td nowrap>
+          <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
+            <img width="25" src="/static/edit.png">
+          </a>
+          {% if not session.role.lower() == 'student' %}
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+              <img width="25" src="/static/roster.png">
+            </a>
+            <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+              <img width="25" src="/static/checkin.png">
+            </a>
+          {% endif %}
+        </td>
+        <td>
+          {{class.status}}
+        </td>
+        <td>
+          {% if not class.classname == "~" %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.classname}} {{class.gclassroom.gclassdict.name}}</a>
+          {% else %}
+            <a href="{{class.gclassroom.gclassdict.alternateLink}}">{{class.gclassroom.gclassdict.name}}</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% endif %}
+    {% endfor %}
+
+  </table>
+</div>
+</div>
+
+<script type="text/javascript">
+
+  jQuery(document).ready(function() {
+
+    $(".waitMsg").click(function() {
+      console.log('Roster')
+      $(".loadMsg").html("<em>Will take a min for a large class.</em>"); 
+    });
+
+    $('#breakstarted').hide();
+    $('#startbreak').hide();
+    var today = new Date();
+    today = moment(today)
+    //var currTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    //$(".today").html(today)
+
+    if ('{{currUser.breakstart}}' != 'None') {
+      var breakstart = moment.utc('{{currUser.breakstart}}').toDate();
+      breakstart = moment(breakstart).local();
+    } else {
+      breakstart = moment().startOf('day');
+    }
+    var breakends = moment(breakstart).add('{{currUser.breakduration}}', 'minutes');
+    breakends = moment(breakends).format('MM/DD/YYYY, h:mm:ss a')
+
+    if (moment().diff(breakstart, 'minutes') > 90) {
+      $('#startbreak').show();
+      if ('{{currUser.breakstart}}' != "None") {
+        var lastbreak = "Last break was: " + moment(breakstart).calendar() + "<br>"
+        $("#lastbreak").html(lastbreak)
+      } 
+    } else {
+      $('#breakstarted').show();
+    }
+
+    var difference = moment().diff(breakstart, 'seconds')
+    if (difference < 600) {
+      $("#breakover").html("Break is over at: " + breakends)
+    }
+
+    if (moment().diff(breakstart, 'minutes') < 90) {
+    // Countdown Timer!!
+    // Set the date we're counting down to
+    var countDownDate = new Date(breakends);
+
+    // Update the count down every 1 second
+    var countDownInterval = setInterval(function() {
+
+      // Get today's date and time
+      var now = new Date().getTime();
+
+      // Find the distance between now and the count down date
+      var distance = countDownDate - now;
+
+      // Time calculations for days, hours, minutes and seconds
+      //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      //var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      // Display the result in the element with id="countdown"
+      // document.getElementById("demo").innerHTML = days + "d " + hours + "h "+ minutes + "m " + seconds + "s ";
+      if (seconds < 10) {
+        seconds = "0"+seconds;
+      }
+      document.getElementById("countdown").innerHTML = "<font color='blue'><b>Timer " + minutes + ":" + seconds +"</b></font>";
+      document.title = "Break: "+ minutes + ":" + seconds
+
+      // If the count down is finished, write some text
+      if (distance < 0) {
+        clearInterval(countDownInterval);
+        document.getElementById("countdown").innerHTML = "<font color='green'><b>Break ended at "+breakends+"</b></font>";
+        document.title = "Break is Over";
+      }
+    }, 1000);
+
+  }
+
+  if ('{{breaks}}'.length > 2 && '{{currUser.role.lower()}}'=="teacher") {
+    var refreshInterval = setInterval(function() {
+      location.reload();
+    }, 30000);
+  }
+ });
+
+</script>
+
+{% endblock %}
+
+

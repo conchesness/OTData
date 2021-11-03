@@ -1,4 +1,4 @@
-from app.classes.forms import ActiveClassesForm, SimpleForm
+from app.classes.forms import ActiveClassesForm, SimpleForm, TokenForm
 from app import app
 from flask import render_template, redirect, session, flash, url_for
 from app.classes.data import GoogleClassroom, User, Help, Token
@@ -34,7 +34,6 @@ def createhelp():
 
         if not form.students.data:
             stuGIdList = [('----','!Anyone'),(gclass.gteacherdict['id'],f"!Teacher: {gclass.gteacherdict['name']['familyName']}")]
-            print(stuGIdList)
             try:
                 gclass.groster['roster']
             except:
@@ -47,7 +46,6 @@ def createhelp():
                         stuName = f"{stu['sortCohort']} {stuName}"
                     stuGIdList.append((stu['userId'],stuName))
                 stuGIdList.sort(key=lambda tup: tup[1]) 
-                print(stuGIdList)
             form.students.choices = stuGIdList
             isStuList = True
         else:
@@ -67,7 +65,7 @@ def createhelp():
                 else:
                     newHelp.update(reqhelper = reqHelper)
 
-            return redirect(url_for('checkin'))
+            return redirect(url_for('classdash',gclassid=gclass.gclassid))
 
     return render_template('helpform.html', currUser=currUser, form=form, isStuList = isStuList)
 
@@ -79,11 +77,11 @@ def offerhelp(helpid):
 
     if currUser == offerHelp.requester:
         flash("You can't be the helper AND the help requester.")
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=offerHelp.gclass.gclassid))
 
     if offerHelp.helper:
         flash("There is already a helper for this help.")
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=offerHelp.gclass.gclassid))
 
     offerHelp.update(
         helper = currUser,
@@ -92,7 +90,7 @@ def offerhelp(helpid):
     )
 
  
-    return redirect(url_for('checkin'))
+    return redirect(url_for('classdash',gclassid=offerHelp.gclass.gclassid))
 
 @app.route('/help/recind/<helpid>')
 def helprecind(helpid):
@@ -109,7 +107,7 @@ def helprecind(helpid):
     else:
         flash("Offer can't be recinded because you are not the Helper.")
 
-    return redirect(url_for('checkin'))
+    return redirect(url_for('classdash',gclassid=recindHelp.gclass.gclassid))
 
 
 @app.route('/help/confirm/<helpid>', methods=['GET', 'POST'])
@@ -127,15 +125,15 @@ def confirmhelp(helpid):
 
     if confirmHelp.requester != currUser and currUser.role.lower() != "teacher":
         flash('You can only confirm a help that you have requested.')
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=confirmHelp.gclass.gclassid))
 
     if not confirmHelp.helper:
         flash('You can only confirm a help where there is a helper.')
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=confirmHelp.gclass.gclassid))
 
     if confirmHelp.status == "confirmed":
         flash('This help is already confirmed.')
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=confirmHelp.gclass.gclassid))
 
     if currUser.role.lower() == 'student' and not form.validate_on_submit():
         return render_template('confirmform.html',form=form)
@@ -172,46 +170,44 @@ def confirmhelp(helpid):
         )
         helper1.save()
 
-    return redirect(url_for('checkin'))
+    return redirect(url_for('classdash',gclassid=confirmHelp.gclass.gclassid))
 
 
 @app.route('/help/delete/<helpid>')
 def deletehelp(helpid):
 
     delHelp = Help.objects.get(pk=helpid)
+    gclassid = delHelp.gclass.gclassid
     currUser = User.objects.get(gid=session['gid'])
 
     if currUser.role.lower() == "teacher":
         delHelp.delete()
         flash('The requested Help is deleted.')
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=gclassid))
 
     if currUser != delHelp.requester:
         flash('You are not the requester of the help so you cannot delete it.')
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=gclassid))
 
     if delHelp.status == "confirmed":
         flash("You can't delete a confirmed help.")
-        return redirect(url_for('checkin'))
+        return redirect(url_for('classdash',gclassid=gclassid))
 
     delHelp.delete()
     flash('Your requested Help is deleted.')
 
-    return redirect(url_for('checkin'))
+    return redirect(url_for('classdash',gclassid=gclassid))
 
-@app.route('/dashboard/<gclassid>')
-def dashboard(gclassid):
-    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
-    helps = Help.objects(gclass=gClassroom)
-
-    return render_template('classdashboard.html', helps=helps)
+@app.route('/approvehelps/<gclassid>')
+def approvehelps(gclassid):
+    return redirect(url_for('classdash',gclassid=gclassid))
 
 @app.route('/approvehelp/<helpid>')
 def approvehelp(helpid):
     help = Help.objects.get(pk=helpid)
     help.update(status='approved')
     
-    return redirect(url_for('dashboard',gclassid=help.gclass.gclassid))
+    return redirect(url_for('classdash',gclassid=help.gclass.gclassid))
 
 @app.route('/rejecthelp/<helpid>')
 def rejecthelp(helpid):
@@ -231,7 +227,7 @@ def rejecthelp(helpid):
         note=help.note+" I looked to delete a token from your account but you had none."
 
     
-    return redirect(url_for('dashboard',gclassid=help.gclass.gclassid))
+    return redirect(url_for('classdash',gclassid=help.gclass.gclassid))
 
 @app.route('/approveallconfirmed/<gclassid>')
 def approveallconfirmed(gclassid):
@@ -240,4 +236,41 @@ def approveallconfirmed(gclassid):
     helps.update(status='approved')
     helps = Help.objects(gclass=gClassroom)
 
-    return render_template('classdashboard.html', helps=helps)
+    return redirect(url_for('classdash', gclassid=gclassid))
+
+@app.route('/tokens/award/<gclassid>', methods=["GET","POST"])
+def tokensAward(gclassid):
+    if session['role'].lower() !="teacher":
+        flash("You can't award tokens")
+        return(redirect(url_for('classdash',gclassid=gclassid)))
+
+    currUser = User.objects.get(id=session['currUserId'])
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    owners = []
+    for student in gClassroom.groster['roster']:
+        owner = (student['userId'], student['profile']['name']['fullName'])
+        owners.append(owner)
+
+    owners.sort(key=lambda x:x[1])
+
+    form = TokenForm()
+    form.owner.choices = owners
+    if form.validate_on_submit():
+        tokenReceiver = User.objects.get(gid=form.owner.data)
+        for i in range(form.numTokens.data):
+            Token(
+                owner = tokenReceiver,
+                giver = currUser,
+                note = form.note.data
+            ).save()
+        return(redirect(url_for('classdash',gclassid=gclassid)))
+
+    return render_template("tokenform.html",form=form)
+
+@app.route('/tokens/list')
+def tokensList():
+    tokens = Token.objects()
+    for token in tokens:
+        flash(f'{token.owner.fname} {token.owner.lname} {token.transaction}')
+
+    return render_template('index.html')

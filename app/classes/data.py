@@ -262,7 +262,7 @@ class Help(Document):
     note = StringField()
 
     meta = {
-        'ordering': 'created'
+        'ordering': ['status','created']
     }
 
 class Token(Document):
@@ -270,7 +270,6 @@ class Token(Document):
     giver = ReferenceField('User', required=True)
     transaction = DateTimeField(default=d.datetime.utcnow)
     amt = IntField(default=1)
-    # This is the objectid from the origin record
     help = ReferenceField('Help')
     note = StringField()
 

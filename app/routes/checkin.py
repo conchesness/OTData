@@ -211,7 +211,7 @@ def breakstart():
             breakclass = form.gclassid.data
         )
         #return redirect(url_for('checkin')) 
-        return redirect(url_for('dashboard',gclassid=form.gclassid.data)) 
+        return redirect(url_for('classdash',gclassid=form.gclassid.data)) 
     
     return render_template('breakstart.html',tokencount=tokencount, form=form)
 

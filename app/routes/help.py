@@ -257,7 +257,7 @@ def tokensAward(gclassid):
     form.owner.choices = owners
     if form.validate_on_submit():
         tokenReceiver = User.objects.get(gid=form.owner.data)
-        for i in range(form.numTokens.data):
+        for i in range(int(form.numTokens.data)):
             Token(
                 owner = tokenReceiver,
                 giver = currUser,

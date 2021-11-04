@@ -45,7 +45,7 @@
                         <td nowrap>
                             <a href="/profile/{{stu[1].aeriesid}}">{{stu[1].afname}} {{stu[1].alname}}</a> 
                             {% if stu[0].updateGClasses == "True" %}
-                            <a data-toggle="tooltip" data-placement="top" title="Update the student's classes" href="/addgclass/{{stu[0].profile.emailAddress}}/{{gclassid}}/{{gclassname}}">(u)</a>
+                            <a data-toggle="tooltip" data-placement="top" title="Update the student's classes" href="/addgclass/{{stu[0].profile.emailAddress}}/{{gclassid}}">(u)</a>
                             {% endif %}
                             {% if not stu[1].lastlogin %}(l){% endif %}
                             {% if not stu[1].lastedited %}(e){% endif %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+{{displayDFHTML}}
+
+<h1 class="display-3">{{gClassroom.gclassdict['name']}}</h1>
+Last Update: {{moment(gClassroom.studsubsdict['lastUpdate']).calendar()}} <br> <br>
+
+{% for item in gClassroom.studsubsdict['studsubs'] %}
+   {{item}} <br> <br>
+{% endfor %}
+
+{{gClassroom.studsubsdict}}
+
+{% endblock %}

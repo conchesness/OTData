@@ -1,46 +1,142 @@
 from app import app
 from .users import credentials_to_dict
-from flask import render_template, redirect, session, flash, url_for
+from flask import render_template, redirect, session, flash, url_for, Markup
 from app.classes.data import User, GoogleClassroom
 from app.classes.forms import GClassForm
 import mongoengine.errors
 import google.oauth2.credentials
 import googleapiclient.discovery
 from google.auth.exceptions import RefreshError
+import datetime as dt
+from .roster import getCourseWork
+import pandas as pd
 
-@app.route('/addgclass/<gmail>/<gclassid>/<gclassname>')
-def addgclass(gmail,gclassid,gclassname):
+@app.route('/addgclass/<gmail>/<gclassid>')
+def addgclass(gmail,gclassid):
 
     try:
         stu = User.objects.get(otemail=gmail)
     except Exception as error:
         flash(f"Got an error: {error}")
         flash("I can't find this user in OTData.")
-        return redirect(url_for('roster',gclassid=gclassid, gclassname=gclassname))
+        return redirect(url_for('roster',gclassid=gclassid))
     
     try:
         stu.gclasses.get(gclassid=gclassid)
     except mongoengine.errors.DoesNotExist:
         pass
     else:
-        flash(f"{stu.fname} {stu.lname} already has {gclassname} stored in OTData.")
-        return redirect(url_for('roster',gclassid=gclassid, gclassname=gclassname))
+        flash(f"{stu.fname} {stu.lname} already has this class stored in OTData.")
+        return redirect(url_for('roster',gclassid=gclassid))
     
     try:
         gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     except Exception as error:
         flash(f"Got an error: {error}")
-        flash(f"Could not find {gclassname} in list of Google Classrooms at OTData.")
-        return redirect(url_for('roster',gclassid=gclassid, gclassname=gclassname))
+        flash(f"Could not find this class in list of Google Classrooms at OTData.")
+        return redirect(url_for('roster',gclassid=gclassid))
     else:
         stu.gclasses.create(
             gclassid=gclassid,
             gclassroom = gClassroom
             )
         stu.save()
-        flash(f"{gclassname} has been added to the OTData classes for {stu.fname} {stu.lname}.")
+        flash(f"This class has been added to the OTData classes for {stu.fname} {stu.lname}.")
 
-    return redirect(url_for('roster',gclassid=gclassid, gclassname=gclassname))
+    return redirect(url_for('roster',gclassid=gclassid))
+
+@app.route('/studsubs/<gclassid>')
+def studsubs(gclassid):
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+
+    subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
+    subsDF = subsDF.drop('id', 1)
+
+    dictfordf = {}
+    for row in gClassroom.groster['roster']:
+        newRow = {'userId':row['userId'],'name':row['profile']['name']['fullName'],'email':row['profile']['emailAddress']}
+        dictfordf[row['userId']] = newRow
+
+    stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
+
+    gbDF = pd.merge(stusDF, 
+                      subsDF, 
+                      on ='userId', 
+                      how ='inner')
+
+
+    dictfordf = {}
+    for row in gClassroom.courseworkdict['courseWork']:
+        dictfordf[row['id']] = row
+
+    courseworkDF = pd.DataFrame.from_dict(dictfordf, orient='index')
+    courseworkDF.rename(columns={"id": "courseWorkId"}, inplace=True)
+
+    gbDF = pd.merge(courseworkDF, 
+                    gbDF, 
+                    on ='courseWorkId', 
+                    how ='inner')
+    
+    displayDFHTML = Markup(pd.DataFrame.to_html(gbDF))
+    #displayDFHTML = Markup(pd.DataFrame.to_html(courseworkDF))
+    #stusDFHTML = Markup(pd.DataFrame.to_html(stusDF))
+    #subsDFHTML = Markup(pd.DataFrame.to_html(subsDF))
+
+    return render_template('studsubs.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML)
+
+
+@app.route('/getstudsubs/<gclassid>')
+def getstudsubs(gclassid):
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    # setup the Google API access credentials
+    if google.oauth2.credentials.Credentials(**session['credentials']).valid:
+        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    else:
+        return redirect('/authorize')
+    session['credentials'] = credentials_to_dict(credentials)
+    classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
+    studSubsAll = []
+    pageToken=None
+    counter=1
+    while True:
+
+        try:
+            studSubs = classroom_service.courses().courseWork().studentSubmissions().list(
+                courseId=gclassid,
+                #states=['TURNED_IN','RETURNED','RECLAIMED_BY_STUDENT'],
+                late = 'LATE_ONLY',
+                courseWorkId='-',
+                pageToken=pageToken
+                ).execute()
+        except RefreshError:
+            flash('Had to reauthorize your Google credentials.')
+            return redirect('/authorize')
+
+        except Exception as error:
+            print(error)
+
+        studSubsAll.extend(studSubs['studentSubmissions'])
+        pageToken = studSubs.get('nextPageToken')
+        print(counter)
+        counter=counter+1
+        if not pageToken:
+            break
+
+    dictfordf = {}
+    for row in studSubsAll:
+        dictfordf[row['id']] = row
+
+    studSubsAll = {'lastUpdate':dt.datetime.utcnow(),'studsubs':dictfordf}
+    gClassroom.update(
+        studsubsdict = studSubsAll
+    )
+
+    getCourseWork(gclassid)
+
+    gClassroom.reload()
+
+    return render_template('studsubs.html',gClassroom=gClassroom)
+
 
 # this function exists to update the stored values for one or more google classrooms
 @app.route('/gclasses/<gclassid>')
@@ -75,11 +171,12 @@ def gclasses(gclassid=None):
     else:
         try:
             gCourses = classroom_service.courses().list(courseStates='ACTIVE').execute()
-            gCourse = None
-            gCourses = gCourses['courses']
         except RefreshError:
             flash("When I asked for the courses from Google Classroom I found that your credentials needed to be refreshed.")
             return redirect('/authorize')
+        else:
+            gCourse = None
+            gCourses = gCourses['courses']
 
     # This will be a list of all the OTData GoogleClassroom objects for this query
     for gCourse in gCourses:

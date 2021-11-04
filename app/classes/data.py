@@ -325,6 +325,7 @@ class GoogleClassroom(Document):
     gteacherdict = DictField()
     gclassdict = DictField()
     courseworkdict = DictField() #<-- not being used at the moment
+    studsubsdict = DictField()
     gclassid = StringField()
     teacher = ReferenceField('User')
     # This is a list of possible cohorts for this class

@@ -4,7 +4,7 @@
 
 
 <h1 class="display-3">{{gClassroom.gclassdict['name']}}</h1>
-Last Update of data: {{moment(gClassroom.studsubsdict['lastUpdate']).calendar()}} <br> <br>
+Last <a href="/getstudsubs/{{gClassroom.gclassid}}">Update</a> of data: {{moment(gClassroom.studsubsdict['lastUpdate']).calendar()}} <br> <br>
 
 {{displayDFHTML}}
 

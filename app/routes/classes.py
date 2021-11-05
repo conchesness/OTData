@@ -77,31 +77,31 @@ def studsubs(gclassid):
                     on ='courseWorkId', 
                     how ='inner')
 
-    gbDF = gbDF.drop(
-        [
-            'courseId_x',
-            'courseWorkId',
-            'description',
-            'state_x',
-            'alternateLink_x',
-            'submissionModificationMode',	
-            'assigneeMode',
-            'creatorUserId',
-            'materials',	
-            'individualStudentsOptions',
-            'multipleChoiceQuestion',	
-            'courseId_y',	
-            'creationTime_y',	
-            'updateTime_y',	
-            'alternateLink_y',	
-            'assignmentSubmission',	
-            'shortAnswerSubmission',	
-            'multipleChoiceSubmission',	
-            'draftGrade',
-            'creationTime_x',	
-            'updateTime_x',
-            'assignment'
-        ], 1)
+    # gbDF = gbDF.drop(
+    #     [
+    #         'courseId_x',
+    #         'courseWorkId',
+    #         'description',
+    #         'state_x',
+    #         'alternateLink_x',
+    #         'submissionModificationMode',	
+    #         'assigneeMode',
+    #         'creatorUserId',
+    #         'materials',	
+    #         'individualStudentsOptions',
+    #         #'multipleChoiceQuestion',	
+    #         'courseId_y',	
+    #         'creationTime_y',	
+    #         'updateTime_y',	
+    #         'alternateLink_y',	
+    #         'assignmentSubmission',	
+    #         'shortAnswerSubmission',	
+    #         #'multipleChoiceSubmission',	
+    #         'draftGrade',
+    #         'creationTime_x',	
+    #         'updateTime_x',
+    #         'assignment'
+    #     ], 1)
 
     #gbDF = pd.pivot_table(data=gbDF,index=['name'],aggfunc={'late':(lambda x:len(x.unique()))})
     gbDF.fillna('', inplace=True)
@@ -170,7 +170,7 @@ def getstudsubs(gclassid):
 
     gClassroom.reload()
 
-    return render_template('studsubs.html',gClassroom=gClassroom)
+    return redirect(url_for('studsubs',gclassid=gclassid))
 
 
 # this function exists to update the stored values for one or more google classrooms

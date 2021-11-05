@@ -257,15 +257,31 @@ def tokensAward(gclassid):
     form.owner.choices = owners
     if form.validate_on_submit():
         tokenReceiver = User.objects.get(gid=form.owner.data)
-        for i in range(int(form.numTokens.data)):
-            Token(
-                owner = tokenReceiver,
-                giver = currUser,
-                note = form.note.data
+        if int(form.numTokens.data) > 0:
+            for i in range(int(form.numTokens.data)):
+                Token(
+                    owner = tokenReceiver,
+                    giver = currUser,
+                    note = form.note.data
+                ).save()
+        else:
+            try:
+                token = Token.objects(owner = tokenReceiver).first()
+            except:
+                flash('No tokens to take.')
+            else:
+                token.delete()
+                flash(f'One Token Deleted for: {form.note.data}.')
+            Help(
+                requester = tokenReceiver,
+                note = f"One token deleted (if you had one) for: {form.note.data}",
+                status = "rejected",
+                confirmed = dt.utcnow
             ).save()
+        
         return(redirect(url_for('classdash',gclassid=gclassid)))
 
-    return render_template("tokenform.html",form=form)
+    return render_template("tokenform.html",form=form,owners=owners)
 
 @app.route('/tokens/list')
 def tokensList():

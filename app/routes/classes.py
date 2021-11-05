@@ -10,6 +10,7 @@ from google.auth.exceptions import RefreshError
 import datetime as dt
 from .roster import getCourseWork
 import pandas as pd
+import numpy as np
 
 @app.route('/addgclass/<gmail>/<gclassid>')
 def addgclass(gmail,gclassid):
@@ -64,7 +65,6 @@ def studsubs(gclassid):
                       on ='userId', 
                       how ='inner')
 
-
     dictfordf = {}
     for row in gClassroom.courseworkdict['courseWork']:
         dictfordf[row['id']] = row
@@ -76,7 +76,43 @@ def studsubs(gclassid):
                     gbDF, 
                     on ='courseWorkId', 
                     how ='inner')
-    
+
+    gbDF = gbDF.drop(
+        [
+            'courseId_x',
+            'courseWorkId',
+            'description',
+            'state_x',
+            'alternateLink_x',
+            'submissionModificationMode',	
+            'assigneeMode',
+            'creatorUserId',
+            'materials',	
+            'individualStudentsOptions',
+            'multipleChoiceQuestion',	
+            'courseId_y',	
+            'creationTime_y',	
+            'updateTime_y',	
+            'alternateLink_y',	
+            'assignmentSubmission',	
+            'shortAnswerSubmission',	
+            'multipleChoiceSubmission',	
+            'draftGrade',
+            'creationTime_x',	
+            'updateTime_x',
+            'assignment'
+        ], 1)
+
+    #gbDF = pd.pivot_table(data=gbDF,index=['name'],aggfunc={'late':(lambda x:len(x.unique()))})
+    gbDF.fillna('', inplace=True)
+    gbDF['late'] = gbDF['late'].astype('bool')
+    #gbDF.replace("True", 1)
+    print(gbDF.dtypes)
+    gbDF = pd.pivot_table(data=gbDF,index=['name'],aggfunc={'late':np.sum,'email':len})
+    gbDF['On Time %'] = 100-(gbDF['late'] / gbDF['email'] * 100)
+    gbDF.rename(columns={"email": "total"}, inplace=True)
+    gbDF = gbDF.sort_values(by=['On Time %'], ascending=False)
+
     displayDFHTML = Markup(pd.DataFrame.to_html(gbDF))
     #displayDFHTML = Markup(pd.DataFrame.to_html(courseworkDF))
     #stusDFHTML = Markup(pd.DataFrame.to_html(stusDF))
@@ -104,7 +140,6 @@ def getstudsubs(gclassid):
             studSubs = classroom_service.courses().courseWork().studentSubmissions().list(
                 courseId=gclassid,
                 #states=['TURNED_IN','RETURNED','RECLAIMED_BY_STUDENT'],
-                late = 'LATE_ONLY',
                 courseWorkId='-',
                 pageToken=pageToken
                 ).execute()

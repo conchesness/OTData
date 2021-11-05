@@ -1,11 +1,30 @@
 {% extends 'base.html' %}
 
 {% block body %}
-
+<div class="container">
 
 <h1 class="display-3">{{gClassroom.gclassdict['name']}}</h1>
 Last <a href="/getstudsubs/{{gClassroom.gclassid}}">Update</a> of data: {{moment(gClassroom.studsubsdict['lastUpdate']).calendar()}} <br> <br>
+<div class="row">
+   <div class="col">
+      <div class="row">
+         <div class="col">
+            <h1 class="display-6">Median: {{median}}</h1>
+            <small>Orange Line</small>
+         </div>
+         <div class="col">
+            <h1 class="display-6">Mean: {{mean}}</h1>
+            <small>Green Triangle</small>
+         </div>
+      </div>
+      <img class="img-fluid" src="/static/{{gClassroom.gclassid}}.png">
+      <small>If you don't see an image here, refresh the screen and it should show up.</small>
+   </div>
+   <div class="col">
+      {{displayDFHTML}}
+   </div>   
+</div>
+</div>
 
-{{displayDFHTML}}
 
 {% endblock %}

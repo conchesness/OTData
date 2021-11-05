@@ -11,6 +11,8 @@ import datetime as dt
 from .roster import getCourseWork
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt 
+
 
 @app.route('/addgclass/<gmail>/<gclassid>')
 def addgclass(gmail,gclassid):
@@ -50,7 +52,12 @@ def addgclass(gmail,gclassid):
 def studsubs(gclassid):
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
 
-    subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
+    try:
+        subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
+    except:
+        flash(Markup(f'You need to <a href="/getstudsubs/{{gclassid}}">update you info from Google Clasroom.</a>'))
+        return redirect(url_for('checkin'))
+
     subsDF = subsDF.drop('id', 1)
 
     dictfordf = {}
@@ -77,48 +84,38 @@ def studsubs(gclassid):
                     on ='courseWorkId', 
                     how ='inner')
 
-    # gbDF = gbDF.drop(
-    #     [
-    #         'courseId_x',
-    #         'courseWorkId',
-    #         'description',
-    #         'state_x',
-    #         'alternateLink_x',
-    #         'submissionModificationMode',	
-    #         'assigneeMode',
-    #         'creatorUserId',
-    #         'materials',	
-    #         'individualStudentsOptions',
-    #         #'multipleChoiceQuestion',	
-    #         'courseId_y',	
-    #         'creationTime_y',	
-    #         'updateTime_y',	
-    #         'alternateLink_y',	
-    #         'assignmentSubmission',	
-    #         'shortAnswerSubmission',	
-    #         #'multipleChoiceSubmission',	
-    #         'draftGrade',
-    #         'creationTime_x',	
-    #         'updateTime_x',
-    #         'assignment'
-    #     ], 1)
-
-    #gbDF = pd.pivot_table(data=gbDF,index=['name'],aggfunc={'late':(lambda x:len(x.unique()))})
     gbDF.fillna('', inplace=True)
     gbDF['late'] = gbDF['late'].astype('bool')
     #gbDF.replace("True", 1)
     print(gbDF.dtypes)
-    gbDF = pd.pivot_table(data=gbDF,index=['name'],aggfunc={'late':np.sum,'email':len})
+    gbDF = pd.pivot_table(data=gbDF,index=['email'],aggfunc={'late':np.sum,'email':len})
     gbDF['On Time %'] = 100-(gbDF['late'] / gbDF['email'] * 100)
     gbDF.rename(columns={"email": "total"}, inplace=True)
     gbDF = gbDF.sort_values(by=['On Time %'], ascending=False)
+    median = round(gbDF['On Time %'].median(),2)
+    mean = round(gbDF['On Time %'].mean(), 2)
 
+    #plotting boxplot 
+    #plt.boxplot([x for x in gbDF['On Time %']],labels=[x for x in gbDF.index]) 
+    plt.boxplot([x for x in gbDF['On Time %']], showmeans=True) 
+
+    #x and y-axis labels 
+    plt.xlabel('name') 
+    plt.ylabel('%') 
+
+    #plot title 
+    plt.title('Analysing on time %') 
+
+    #save and display 
+    plt.savefig(f'app/static/{gclassid}.png',dpi=300,bbox_inches='tight')
+    plt.clf()
+  
     displayDFHTML = Markup(pd.DataFrame.to_html(gbDF))
     #displayDFHTML = Markup(pd.DataFrame.to_html(courseworkDF))
     #stusDFHTML = Markup(pd.DataFrame.to_html(stusDF))
     #subsDFHTML = Markup(pd.DataFrame.to_html(subsDF))
 
-    return render_template('studsubs.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML)
+    return render_template('studsubs.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML,median=median,mean=mean)
 
 
 @app.route('/getstudsubs/<gclassid>')

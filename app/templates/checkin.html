@@ -17,7 +17,9 @@
             <td nowrap>
               <img width="25" src="/static/edit.png"><b>E</b>dit
               {% if not session.role.lower() == 'student' %}<br>
+              {% if request.host == '127.0.0.1:5000' %}
                 <img width="25" src="/static/roster.png"><b>R</b>oster<br>
+              {% endif %}
                 <img width="25" src="/static/checkin.png"><b>C</b>heckins
               {% endif %}
             </td>
@@ -72,9 +74,11 @@
               <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
                 <img width="25" src="/static/edit.png">
               </a>
+              {% if request.host == '127.0.0.1:5000' %}
               <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
                 <img width="25" src="/static/roster.png">
               </a>
+              {% endif %}
               <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Student Submissions" href="/studsubs/{{class.gclassid}}">
                 <img width="25" src="/static/update.png">
               </a>
@@ -110,7 +114,9 @@
         <td>
           <img width="25" src="/static/edit.png"> <b>E</b>dit
           {% if not session.role.lower() == 'student' %}<br>
+            {% if request.host == '127.0.0.1:5000' %}
             <img width="25" src="/static/roster.png"><b>R</b>oster<br>
+            {% endif %}
             <img width="25" src="/static/checkin.png"><b>C</b>heckins
           {% endif %}
         </td>
@@ -126,9 +132,11 @@
             <img width="25" src="/static/edit.png">
           </a>
           {% if not session.role.lower() == 'student' %}
+          {% if request.host == '127.0.0.1:5000' %}
             <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
               <img width="25" src="/static/roster.png">
             </a>
+          {% endif %}
             <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
               <img width="25" src="/static/checkin.png">
             </a>
@@ -152,9 +160,11 @@
             <img width="25" src="/static/edit.png">
           </a>
           {% if not session.role.lower() == 'student' %}
+          {% if request.host == '127.0.0.1:5000' %}
             <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
               <img width="25" src="/static/roster.png">
             </a>
+          {% endif %}
             <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
               <img width="25" src="/static/checkin.png">
             </a>

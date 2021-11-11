@@ -113,7 +113,7 @@ class GClass(EmbeddedDocument):
     #gclassdict = DictField() # Depricated
     #gteacher = DictField() # Depricated
     status = StringField()
-    #classname = StringField() # depricated
+    classname = StringField() # created by user for sorting
     gclassroom = ReferenceField('GoogleClassroom')
     nummissing = StringField()
     nummissingupdate = DateTimeField()

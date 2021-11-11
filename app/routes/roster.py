@@ -1,7 +1,7 @@
 from re import S
 from app import app
 from .users import credentials_to_dict
-from flask import render_template, redirect, session, flash, url_for
+from flask import render_template, redirect, session, flash, url_for, Markup
 from app.classes.data import User, GoogleClassroom
 from app.classes.forms import SimpleForm, SortOrderCohortForm
 from datetime import datetime as dt
@@ -11,19 +11,22 @@ import googleapiclient.discovery
 from google.auth.exceptions import RefreshError
 import ast
 
-@app.route("/roster/saved/<gclassid>", methods=['GET','POST'])
-def rostersaved(gclassid):
-
-    gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
-    gclassname = gclassroom.gclassdict['name']
-
-    print(gclassroom.groster)
-
-    return render_template('roster.html',gclassname=gclassname, gclassid=gclassid, otdstus=gclassroom.groster)
-
-@app.route("/roster/<gclassid>/<gclassname>", methods=['GET','POST'])
 @app.route("/roster/<gclassid>", methods=['GET','POST'])
-def roster(gclassid,gclassname=None):
+def roster(gclassid):
+    gclass = GoogleClassroom.objects.get(gclassid=gclassid)
+    try:
+        otdstus = gclass.groster['roster']
+    except:
+        flash(Markup(f"You need to <a href='/getroster/{gclassid}'>update your roster from Google Classroom</a>."))
+        return redirect(url_for('checkin'))
+
+    otdstus = sorted(otdstus, key = lambda i: (i['sortCohort'],i['profile']['name']['fullName']))
+   
+    return render_template('rosternew.html',gclassname=gclass.gclassdict['name'], gclassid=gclassid, otdstus=otdstus)
+
+
+@app.route("/getroster/<gclassid>", methods=['GET','POST'])
+def getroster(gclassid):
    
     # TODO create a function to retrieve roster cause I run this code three times
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
@@ -47,76 +50,57 @@ def roster(gclassid,gclassname=None):
             break
         students_results = classroom_service.courses().students().list(courseId = gclassid,pageToken=pageToken).execute()
 
-    gclass = GoogleClassroom.objects.get(gclassid=gclassid)
-    gclass.update(groster=gstudents)
-
-    otdstus=[]
     stus=[]
-    for stu in gstudents:
+    length = len(gstudents)
+    for i,stu in enumerate(gstudents):
+        print(f"{i}/{length}")
         # Make sure the students are actually students
         if stu['profile']['emailAddress'][:2]=="s_":   
             stu['sortCohort'] = ''         
             try:
                 # see if they are in OTData
                 otdstu = User.objects.get(otemail=stu['profile']['emailAddress'])
-                # If they are in OTData get any missing assignment data
-            # TODO find the right error for does not exist
             except mongoengine.errors.DoesNotExist as error:
-                flash(f"Possibly, {stu['profile']['emailAddress']} is not in OTData")
-                flash(f"the exact error was: {error}")
-                if error == "User matching query does not exist":
-                    stu['numMissing'] = 0
-                    stu['numMissingUpdate'] = None
+                flash(f"{stu['profile']['name']['fullName']} is not in OTData")
             except Exception as error:
-                flash(f'unknown error occured: {error}')
+                flash(f"Error occured when looking for {stu['profile']['name']['fullName']}: {error}")
+            else:
+                stu['otdobject'] = otdstu
+
             try:
                 otdStuClass = otdstu.gclasses.get(gclassid=gclassid)
             except mongoengine.errors.DoesNotExist as error:
-                #flash(f"A Mongoengine DoesNotExist error occured: {error}")
                 stu['updateGClasses'] = "True"
-                otdstus.append([stu,otdstu])
             except Exception as error:
                 flash(f"An unknown error occured: {error}")
             else:
                 stu['updateGClasses'] = "False"
-                stu['missingLink'] = otdStuClass.missinglink
-
-                try:
-                    len(otdStuClass.missingasses['missing']) > 0
-                except KeyError:
-                    stu['numMissing'] = 0
-                    stu['numMissingUpdate'] = None
-                else:
-                    if len(otdStuClass.missingasses['missing']) > 0:
-                        stu['numMissing'] = otdStuClass.nummissing
-                        stu['numMissingUpdate'] = otdStuClass.nummissingupdate.date().strftime("%m/%d/%Y")
                 try:
                     if otdStuClass.sortcohort:
                         stu['sortCohort'] = otdStuClass.sortcohort
                 except KeyError:
                     pass
-                otdstus.append([stu,otdstu])
         stus.append(stu)
+    
 
-    otdstus = sorted(otdstus, key = lambda i: (i[0]['sortCohort'],i[0]['profile']['name']['familyName']))
+    stus = sorted(stus, key = lambda i: (i['sortCohort'],i['profile']['name']['familyName']))
+    for stu in stus:
+        print(stu)
+        break
 
     groster = {}
     groster['roster'] = stus
-
-    googleClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
-    # print(googleClassroom.gclassdict)
-    if not gclassname:
-        gclassname = googleClassroom.gclassdict['name']
-
-    googleClassroom.update(
+    gclass = GoogleClassroom.objects.get(gclassid=gclassid)
+    gclassname = gclass.gclassdict['name']
+    gclass.update(
             groster = groster
         )
+    return redirect(url_for('roster',gclassid=gclassid))
+    #return render_template('roster.html',gclassname=gclassname, gclassid=gclassid, otdstus=stus)
 
-    return render_template('roster.html',gclassname=gclassname, gclassid=gclassid, otdstus=otdstus)
-
-@app.route('/getguardians/<gclassid>/<gclassname>/<index>')
-@app.route('/getguardians/<gclassid>/<gclassname>')
-def getgaurdians(gclassid,gclassname,index=0):
+@app.route('/getguardians/<gclassid>/<index>')
+@app.route('/getguardians/<gclassid>')
+def getgaurdians(gclassid,index=0):
     if index == 0:
         session['tempGStudents'] = None
 
@@ -166,7 +150,7 @@ def getgaurdians(gclassid,gclassname,index=0):
     session['tempGStudents'] = studentsOnly
     
     numStus = len(session['tempGStudents'])  
-    numIterations = 2
+    numIterations = 4
     iterator = 0
 
     for student in session['tempGStudents'][index:]:
@@ -211,12 +195,12 @@ def getgaurdians(gclassid,gclassname,index=0):
 
     if numStus > (index):
         # This is the url for the loading page to call back
-        url = f"/getguardians/{gclassid}/{gclassname}"
+        url = f"/getguardians/{gclassid}"
 
         return render_template ('loading.html', url=url, nextIndex=index, total=numStus)
 
     session['tempGStudents'] = None
-    return redirect(url_for('roster',gclassid=gclassid,gclassname=gclassname))
+    return redirect(url_for('roster',gclassid=gclassid))
 
 @app.route('/inviteguardians/<gid>/<gclassid>/<gclassname>')
 @app.route('/inviteguardians/<gid>')

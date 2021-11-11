@@ -132,15 +132,8 @@ def before_request():
 @app.route('/')
 def index():
 
-    #Get any announcements
-    try:
-        announcement = Post.objects.first()
-        announceBody = Markup(announcement.body)
-    except:
-        announcement = None
-        announceBody = None
-
     #get the curent requesting this page but include error handling because the user might not be logged in
+
     try: 
         currUser = User.objects.get(pk=session['currUserId'])
         # If this is a student, send them to their profile page
@@ -149,7 +142,7 @@ def index():
     except:
         currUser=None
 
-    return render_template("index.html", announceBody=announceBody, announcement=announcement, currUser=currUser)
+    return render_template("index.html", currUser=currUser)
 
 
 # a lot of stuff going on here for the user as they log in including creatin new users if this is their first login

@@ -5,29 +5,39 @@ from app.classes.data import GoogleClassroom, User, Help, Token
 from app.classes.forms import ActiveClassesForm
 from datetime import datetime as dt
 #from datetime import timedelta
-#from mongoengine import Q
+from mongoengine import Q
 import mongoengine.errors
 
-@app.route('/help/create', methods=['GET', 'POST'])
-def createhelp():
+@app.route('/help/create/<gclassid>', methods=['GET', 'POST'])
+def createhelp(gclassid):
+
+    currUser = User.objects.get(gid=session['gid'])
+    # Only create a new help if there is not an active one for this class
+    gClass = currUser.gclasses.filter(gclassid=gclassid)
+    gClass = gClass[0]
+    query = Q(requester=currUser) & Q(gclass=gClass.gclassroom) & (Q(status = 'asked') | Q(status = 'offered'))
+    lastHelp = Help.objects(query)
+    if len(lastHelp) > 0:
+        flash('You have an open help for this class. Delete or complete that Help first.')
+        return redirect(url_for('classdash',gclassid=gclassid))
 
     form = ActiveClassesForm()
-    currUser = User.objects.get(gid=session['gid'])
-    gCourses = currUser.gclasses
-    gclasses = []
 
-    for gCourse in gCourses:
-        if gCourse.gclassroom:
-            tempname = gCourse.gclassroom.gclassdict['name']
-            if not gCourse.status:
 
-                gCourse.status = ""
 
-            # a list of tuples for the form
-            if gCourse.status == "Active":
-                gclasses.append((gCourse.gclassroom.gclassid, tempname))
+    # gclasses = []
+    # for gCourse in gCourses:
+    #     if gCourse.gclassroom:
+    #         tempname = gCourse.gclassroom.gclassdict['name']
+    #         if not gCourse.status:
 
-    form.gclassid.choices = gclasses
+    #             gCourse.status = ""
+
+    #         # a list of tuples for the form
+    #         if gCourse.status == "Active":
+    #             gclasses.append((gCourse.gclassroom.gclassid, tempname))
+
+    form.gclassid.choices = [(gClass.gclassid,gClass.classname)]
     isStuList = False
     if form.validate_on_submit():
         gclass = GoogleClassroom.objects.get(gclassid = form.gclassid.data)

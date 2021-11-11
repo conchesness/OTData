@@ -55,7 +55,7 @@
     <div class="col-lg-11 col-xl-8 my-3 border-3 border-top border-bottom border-start">
       <div class="row my-3">
         <div class="col-2"><h3 class="display-5 mb-0">Help</h3></div>
-        <div class="col-2 mb-0"> <p> <a href="/help/create" class="btn btn-info btn-sm" role="button">Request Help</a></p></div>
+        <div class="col-2 mb-0"> <p> <a href="/help/create/{{gClassroom.gclassid}}" class="btn btn-info btn-sm" role="button">Request Help</a></p></div>
         <div class='col mb-0'>
           {% if tokens and tokens > 1%}
             You have earned {{tokens}} tokens.
@@ -163,7 +163,7 @@
     </table>
     </div>
     <!--Break Column-->
-    <div class="col-lg-11 col-xl-4 my-3 border border-3">
+    <div class="col-lg-11 col-xl-4 my-3 border border-3" id="breakColumn">
         <h3 class="display-5 mb-0">Break</h3>
 
       <p class="my-0">Please checkin first.</p>
@@ -174,7 +174,7 @@
       </div>
       <div id="startbreak">
         <p id="lastbreak"></p>
-        <p> <a href="/breakstart" class="btn btn-info btn-sm" role="button">Start Break</a></p>
+        <p> <a href="/breakstart/{{gClassroom.gclassid}}" class="btn btn-info btn-sm" role="button">Start Break</a></p>
       </div>
       {% if breaks %}
       <h4 class="mb-0">Breaks in the Last 90 Mins</h4>
@@ -196,15 +196,18 @@
             if ('{{currUser.role.lower()}}' == "teacher") {
               if (breakEndTemp.isBefore(moment().local()) == false) {
                 document.getElementById("isover{{loop.index}}").innerHTML = "On Break";
-              } else {
-                document.getElementById("isover{{loop.index}}").innerHTML = "Back to Work";
-              }
-              if (breakEndTemp.isBefore(moment().local())) {
-                document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
-              } else {
                 document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
                 document.getElementById("isover{{loop.index}}").style.color='#ffffff';
+              } else {
+                document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
+                document.getElementById("isover{{loop.index}}").innerHTML = "Back to Work";
               }
+              // if (breakEndTemp.isBefore(moment().local())) {
+              //   document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
+              // } else {
+              //   document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
+              //   document.getElementById("isover{{loop.index}}").style.color='#ffffff';
+              // }
             }
           </script>
         </tr>
@@ -220,7 +223,7 @@
 
     <hr>
     <h1 class="display-5">Approve Helps</h1>
-    <a class="btn btn-primary btn-sm" role="button" href="/approveallconfirmed/{{gclassid}}">Approve ALL Remaining</a>
+    <a class="btn btn-primary btn-sm" role="button" href="/approveallconfirmed/{{gClassroom.gclassid}}">Approve ALL Remaining</a>
     <table class="table">
         <tr><th></th><th>Helped</th><th>Helper</th><th>Status</th><th>Created</th><th>Description of Help</th></tr>
         {% for help in approveHelps | sort(attribute="created", reverse=true) | sort(attribute="status")%}
@@ -330,7 +333,8 @@
   
     if ('{{breaks}}'.length > 2 && '{{currUser.role.lower()}}'=="teacher") {
       var refreshInterval = setInterval(function() {
-        location.reload();
+        //location.reload();
+        $("#breakColumn").load(location.href + " #breakColumn");
       }, 30000);
     }
    });

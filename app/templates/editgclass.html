@@ -11,21 +11,43 @@
         {% endfor %}
     {% endfor %}
     <h1>Edit the Classname for {{editGClass.gclassroom.gclassdict.name}}</h1>
-    <em>This edit can only be seen by you and only on this site</em> <br> <br>
-    Instructions: <br>
     <ul>
-        <li>Leave the fiield blank to revert to the original name: {{editGClass.gclassroom.gclassdict.name}}</li>
-        <li>What ever you type in this field will appear BEFORE {{editGClass.gclassroom.gclassdict.name}}</li>
-        <li>What ever you type here will impact the sort order of your classes</li>
-        <li>If you add a '~' it will force it to the end of the list and if you add a '!' it will be at the beginning of the list.</li>
+        <li>
+            This edit can only be seen by you and only on this site.
+        </li>
+        <li>
+            Rename classes to help you identify the class by using the name you want.
+        </li>
+        <li>
+            This name will also effect the sort order of your classes:
+            <ul>
+                <li>
+                    add a '~' at the beginning it will force it to the end
+                </li>
+                <li>
+                    add a '!' at the beginning it will force it to the beginning
+                </li>
+                <li>
+                    add a number or a letter then a number ie: a1, a3, a5, a7, b2, b4, b6, b8
+                </li>
+            </ul>
+        </li>
     </ul>
     <br>
-    <form method=post>
+    <form class="row" method=post>
         {{ form.hidden_tag() }} 
-        <b>Prefix:</b> <br>
-        {{ form.classname(size="20") }} 
-        {{ form.status() }}
-        {{form.submit()}}
+            <div class="col-5">
+                Custom Name: <br>
+                {{ form.classname(class="form-control") }} 
+            </div>
+            <div class="col-auto">
+                status: <br>
+                {{ form.status(class="form-control") }} 
+            </div>  
+            <div class="col-auto">
+                <br>
+                {{ form.submit(class="form-control") }}
+            </div>
     </form>
     <br>
     <table> 

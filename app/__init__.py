@@ -13,13 +13,14 @@ app.jinja_options['extensions'].append('jinja2.ext.do')
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY") # or os.urandom(20)
 # you must change the next line to be link to your database at mongodb.com
 connect("otdata", host=f"{os.environ.get('mongodb_host')}/otdata?retryWrites=true&w=majority")
-
+#connect("otdata",host="mongodb+srv://admin:bulld0gz@cluster0.8m0v1.mongodb.net/otdata?retryWrites=true&w=majority")
 # Sandbox DB
 # connect("otdatasb", host=f"{os.environ.get('mongodb_host')}/otdatasb?retryWrites=true&w=majority")
 
 moment = Moment(app)
 
 def base64encode(img):
+
     image = base64.b64encode(img)
     image = image.decode('utf-8')
     return image

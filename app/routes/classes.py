@@ -96,7 +96,7 @@ def studsubs(gclassid):
     mean = round(gbDF['On Time %'].mean(), 2)
 
     #plotting boxplot 
-    #plt.boxplot([x for x in gbDF['On Time %']],labels=[x for x in gbDF.index]) 
+    #plt.boxplot([x for x in gbDF['On Time %']],labels=[x for x in gbDF.index], showmeans=True) 
     plt.boxplot([x for x in gbDF['On Time %']], showmeans=True) 
 
     #x and y-axis labels 
@@ -171,11 +171,8 @@ def getstudsubs(gclassid):
 
 
 # this function exists to update the stored values for one or more google classrooms
-@app.route('/gclasses/<gclassid>')
 @app.route('/gclasses')
 def gclasses(gclassid=None):
-    if gclassid:
-        gclassid=str(gclassid)
 
     # Get the currently logged in user because, this will only work for the Current User as I don't have privleges to retrieve classes for other people.
     currUser = User.objects.get(pk = session['currUserId'])
@@ -187,37 +184,27 @@ def gclasses(gclassid=None):
     session['credentials'] = credentials_to_dict(credentials)
     classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
 
-    # retrieve one Google Class from Google if the class id is passed in the url
-    if gclassid:
-        gCourses = []
-        try:
-            gCourse = classroom_service.courses().get(id=gclassid).execute()
-        except RefreshError:
-            flash("When I asked for the courses from Google Classroom I found that your credentials needed to be refreshed.")
-            return redirect('/authorize')
-        
-        gCourses.append(gCourse)
-
-    # Get all of the google classes if there is not a class id in the url
-    # put the one class in an array of one item so it works in the following for loop
+    # Get all of the google classes
+    try:
+        gCourses = classroom_service.courses().list(courseStates='ACTIVE').execute()
+    except RefreshError:
+        flash("When I asked for the courses from Google Classroom I found that your credentials needed to be refreshed.")
+        return redirect('/authorize')
     else:
-        try:
-            gCourses = classroom_service.courses().list(courseStates='ACTIVE').execute()
-        except RefreshError:
-            flash("When I asked for the courses from Google Classroom I found that your credentials needed to be refreshed.")
-            return redirect('/authorize')
-        else:
-            gCourse = None
-            gCourses = gCourses['courses']
+        gCourse = None
+        gCourses = gCourses['courses']
 
-    # This will be a list of all the OTData GoogleClassroom objects for this query
-    for gCourse in gCourses:
+    # Iterate through the classes
+    for i,gCourse in enumerate(gCourses):
+        length = len(gCourses)
+        print(f"course {i}/{length}")
         # get the teacher record
         try:
             # See if I can find a Google Teacher User
             GClassTeacher = classroom_service.userProfiles().get(userId=gCourse['ownerId']).execute()
         except:
             GClassTeacher = None
+
         # See if the teacher has a record on OTData site
         try:
             otdataGClassTeacher = User.objects.get(gid = gCourse['ownerId'])
@@ -230,7 +217,7 @@ def gclasses(gclassid=None):
         except:
             otdataGCourse = None
 
-        # if the GCourse IS NOT in OTData the teacher IS in the OTData
+        # if the GCourse IS NOT in OTData and the teacher IS in the OTData
         if not otdataGCourse and otdataGClassTeacher:
             otdataGCourse = GoogleClassroom(
                 gclassdict = gCourse,
@@ -239,42 +226,45 @@ def gclasses(gclassid=None):
                 teacher = otdataGClassTeacher
             ).save()
 
-        # If there is a teacher in OTData and not a gcourse
+        # If there is NOT a teacher in OTData and NOT a course in OTData
         elif not otdataGCourse and not otdataGClassTeacher:
             otdataGCourse = GoogleClassroom(
                 gclassdict = gCourse,
                 gteacherdict = GClassTeacher,
                 gclassid = gCourse['id']
             ).save()
-        # if the GCourse is in OTData then update it
+
+        # if the GCourse and the teacher is in OTData then update it
         elif otdataGCourse and otdataGClassTeacher:
             otdataGCourse.update(
                 gclassdict = gCourse,
                 gteacherdict = GClassTeacher,
                 teacher = otdataGClassTeacher
             )
+
+        # if the course is in OTData but the teacher is not in otdata
         elif otdataGCourse and not otdataGClassTeacher:
             otdataGCourse.update(
                 gclassdict = gCourse,
                 gteacherdict = GClassTeacher
             )
 
-        # check to see if the class exists in the user's embedded doc
+        # check to see if the class exists in the current user's embedded doc
         try:
             userGClass = currUser.gclasses.get(gclassid=gCourse['id'])
         except:
             userGClass = None
 
-        # if the class does not exist then add it to the embedded doc
+        # if the class does not exist then add it to the embedded doc 
         if not userGClass:
             newUserGClass = currUser.gclasses.create(
                 gclassid = gCourse['id'],
-                gclassroom = otdataGCourse
+                gclassroom = otdataGCourse,
+                classname = otdataGCourse.gclassdict['name'],
+                status = 'Inactive'
             )
             userGClass = newUserGClass
-        else:
-            userGClass = currUser.gclasses.filter(gclassid=gCourse['id']).update(gclassroom = otdataGCourse)
-        
+
     currUser.save()
 
     return redirect(url_for('checkin'))
@@ -287,17 +277,21 @@ def editgclass(gclassid):
     form = GClassForm()
 
     if form.validate_on_submit():
-
         currUser.gclasses.filter(gclassid = gclassid).update(
-            classname = form.classname.data,
+            classname = form.classname.data, 
             status = form.status.data
         )
 
         currUser.gclasses.filter(gclassid = gclassid).save()
         return redirect(url_for('checkin'))
 
-    # if editGClass.classname:
-    #     form.classname.data = editGClass.classname
+    if editGClass.classname:
+        form.classname.data = editGClass.classname
+    else:
+        form.classname.data = editGClass.gclassroom.gclassdict['name']
+    
+    if editGClass.status:
+        form.status.data = editGClass.status
 
     return render_template('editgclass.html', form = form, editGClass = editGClass)
 

@@ -86,8 +86,8 @@ class CheckInForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class GClassForm(FlaskForm):
-    classname = StringField()
-    status = SelectField("Status:",choices=[('Active','Active'),('Inactive','Inactive'),('Ignore','Ignore')])
+    classname = StringField() # for user to input a custom name
+    status = SelectField("Status:",choices=[('Inactive','Inactive'),('Active','Active')])
     submit = SubmitField()
 
 class UserForm(FlaskForm):

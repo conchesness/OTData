@@ -163,7 +163,7 @@
     </table>
     </div>
     <!--Break Column-->
-    <div class="col-lg-11 col-xl-4 my-3 border border-3" id="breakColumn">
+    <div class="col-lg-11 col-xl-4 my-3 border border-3">
         <h3 class="display-5 mb-0">Break</h3>
 
       <p class="my-0">Please checkin first.</p>
@@ -177,45 +177,47 @@
         <p> <a href="/breakstart/{{gClassroom.gclassid}}" class="btn btn-info btn-sm" role="button">Start Break</a></p>
       </div>
       {% if breaks %}
+      <div id="breakColumn">
       <h4 class="mb-0">Breaks in the Last 90 Mins</h4>
       <p class="mt-0"><small>refresh page to update</small></p>
       <table class="table table-small">
         <tr>
-          <th>Student</th><th>Break Ends</th><th></th>
+          <th>Student</th><th>Break start</th><th>Break ends</th>
         </tr>
+
         {% for break in breaks | sort(attribute="breakstart",reverse=True) %}
         <tr>
           <td>{{break.fname}} {{break.lname}}</td> 
           <td id="in10mins{{loop.index}}"></td> 
           <td id="isover{{loop.index}}"></td>
-          <script type="text/javascript">
-            var breakStartTemp = moment.utc('{{break.breakstart}}').toDate();
-            breakStartTemp = moment(breakStartTemp).local();
-            var breakEndTemp = moment(breakStartTemp).add('{{break.breakduration}}', 'minutes');
-            document.getElementById("in10mins{{loop.index}}").innerHTML = breakEndTemp.format('h:mm:ss a');
-            if ('{{currUser.role.lower()}}' == "teacher") {
-              if (breakEndTemp.isBefore(moment().local()) == false) {
-                document.getElementById("isover{{loop.index}}").innerHTML = "On Break";
-                document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
-                document.getElementById("isover{{loop.index}}").style.color='#ffffff';
-              } else {
-                document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
-                document.getElementById("isover{{loop.index}}").innerHTML = "Back to Work";
-              }
-              // if (breakEndTemp.isBefore(moment().local())) {
-              //   document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
-              // } else {
-              //   document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
-              //   document.getElementById("isover{{loop.index}}").style.color='#ffffff';
-              // }
-            }
-          </script>
         </tr>
+
+        <script type="text/javascript">
+          var breakStartTemp = moment.utc('{{break.breakstart}}').toDate();
+          breakStartTemp = moment(breakStartTemp).local();
+          console.log(breakStartTemp)
+          var breakEndTemp = moment(breakStartTemp).add('{{break.breakduration}}', 'minutes');
+          document.getElementById("in10mins{{loop.index}}").innerHTML = breakEndTemp.format('h:mm:ss a');
+          if ('{{currUser.role.lower()}}' == "teacher") {
+            if (breakEndTemp.isBefore(moment().local()) == false) {
+              document.getElementById("isover{{loop.index}}").innerHTML = "On Break";
+              document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
+              document.getElementById("isover{{loop.index}}").style.color='#ffffff';
+            } else {
+              document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
+              document.getElementById("isover{{loop.index}}").innerHTML = "Back to Work";
+            }
+          }
+          </script>
+
         {% endfor %}
       </table>
+      </div>
       {% endif %}
     </div>
   </div>
+
+
 
 
     {% if session.role.lower()=="teacher" %}
@@ -308,8 +310,8 @@
         var distance = countDownDate - now;
   
         // Time calculations for days, hours, minutes and seconds
-        //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        //var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        // var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        // var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
   
@@ -328,16 +330,15 @@
           document.title = "Break is Over";
         }
       }, 1000);
-  
-    }
-  
-    if ('{{breaks}}'.length > 2 && '{{currUser.role.lower()}}'=="teacher") {
-      var refreshInterval = setInterval(function() {
-        //location.reload();
-        $("#breakColumn").load(location.href + " #breakColumn");
-      }, 30000);
     }
    });
+
+  //  if ('{{breaks|length}}' > 0 && '{{currUser.role.lower()}}'=="teacher") {
+  //     var refreshInterval = setInterval(function() {
+  //       location.reload();
+  //       //$("#breakColumn").load(location.href + " #breakColumn");
+  //     }, 30000);
+  //   }
   
   </script>
   

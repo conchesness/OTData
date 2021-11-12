@@ -80,7 +80,7 @@ def before_request():
     # TODO create a decorator or something for this
     unauthPaths = ['/','/home','/authorize','/login','/oauth2callback','/static','/logout','/revoke','/msgreply','/msgstatus']   
     communityPaths = ['/profile','/editprofile','/findstufromadult','/addstutoadult']
-    studentPaths = ['/classdash','/assignments','/comp','/help','/breakstart','/postgrad','/cc','/plan','/profile','/editprofile','/addadult','/editadult','/deleteadult','/sendstudentemail','/checkin','/deletecheckin','/editgclass','/deletegclass','/gclasses','/comp','/missingassignmentsstu'] 
+    studentPaths = ['/breaks','/classdash','/assignments','/comp','/help','/breakstart','/postgrad','/cc','/plan','/profile','/editprofile','/addadult','/editadult','/deleteadult','/sendstudentemail','/checkin','/deletecheckin','/editgclass','/deletegclass','/gclasses','/comp','/missingassignmentsstu'] 
     # this is some tricky code designed to send the user to the page they requested even if they have to first go through
     # a authorization process.
     try: 

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="container-fluid">
+<div class="container">
 <h1 class="display-3">{{gClassroom.gclassdict['name']}}</h1>
 
 <div class="row">
@@ -52,7 +52,7 @@
 
   <!--Help Column-->
   <div class="row">
-    <div class="col-lg-11 col-xl-7 my-3 border-3 border-top border-bottom border-start">
+    <div class="col-lg-11 col-xl-8 my-3 border-3 border-top border-bottom border-start">
       <div class="row my-3">
         <div class="col-2"><h3 class="display-5 mb-0">Help</h3></div>
         <div class="col-2 mb-0"> <p> <a href="/help/create/{{gClassroom.gclassid}}" class="btn btn-info btn-sm" role="button">Request Help</a></p></div>
@@ -163,7 +163,7 @@
     </table>
     </div>
     <!--Break Column-->
-    <div class="col-lg-11 col-xl-5 my-3 pb-3 border border-3">
+    <div class="col-lg-11 col-xl-4 my-3 border border-3">
         <h3 class="display-5 mb-0">Break</h3>
 
       <p class="my-0">Please checkin first.</p>
@@ -176,11 +176,49 @@
         <p id="lastbreak"></p>
         <p> <a href="/breakstart/{{gClassroom.gclassid}}" class="btn btn-info btn-sm" role="button">Start Break</a></p>
       </div>
+      {% if breaks %}
+      <div id="breakColumn">
+      <h4 class="mb-0">Breaks in the Last 90 Mins</h4>
+      <p class="mt-0"><small>refresh page to update</small></p>
+      <table class="table table-small">
+        <tr>
+          <th>Student</th><th>Break start</th><th>Break ends</th>
+        </tr>
 
-      <iframe class="mb-3" width="100%" height="100%" src="/breaks/{{gClassroom.gclassid}}" id="breaksFrame" title="Breaks Frame"></iframe>
+        {% for break in breaks | sort(attribute="breakstart",reverse=True) %}
+        <tr>
+          <td>{{break.fname}} {{break.lname}}</td> 
+          <td id="in10mins{{loop.index}}"></td> 
+          <td id="isover{{loop.index}}"></td>
+        </tr>
 
+        <script type="text/javascript">
+          var breakStartTemp = moment.utc('{{break.breakstart}}').toDate();
+          breakStartTemp = moment(breakStartTemp).local();
+          console.log(breakStartTemp)
+          var breakEndTemp = moment(breakStartTemp).add('{{break.breakduration}}', 'minutes');
+          document.getElementById("in10mins{{loop.index}}").innerHTML = breakEndTemp.format('h:mm:ss a');
+          if ('{{currUser.role.lower()}}' == "teacher") {
+            if (breakEndTemp.isBefore(moment().local()) == false) {
+              document.getElementById("isover{{loop.index}}").innerHTML = "On Break";
+              document.getElementById("isover{{loop.index}}").style.backgroundColor='#0000ff';
+              document.getElementById("isover{{loop.index}}").style.color='#ffffff';
+            } else {
+              document.getElementById("isover{{loop.index}}").style.backgroundColor='#00ff00';
+              document.getElementById("isover{{loop.index}}").innerHTML = "Back to Work";
+            }
+          }
+          </script>
+
+        {% endfor %}
+      </table>
+      </div>
+      {% endif %}
     </div>
   </div>
+
+<iframe src="/breaks/{{gClassroom.gclassid}}" id="breaksFrame" title="Breaks Frame"></iframe>
+
 
     {% if session.role.lower()=="teacher" %}
     <a href="/tokens/award/{{gClassroom.gclassid}}">Award Tokens</a>
@@ -254,7 +292,7 @@
   
       var difference = moment().diff(breakstart, 'seconds')
       if (difference < 600) {
-        $("#breakover").html("<font color='green'>Break is over at: " + breakends + "</font>")
+        $("#breakover").html("Break is over at: " + breakends)
       }
   
       if (moment().diff(breakstart, 'minutes') < 90) {
@@ -295,16 +333,13 @@
     }
    });
 
-   if ('{{breaks|length}}' > 0 && '{{currUser.role.lower()}}'=="teacher") {
-      var refreshInterval = setInterval(function() {
-        //location.reload();
-        document.getElementById('breaksFrame').contentDocument.location.reload(true);
-      }, 30000);
-    }
+  //  if ('{{breaks|length}}' > 0 && '{{currUser.role.lower()}}'=="teacher") {
+  //     var refreshInterval = setInterval(function() {
+  //       location.reload();
+  //       //$("#breakColumn").load(location.href + " #breakColumn");
+  //     }, 30000);
+  //   }
   
-
-  document.getElementById('YOUR IFRAME').contentDocument.location.reload(true);
-
   </script>
   
 {% endblock %}

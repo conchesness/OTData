@@ -80,6 +80,15 @@ def classdash(gclassid):
 
     return render_template('classdash.html',helps=helps, approveHelps=approveHelps, breaks=breaks,tokens=tokens,myHelps=myHelps,myOffers=myOffers, currUser=currUser,gClassroom=gClassroom,lastCheckIn=lastCheckIn,form=form)
 
+@app.route('/breaks/<gclassid>')
+def breaks(gclassid):
+    query = Q(breakclass=gclassid) & Q(breakstart__exists = True) & Q(breakstart__gt = dt.utcnow() - timedelta(minutes=90))
+    try:
+        breaks = User.objects(query)
+    except:
+        breaks = None
+
+    return render_template('breaks.html',classid=gclassid,breaks=breaks)
 
 @app.route("/checkin", methods=['GET', 'POST'])
 def checkin():

@@ -14,6 +14,9 @@ import ast
 @app.route("/roster/<gclassid>", methods=['GET','POST'])
 def roster(gclassid):
     gclass = GoogleClassroom.objects.get(gclassid=gclassid)
+    for stu in gclass.groster['roster']:
+        print(f"cohort: {stu['sortCohort']} updateGClass: {stu['updateGClasses']}")
+
     try:
         otdstus = gclass.groster['roster']
     except:
@@ -53,10 +56,9 @@ def getroster(gclassid):
     stus=[]
     length = len(gstudents)
     for i,stu in enumerate(gstudents):
-        print(f"{i}/{length}")
         # Make sure the students are actually students
         if stu['profile']['emailAddress'][:2]=="s_":   
-            stu['sortCohort'] = ''         
+            stu['sortCohort'] = '--'         
             try:
                 # see if they are in OTData
                 otdstu = User.objects.get(otemail=stu['profile']['emailAddress'])
@@ -80,18 +82,15 @@ def getroster(gclassid):
                         stu['sortCohort'] = otdStuClass.sortcohort
                 except KeyError:
                     pass
-        stus.append(stu)
+            print(f"{i}/{length} sort cohort: {stu['sortCohort']} updateGClass: {stu['updateGClasses']}")
+            stus.append(stu)
     
-
     stus = sorted(stus, key = lambda i: (i['sortCohort'],i['profile']['name']['familyName']))
-    for stu in stus:
-        print(stu)
-        break
 
     groster = {}
     groster['roster'] = stus
     gclass = GoogleClassroom.objects.get(gclassid=gclassid)
-    gclassname = gclass.gclassdict['name']
+    #gclassname = gclass.gclassdict['name']
     gclass.update(
             groster = groster
         )

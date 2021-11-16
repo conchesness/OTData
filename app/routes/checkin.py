@@ -90,7 +90,7 @@ def classdash(gclassid):
 
         # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
         # All dates retrieved from the DB are in UTC
-        if lastCheckIn and lastCheckIn.gclassid and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == int(form.gclassid.data):
+        if lastCheckIn and lastCheckIn.gclassid and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and lastCheckIn.gclassid == gclassid:
             flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
             return redirect(url_for('classdash',gclassid=gclassid))
 

@@ -17,6 +17,7 @@ from .credentials import twilio_account_sid, twilio_auth_token
 def classdash(gclassid):
     currUser = User.objects.get(pk = session['currUserId'])
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+
     # Only get this is the user is a Teacher
     if currUser.role.lower() == "teacher":
         approveHelps = Help.objects(gclass=gClassroom,status="confirmed")
@@ -47,6 +48,43 @@ def classdash(gclassid):
     form = CheckInForm()
     lastCheckIn = CheckIn.objects(student=currUser,gclassid=gclassid).first()
 
+    assigns_choices = []
+    numCount = 0
+    strCount = 0
+    for ass in gClassroom['courseworkdict']['courseWork']:
+        #Check to see if there is a number in the front of the title
+        for i,letter in enumerate(ass['title']):
+            if letter != ".":
+                try:
+                    int(letter)
+                except:
+                    break
+
+        if i == 0:
+            sortValue = 0
+            strCount = strCount + 1
+        else:
+            sortValue = float(ass['title'][0:i])
+            numCount = numCount + 1
+
+        choice = (sortValue,ass['title'])
+        assigns_choices.append(choice)
+        print(numCount+strCount)
+    if strCount > numCount:
+        assigns_choices = []
+        for ass in gClassroom['courseworkdict']['courseWork']:
+            choice = (ass['title'],ass['title'])
+            assigns_choices.append(choice)
+        flash("Assignments are sorted alphabetically.")
+    else:
+        flash("Assignments are sorted numerically.")
+
+    assigns_choices = sorted(assigns_choices, key = lambda i: (i[0]), reverse=True)
+    assigns_choices.insert(0, ('other','other'))
+    assigns_choices.insert(0, ('','-----'))
+
+    form.assigns.choices = assigns_choices
+
     #if form.validate_on_submit() and currUser.role.lower() == 'student':
     if form.validate_on_submit():
 
@@ -59,6 +97,10 @@ def classdash(gclassid):
         if len(form.status.data) == 0:
             flash('"How are you" is a required field')
             return redirect(url_for('classdash',gclassid=gclassid))
+        
+        if form.assigns.data == "other" and len(form.desc.data) == 0:
+            flash("If you choose Other please describe what you are doing.")
+            return redirect(url_for('classdash',gclassid=gclassid))
 
         googleclass = GoogleClassroom.objects.get(gclassid=gclassid)
 
@@ -67,7 +109,7 @@ def classdash(gclassid):
             googleclass = googleclass,
             gclassname = googleclass.gclassdict['name'],
             student = currUser,
-            desc = form.desc.data,
+            desc = f"{form.assigns.data} {form.desc.data}",
             status = form.status.data         
             )
         

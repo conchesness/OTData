@@ -75,7 +75,8 @@ class NewStudentForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class CheckInForm(FlaskForm):
-    desc = TextAreaField("What are you working on?",validators=[InputRequired()])
+    desc = TextAreaField("What are you working on?")
+    assigns = SelectField("Assignments",choices=[],validators=[InputRequired()])
     #gclassid = SelectField(choices=[],validators=[InputRequired()])
     #gclassname = StringField()
     status = SelectField("How are you?",choices=[('','---'),('5','Very Productive'),('4','Mostly'),('3','Meh'),('2','Not really'),('1', 'Not')],validators=[InputRequired()])

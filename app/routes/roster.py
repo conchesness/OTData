@@ -248,6 +248,8 @@ def inviteguardians(gid,gclassid=None,gclassname=None):
     else:
         return(redirect(url_for('profile',aeriesid=editStu.aeriesid)))
 
+
+
 def getCourseWork(gclassid):
     pageToken = None
     assignmentsAll = {}
@@ -269,28 +271,18 @@ def getCourseWork(gclassid):
                     pageToken=pageToken,
                     ).execute()
         except RefreshError:
-            return redirect(url_for('authorize'))
+            return "refresh"
 
         except Exception as error:
-            # print(type(error))    # the exception instance
-            # print(error.args)     # arguments stored in .args
-            # print(error)          # __str__ allows args to be printed directly,
-            #                      # but may be overridden in exception subclasses
             x, y = error.args     # unpack args
-            # print(f"x type: {type(x)}")
-            # print(f"y type: {type(y)}")
-            #print('x =', x)
-            #print('y =', y)
             if isinstance(y, bytes):
                 y = y.decode("UTF-8")
             errorDict = ast.literal_eval(y)
             if errorDict['error'] == 'invalid_grant':
-                print(f"Got Error: {errorDict}")
                 flash('Your login has expired. You need to re-login.')
-                return "AUTHORIZE"
+                return "refresh"
             elif errorDict['error']['status'] == "PERMISSION_DENIED":
-                print(f"Got Error: {errorDict}")
-                return "PERMISSION_DENIED"
+                return "refresh"
             else:
                 flash(f"Got unknown Error: {errorDict}")
                 return False
@@ -306,6 +298,13 @@ def getCourseWork(gclassid):
     gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     gclassroom.update(courseworkdict = assignmentsAll)
     return True
+
+@app.route('/getcoursework/<gclassid>')
+def getcw(gclassid):
+    result = getCourseWork(gclassid)
+    if result == "refresh":
+        return redirect(url_for('authorize'))
+    return redirect(url_for('checkin'))
 
 def getmissing(gid, aeriesid, gclassid):
     missStudSubsAll = []
@@ -332,15 +331,9 @@ def getmissing(gid, aeriesid, gclassid):
             return "AUTHORIZE"
 
         except Exception as error:
-            # print(type(error))    # the exception instance
-            # print(error.args)     # arguments stored in .args
-            # print(error)          # __str__ allows args to be printed directly,
-            #                      # but may be overridden in exception subclasses
+
             x, y = error.args     # unpack args
-            # print(f"x type: {type(x)}")
-            # print(f"y type: {type(y)}")
-            #print('x =', x)
-            #print('y =', y)
+
             if isinstance(y, bytes):
                 y = y.decode("UTF-8")
             errorDict = ast.literal_eval(y)

@@ -16,13 +16,24 @@
                   </div>
               {% endfor %}
           {% endfor %}
-          <div class="form-group">
-          <form method=post>
-            {{ form.hidden_tag() }}
-            <p>Were you productive since last class?<font color="red">*</font>: {{form.status(class="form-control")}}</p>
+          
+          <div class="row form-group">
+            <div class="col">
+              <form method=post>
+                {{ form.hidden_tag() }}
+                <p>Were you productive since last class?<font color="red">*</font>: {{form.status(class="form-control")}}</p>
+                
+            </div>
+            <div class="col">
+              <p>
+              What assignment are you working on<font color="red">*</font>:<br>
+              {{form.assigns(class="form-control")}}
+              </p>
+            </div>
+            </div>
             <p>
-              What is your goal for class today?<font color="red">*</font>: <br>
-              <small>Be specific! Which specific assignment?</small>
+              If you chose other, what are you gonna do?<font color="red">*</font>: <br>
+              <small>Be specific!</small>
               <br>{{form.desc(class="form-control")}}
             </p>
             <p>{{form.submit(class="form-control btn-primary")}}</p>
@@ -36,7 +47,7 @@
         </tr>
         <tr>
             <td><a href="/deletecheckin/{{lastCheckIn.id}}"><img width="20" src="/static/delete.png"></a></td>
-            <td>{{lastCheckIn.createdate}}</td>
+            <td>{{moment(lastCheckIn.createdate).calendar()}}</td>
             <td>{{lastCheckIn.status}}</td>
             <td>{{lastCheckIn.desc}}</td>
         </tr>

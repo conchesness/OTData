@@ -1,0 +1,33 @@
+{
+    'courseId': '377495068908', 
+    'id': '428448463137', 
+    'title': '9030 Lists Make', 
+    'description': '1) Watch the video to see what the app is supposed to do\n2) Follow the instructions on the List Make app to remix it\n3) Copy the share link on your app and add it to google classroom\n4) Turn it in when you are done', 
+    'materials': 
+        [
+            {'youtubeVideo': 
+                {
+                    'id': '4PBed0VvJNI', 'title': 
+                    'Steve Wright Lists Make - App Lab', 
+                    'alternateLink': 'https://www.youtube.com/watch?v=4PBed0VvJNI', 
+                    'thumbnailUrl': 'https://i.ytimg.com/vi/4PBed0VvJNI/default.jpg'
+                }
+            }, 
+            {
+                'link': 
+                    {
+                        'url': 'https://studio.code.org/projects/applab/M0kn_OYGyxA0GOHGmhOKKbpepXVbxjCMyFg5EGralB4', 
+                        'title': 'List Make - App Lab', 
+                        'thumbnailUrl': 'https://classroom.google.com/webthumbnail?url=https://studio.code.org/projects/applab/M0kn_OYGyxA0GOHGmhOKKbpepXVbxjCMyFg5EGralB4'
+                    }
+                }
+            ], 
+    'state': 'PUBLISHED', 
+    'alternateLink': 'https://classroom.google.com/c/Mzc3NDk1MDY4OTA4/a/NDI4NDQ4NDYzMTM3/details', 
+    'creationTime': '2021-11-09T15:40:31.187Z', 
+    'updateTime': '2021-11-09T15:43:51.890Z', 
+    'dueDate': {'year': 2021, 'month': 11, 'day': 15}, 
+    'dueTime': {'hours': 7, 'minutes': 59}, 
+    'maxPoints': 100, 
+    'workType': 'ASSIGNMENT', 
+    'submissionModificationMode': 'MODIFIABLE_UNTIL_TURNED_IN', 'assignment': {'studentWorkFolder': {'id': '194zAdubLrZfFehpnNq9IiJA_ZDwIXNd0-4cIQ8XZ9rjj1RRfcLgdcwYCYwphExiwJpc7oGtl', 'title': '9030 Lists Make', 'alternateLink': 'https://drive.google.com/drive/folders/194zAdubLrZfFehpnNq9IiJA_ZDwIXNd0-4cIQ8XZ9rjj1RRfcLgdcwYCYwphExiwJpc7oGtl'}}, 'assigneeMode': 'ALL_STUDENTS', 'creatorUserId': '118043475517321263044', 'topicId': '419073698673'}

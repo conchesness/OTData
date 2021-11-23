@@ -69,17 +69,15 @@ def classdash(gclassid):
 
         choice = (sortValue,ass['title'])
         assigns_choices.append(choice)
-        print(numCount+strCount)
     if strCount > numCount:
         assigns_choices = []
         for ass in gClassroom['courseworkdict']['courseWork']:
             choice = (ass['title'],ass['title'])
             assigns_choices.append(choice)
-        flash("Assignments are sorted alphabetically.")
     else:
         flash("Assignments are sorted numerically.")
+        assigns_choices = sorted(assigns_choices, key = lambda i: (i[0]), reverse=True)
 
-    assigns_choices = sorted(assigns_choices, key = lambda i: (i[0]), reverse=True)
     assigns_choices.insert(0, ('other','other'))
     assigns_choices.insert(0, ('','-----'))
 

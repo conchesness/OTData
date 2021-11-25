@@ -59,28 +59,9 @@
             {% endif %}
         {% endfor %}
 
-    <br> <br> <b>Adult Emails:</b> <br>
-        {% for stu in notcheckedstus | sort(attribute="lname,fname")  %}
-            {% if stu.gid %}
-                {% if stu.adults %}
-                    {% for adult in stu.adults %}
-                        {% if adult.email %}
-                            {{adult.email}},
-                        {% elif stu.aadultemail %}
-                            {{stu.aadultemail}}
-                        {% endif %}
-                    {% endfor %}
-                {% else %}
-                    {% if stu.aadultemail %}
-                        {{stu.aadultemail}}
-                    {% endif %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-
         <table class="table">
             <tr>
-                <th>Date</th><th>Student</th><th>Status</th><th>working on...</th><th>Synchronous</th><th>Camera Off Reason</th>
+                <th>Date</th><th>Student</th><th>Status</th><th>working on...</th>
             </tr>
             {% for checkin in checkins %}
             
@@ -107,16 +88,6 @@
                 {% endif %}
                 {{checkin.status}} </td>
                 <td> {{checkin.desc}} </td>
-                <td> {{checkin.synchronous}} </td>
-                <td>
-                    {% if checkin.cameraoff %}
-                        {% if checkin.cameraoffreason.lower() == "other" %}
-                            Other: {{checkin.cameraoffreasonother}}
-                        {% else %}
-                            {{checkin.cameraoffreasonother}}
-                        {% endif %}
-                    {% endif %}
-                </td>
             </tr>
             {% endfor %}
         </table>

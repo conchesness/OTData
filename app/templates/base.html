@@ -95,6 +95,15 @@
                   $("#modal").click();
               };
           });
+          $( "#modalform" ).submit(function( event ) {
+            if ($(this).attr("class") != undefined) {
+                  if($(this).attr("class").indexOf('dropdown-toggle') < 0) {
+                      $("#modal").click();
+                  };
+              } else {
+                  $("#modal").click();
+              };
+          });
       });
   </script>
 </body>

@@ -69,10 +69,7 @@
               Teacher
             </th>
             <th>
-              Missing
-              {% if currUser.role.lower() == "student" and currUser.gid == session.gid %}
-                <small>(<a href="/missingassignmentsstu/{{currUser.gid}}">Update</a>)</small>
-              {% endif %}
+
             </th>
         </tr>
       </thead>

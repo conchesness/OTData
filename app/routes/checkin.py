@@ -213,7 +213,7 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
 def deletecheckin(checkinid,gclassid=None,gclassname=None):
     checkin = CheckIn.objects.get(pk=checkinid)
     currUser=User.objects.get(id=session['currUserId'])
-    if currUser == checkin.student:
+    if currUser == checkin.student or currUser.role.lower() == "teacher":
         checkin.delete()
         flash('Checkin deleted')
     else:

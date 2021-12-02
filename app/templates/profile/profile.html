@@ -221,12 +221,7 @@
                 <th>Class</th>
                 <th>Teacher</th>
                 <th>
-                    Missing Assignments
-                    {% if currUser.gid == session.gid %}
-                        <br><small><a href="/missingassignmentsstu/{{currUser.gid}}">Update</a>
-                        <a href="/missingassignmentslist/{{currUser.aeriesid}}" class="missingUpdate">
-                            <!--list--></a></small>
-                        {% endif %}
+
                 </th>
             </tr>
             {% for class in currUser.gclasses %}
@@ -238,15 +233,7 @@
                     </td>
                     <td>{% if class.gclassroom.gteacherdict %}{{class.gclassroom.gteacherdict.name.fullName}}{% endif %}</td>
                     <td>
-                        {% if class.nummissing|int > 0 %}
-                            {% if currUser.gid == session.gid %}
-                                <a href="{{class.missinglink}}">
-                                    {{class.nummissing}} 
-                                </a>
-                            {% else %}
-                                {{class.nummissing}}
-                            {% endif %}
-                        {% endif %}
+
                     </td>
                 </tr>
             {% endif %}

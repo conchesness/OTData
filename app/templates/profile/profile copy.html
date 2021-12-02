@@ -246,12 +246,6 @@
                                 <th>Class</th>
                                 <th>Teacher</th>
                                 <th>
-                                    Missing Assignments
-                                    {% if currUser.gid == session.gid %}
-                                        <br><small><a href="/missingassignmentsstu/{{currUser.gid}}">Update</a>
-                                        <a href="/missingassignmentslist/{{currUser.aeriesid}}" class="missingUpdate">
-                                            <!--list--></a></small>
-                                        {% endif %}
                                 </th>
                             </tr>
                         {% for class in currUser.gclasses %}

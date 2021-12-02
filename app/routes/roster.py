@@ -31,7 +31,7 @@ def roster(gclassid):
 @app.route("/getroster/<gclassid>", methods=['GET','POST'])
 def getroster(gclassid):
    
-    # TODO create a function to retrieve roster cause I run this code three times
+    # TODO 
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
     else:
@@ -306,90 +306,6 @@ def getcw(gclassid):
         return redirect(url_for('authorize'))
     return redirect(url_for('checkin'))
 
-def getmissing(gid, aeriesid, gclassid):
-    missStudSubsAll = []
-    pageToken=None 
-
-    if google.oauth2.credentials.Credentials(**session['credentials']).valid:
-        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
-    else:
-        return redirect('/authorize')    
-    
-    session['credentials'] = credentials_to_dict(credentials)
-    classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
-
-    while True:
-        try:
-            missStudSubs = classroom_service.courses().courseWork().studentSubmissions().list(
-                userId = gid,
-                courseId=gclassid,
-                courseWorkId='-',
-                late = "LATE_ONLY",
-                pageToken=pageToken
-            ).execute()
-        except RefreshError:
-            return "AUTHORIZE"
-
-        except Exception as error:
-
-            x, y = error.args     # unpack args
-
-            if isinstance(y, bytes):
-                y = y.decode("UTF-8")
-            errorDict = ast.literal_eval(y)
-            if errorDict['error'] == 'invalid_grant':
-                print(f"Got Error: {errorDict}")
-                flash('Your login has expired. You need to re-login.')
-                return "LOGIN"
-            elif errorDict['error']['status'] == "PERMISSION_DENIED":
-                print(f"Got Error: {errorDict}")
-                flash(f"You do not have permission to access this class for this student.")
-                return "PERMISSION_DENIED"
-            else:
-                flash(f"Got unknown Error: {errorDict}")
-                return "UNKNOWN"
-        else:
-            countMissing = 0
-            try:
-                subs = missStudSubs['studentSubmissions']
-            except:
-                pass
-            else:
-                for item in subs:
-
-                    try:
-                        assignedGrade = int(item['assignedGrade']) > 0
-                    except:
-                        assignedGrade = False
-
-                    # for subHistoryItem in item['submissionHistory']:
-                    #     try:
-                    #         gradeHistory = subHistoryItem['gradeHistory']
-                    #     except:
-                    #         gradeHistory = None
-
-                    if (assignedGrade == False and item['state'] != "TURNED_IN"):
-                        missing = True
-                        countMissing += 1
-                        #print(f"Missing: {missing} id: {item['id']} Late: {late} State: {item['state']} courseWorkType: {item['courseWorkType']} AssignedGrade: {assignedGrade} GradeHistory: {gradeHistory}")
-        try: 
-            missStudSubsAll.extend(missStudSubs['studentSubmissions'])
-        # UnboundLocalError happens when missStudSubs does not exist
-        # KeyError happens when missStudSubs dict exists BUT the studentSubmissions key does not
-        # in both cases there will be no nextPageToken
-        except (KeyError, UnboundLocalError):
-            pass
-        else:
-            pageToken = missStudSubs.get('nextPageToken')
-
-        if not pageToken:
-            break
-
-    missingAsses = {}
-    missingAsses['missing'] = missStudSubsAll
-    print(len(missingAsses['missing']))
-    return missingAsses
-
 @app.route('/listmissing/<gclassid>/<index>')
 @app.route('/listmissing/<gclassid>')
 def nummissing(gclassid,index=0):
@@ -454,60 +370,6 @@ def nummissing(gclassid,index=0):
         except:
             flash(f"{gstudent['profile']['emailAddress']} is not in OTData.")
             otdStudent = None
-            missingAsses = None
-        else:
-            # Run getmissing function
-            missingAsses = getmissing(gstudent['userId'],otdStudent.aeriesid,gclassid)
-
-        if missingAsses == "AUTHORIZE":
-            flash("Need to re-authorize with Google to get these assignments.")
-            return redirect(url_for('authorize'))
-        elif missingAsses == "LOGIN":
-            flash("Your login has expired.")
-            return redirect(url_for('login'))
-
-        # the getmissing function should return 'False' if an error occurs and 0 if no error but none are found.
-        if missingAsses:
-            numMissStudSubs = len(missingAsses['missing'])
-        else:
-            continue
-
-        # save numMissStudSubs to the students GClasses embedded doc list field
-        # in the nummissing field and the date in the nummissingupdate field
-
-        # TODO add MissingLink like in Roster
-        if otdStudent and missingAsses:
-
-            try:
-                otdStuClass = otdStudent.gclasses.get(gclassid = gclassid)
-            except mongoengine.errors.DoesNotExist:
-                flash(f"could not find class in OTData")
-                otdStuClass = None
-            if otdStuClass:
-                try:
-                    otdStuClass.missingasses['missing']
-                except KeyError:
-                    missinglink = None
-                else:
-                    try:
-                        end = otdStuClass.missingasses['missing'][0]['alternateLink']
-                    except:
-                        missinglink = None
-                    else:
-                        beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
-                        print(end)
-                        inverseEnd = end[::-1]
-                        indexFromEnd = inverseEnd.index('/')
-                        end = end[indexFromEnd*-1:]
-                        missinglink = f"{beginning}/sp/{end}/m"
-
-                otdStudent.gclasses.filter(gclassid = gclassid).update(
-                    nummissing = str(numMissStudSubs),
-                    nummissingupdate = dt.utcnow(),
-                    missingasses = missingAsses,
-                    missinglink = missinglink
-                )
-                otdStudent.save()
 
             try:
                 otdStudentClass = otdStudent.gclasses.get(gclassid = gclassid)
@@ -516,62 +378,20 @@ def nummissing(gclassid,index=0):
                 flash(f"Failed to find {gclassname} in {otdStudent.fname}'s OTData gclasses.")
             
             if otdStudent and otdStudentClass:
-                flash(f"{otdStudent.fname} {otdStudent.alname} Missing: {otdStudentClass.nummissing}")
-
-    url = f"/listmissing/{gclassid}"
+                flash(f"{otdStudent.fname} {otdStudent.alname}")
     
     if numStus > index:
         # elapsedTime = dt.now() - session['startTimeTemp']
         # # an approximation of how much time it took to process one student
         # currPerStuTime = elapsedTime / index
         # timeLeft = (numStus - (index+1)) * currPerStuTime
-        return render_template ('loading.html', url=url, nextIndex=index, total=numStus)
+        return render_template ('loading.html', nextIndex=index, total=numStus)
 
 
     session['tempGStudents'] = None
     return redirect(url_for('roster',gclassid=gclassid))
 
-@app.route('/missingassignmentsstu/<gid>')
-def missingassignmentsstu(gid):
-    student = User.objects.get(gid=gid)
-    for gclass in student.gclasses:
-        if gclass.status and gclass.status.lower() == 'active':
-            missingAsses = getmissing(student.gid,student.aeriesid,gclass.gclassid)
-            if missingAsses == "AUTHORIZE":
-                flash("Need to re-authorize with Google to get these assignments.")
-                return redirect(url_for('authorize'))
-            elif missingAsses == "LOGIN":
-                flash("Your login has expired.")
-                return redirect(url_for('login'))
-            elif len(missingAsses['missing']) >= 0:
-                numMissing = len(missingAsses['missing'])
-            else:
-                continue
 
-            otdStuClass = gclass
-            try: 
-                otdStuClass.missingasses['missing']
-            except:
-                missinglink = None
-            else:
-                if len(otdStuClass.missingasses['missing']) > 0:
-                    beginning = otdStuClass.gclassroom.gclassdict['alternateLink']
-                    end = otdStuClass.missingasses['missing'][0]['alternateLink']
-                    print(end)
-                    inverseEnd = end[::-1]
-                    indexFromEnd = inverseEnd.index('/')
-                    end = end[indexFromEnd*-1:]
-                    missinglink = f"{beginning}/sp/{end}/m"
-
-            student.gclasses.filter(gclassid = gclass.gclassid).update(
-                nummissing = str(numMissing),
-                nummissingupdate = dt.utcnow(),
-                missingasses = missingAsses,
-                missinglink = missinglink
-            )
-            student.save()
-
-    return redirect(url_for('profile',aeriesid=student.aeriesid))
 
 @app.route('/assignments/list/<aeriesid>')
 def missingassignmentslist(aeriesid):
@@ -592,9 +412,6 @@ def missingassignmentslist(aeriesid):
                 flash(f"An error occured. I was unable to update the assignment list for {gclass.gclassroom.gclassdict['name']}.")
             elif getCourseWorkResult:
                 flash(f"Saved assignment list for {gclass.gclassroom.gclassdict['name']}")
-
-    # # TODO iterate through each missing assingment which are saved at gclass.missingasses. If it doesn't exist update the list
-
 
     return render_template('missasslist.html.j2',stu=stu)
 

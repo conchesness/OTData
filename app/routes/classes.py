@@ -48,6 +48,90 @@ def addgclass(gmail,gclassid):
 
     return redirect(url_for('roster',gclassid=gclassid))
 
+@app.route('/missingclass/<gclassid>')
+def missingclass(gclassid):
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+
+    #Get all the student submissions
+    try:
+        subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
+    except:
+        flash(Markup(f'You need to <a href="/getstudsubs/{{gclassid}}">update you info from Google Clasroom.</a>'))
+        return redirect(url_for('checkin'))
+
+    subsDF = subsDF.drop('id', 1)
+
+    subsDFlink = subsDF.drop_duplicates(subset=['userId'])
+    subsDFlink = subsDFlink[['userId','alternateLink']]
+    subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[-17:], axis=1)
+
+    #Create a list of students
+    dictfordf = {}
+    for row in gClassroom.groster['roster']:
+        newRow = {'userId':row['userId'],'name':row['profile']['name']['fullName'],'email':row['profile']['emailAddress']}
+        dictfordf[row['userId']] = newRow
+
+    stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
+
+    #Merge the students with the assignments
+    gbDF = pd.merge(stusDF, 
+                      subsDF, 
+                      on ='userId', 
+                      how ='inner')
+
+    #Get all the assignments
+    dictfordf = {}
+    for row in gClassroom.courseworkdict['courseWork']:
+        dictfordf[row['id']] = row
+
+    courseworkDF = pd.DataFrame.from_dict(dictfordf, orient='index')
+    courseworkDF.rename(columns={"id": "courseWorkId"}, inplace=True)
+
+    #merge in all the assignments
+    gbDF = pd.merge(courseworkDF, 
+                    gbDF, 
+                    on ='courseWorkId', 
+                    how ='inner')
+   
+    gbDF = gbDF.drop(['creationTime_x','updateTime_x','dueTime','maxPoints','assignment','assigneeMode','courseId_y','description','materials','submissionModificationMode','creatorUserId','individualStudentsOptions','assignmentSubmission','draftGrade','shortAnswerSubmission'], 1)
+    # drop all rows that are NOT late
+    gbDF = gbDF.dropna(subset=['late'])
+    # drop all rows that are turned_in
+    index_names = gbDF[ gbDF['state_y'] == "TURNED_IN" ].index
+    gbDF.drop(index_names, inplace = True)
+    # drop all rows with a grade including zero
+    index_names = gbDF[ gbDF['assignedGrade'] >= 0 ].index
+    gbDF.drop(index_names, inplace = True)
+
+    gbDFpivot = pd.pivot_table(data=gbDF,index=['email'],aggfunc={'email':len})
+
+    gbDFpivot.rename(columns={"email": "TotalMissing"}, inplace=True)
+    gbDFpivot.reset_index()
+    gbDFpivot.rename(columns={"index": "email"}, inplace=True)
+
+
+    gbDFpivot = pd.merge(stusDF, 
+                    gbDFpivot, 
+                    on ='email', 
+                    how ='inner')
+
+    gbDFpivot = pd.merge(subsDFlink, 
+                gbDFpivot, 
+                on ='userId', 
+                how ='inner')
+
+    gbDFpivot.drop(['alternateLink','userId'],1,inplace=True)
+
+    gbDFpivot = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
+    gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
+    gbDFpivot.reset_index(inplace=True)
+    gbDFpivot.drop(['index','missingLink','email'],1,inplace=True)
+
+
+    displayDFHTML = Markup(gbDFpivot.to_html(escape=False))
+
+    return render_template('missingclass.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML)
+
 @app.route('/studsubs/<gclassid>')
 def studsubs(gclassid):
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)

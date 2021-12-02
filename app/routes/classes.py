@@ -63,7 +63,7 @@ def missingclass(gclassid):
 
     subsDFlink = subsDF.drop_duplicates(subset=['userId'])
     subsDFlink = subsDFlink[['userId','alternateLink']]
-    subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[-17:], axis=1)
+    subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[-17:]+"/m", axis=1)
 
     #Create a list of students
     dictfordf = {}

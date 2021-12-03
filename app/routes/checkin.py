@@ -195,7 +195,7 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
     searchdatetime = searchdatetime.astimezone(pytz.utc)
     #searchdatetime = searchdatetime - timedelta(hours = searchdatetime.hour)
     #Since 4pm is the latest checkin time I set the time after that for manual checkin
-    searchdatetime = searchdatetime + timedelta(hours = 20, minutes = 1)
+    #searchdatetime = searchdatetime + timedelta(hours = 20, minutes = 1)
 
     newCheckIn = CheckIn(
                     createdate = searchdatetime,

@@ -63,7 +63,7 @@ def missingclass(gclassid):
 
     subsDFlink = subsDF.drop_duplicates(subset=['userId'])
     subsDFlink = subsDFlink[['userId','alternateLink']]
-    subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[-17:]+"/m", axis=1)
+    subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[row.alternateLink.find('student/')+7:]+"/m", axis=1)
 
     #Create a list of students
     dictfordf = {}
@@ -125,7 +125,7 @@ def missingclass(gclassid):
     gbDFpivot = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
     gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
     gbDFpivot.reset_index(inplace=True)
-    gbDFpivot.drop(['index','missingLink','email'],1,inplace=True)
+    gbDFpivot.drop(['index','email'],1,inplace=True)
 
 
     displayDFHTML = Markup(gbDFpivot.to_html(escape=False))

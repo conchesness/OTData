@@ -123,10 +123,9 @@ def missingclass(gclassid):
     gbDFpivot.drop(['alternateLink','userId'],1,inplace=True)
 
     gbDFpivot = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
-    gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
+    gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a target="_blank" href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
     gbDFpivot.reset_index(inplace=True)
-    gbDFpivot.drop(['index','email'],1,inplace=True)
-
+    gbDFpivot.drop(['index','missingLink','email'],1,inplace=True)
 
     displayDFHTML = Markup(gbDFpivot.to_html(escape=False))
 

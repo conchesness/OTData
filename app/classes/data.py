@@ -121,6 +121,8 @@ class GClass(EmbeddedDocument):
     missinglink = StringField()
     # this is a value that designates cohort for a student with a class
     sortcohort = StringField()
+    submissions = DictField()
+    submissionsupdate = DateTimeField()
 
 class PostGrad(EmbeddedDocument):
     oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
@@ -324,7 +326,8 @@ class PlanCheckin(Document):
 class GoogleClassroom(Document):
     gteacherdict = DictField()
     gclassdict = DictField()
-    courseworkdict = DictField() #<-- not being used at the moment
+    courseworkdict = DictField()
+    courseworkupdate = DateTimeField()
     studsubsdict = DictField()
     gclassid = StringField()
     teacher = ReferenceField('User')

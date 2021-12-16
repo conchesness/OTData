@@ -296,8 +296,8 @@ def getCourseWork(gclassid):
             if pageToken == None:
                 break
     gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
-    gclassroom.update(courseworkdict = assignmentsAll)
-    return True
+    gclassroom.update(courseworkdict = assignmentsAll, courseworkupdate = dt.utcnow())
+    return assignmentsAll
 
 @app.route('/getcoursework/<gclassid>')
 def getcw(gclassid):

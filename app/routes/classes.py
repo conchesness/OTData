@@ -48,6 +48,103 @@ def addgclass(gmail,gclassid):
 
     return redirect(url_for('roster',gclassid=gclassid))
 
+@app.route('/student/getstudentwork/<gclassid>')
+def getstudentwork(gclassid):
+    if session['role'].lower() != "student":
+        flash('This link is only for students.')
+        return redirect('checkin')
+
+    # setup the Google API access credentials
+    if google.oauth2.credentials.Credentials(**session['credentials']).valid:
+        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    else:
+        return redirect('/authorize')
+    session['credentials'] = credentials_to_dict(credentials)
+    classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
+    studSubsAll = []
+    pageToken=None
+    counter=1
+    while True:
+        try:
+            studSubs = classroom_service.courses().courseWork().studentSubmissions().list(
+                courseId=gclassid,
+                #states=['TURNED_IN','RETURNED','RECLAIMED_BY_STUDENT'],
+                courseWorkId='-',
+                pageToken=pageToken
+                ).execute()
+        except RefreshError:
+            flash('Had to reauthorize your Google credentials.')
+            return redirect('/authorize')
+
+        except Exception as error:
+            print(error)
+
+        studSubsAll.extend(studSubs['studentSubmissions'])
+        pageToken = studSubs.get('nextPageToken')
+        print(counter)
+        counter=counter+1
+        if not pageToken:
+            break
+    studSubsDict = {}
+    studSubsDict['mySubmissions'] = studSubsAll
+    currUser = User.objects.get(gid=session['gid'])
+    currUser.gclasses.filter(gclassid = gclassid).update(
+        submissions = studSubsDict,
+        submissionsupdate = dt.datetime.utcnow()
+    )
+    currUser.save()
+
+    return redirect(url_for('checkin'))
+
+@app.route('/student/mywork')
+def mywork():
+    currUser = User.objects.get(gid = session['gid'])
+
+    myClasses = currUser.gclasses.filter(status = 'Active')
+    myWorkList= []
+    courseWorkAll = []
+    classList = []
+    for myClass in myClasses:
+        myWorkList = myWorkList + myClass.submissions['mySubmissions']
+        if not myClass.gclassroom.courseworkdict or myClass.gclassroom.courseworkupdate - dt.timedelta(1) > dt.datetime.utcnow():
+            print(myClass.gclassroom.courseworkupdate - dt.timedelta(1) > dt.datetime.utcnow())
+            courseWork = getCourseWork(myClass.gclassid)
+            if courseWork == "refresh":
+                return redirect(url_for('authorize'))
+        else:
+            courseWork = myClass.gclassroom.courseworkdict
+
+        thisClass = {'className':myClass.gclassroom.gclassdict['name'],'courseId':myClass.gclassroom.gclassdict['id']}
+        classList.append(thisClass)
+        courseWorkAll = courseWorkAll + courseWork['courseWork']
+        
+    myWorkDF = pd.DataFrame(myWorkList)
+    courseWorkDF = pd.DataFrame(courseWorkAll)
+    courseWorkDF.rename(columns={"id": "courseWorkId"}, inplace=True)
+    classListDF = pd.DataFrame(classList)
+
+    #merge in all the assignments
+    myWorkDF = pd.merge(courseWorkDF, 
+                    myWorkDF, 
+                    on ='courseWorkId', 
+                    how ='inner')
+
+    myWorkDF.rename(columns={"courseId_x": "courseId"}, inplace=True)
+
+    #merge in all the assignments
+    myWorkDF = pd.merge(classListDF, 
+                    myWorkDF, 
+                    on ='courseId', 
+                    how ='inner')
+
+
+    myWorkDF.drop(['materials','state_x','creationTime_x','updateTime_x','workType','submissionModificationMode','creatorUserId','topicId','dueTime','multipleChoiceQuestion','courseId_y','userId','courseWorkType','assignmentSubmission','shortAnswerSubmission','multipleChoiceSubmission'],1,inplace=True)
+
+    displayDFHTML = Markup(myWorkDF.to_html(escape=False))
+    
+    return render_template('mywork.html',displayDFHTML=displayDFHTML)
+
+
 @app.route('/missingclass/<gclassid>')
 def missingclass(gclassid):
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)

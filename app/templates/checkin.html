@@ -21,6 +21,9 @@
                 <img width="25" src="/static/checkin.png"><b>C</b>heckins
               {% endif %}
             </td>
+            {% if session.role.lower() == 'student' %}
+            <td>Work</td>
+            {% endif %}
             <th>
               Status
             </th>
@@ -59,6 +62,14 @@
               </a>
               {% endif %}
             </td>
+            {% if session['role'].lower() == 'student' %}
+            <td>
+              <a href="/student/getstudentwork/{{class.gclassid}}"><img width="25" src="/static/update.png"></a>
+              {% if class.submissionsupdate %}
+                <small>{{moment(class.submissionsupdate).calendar()}}</small>
+              {% endif %}
+            </td>
+            {% endif %}
             <td>
               {% if class.status %}
                 {{ class.status }}

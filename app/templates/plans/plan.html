@@ -120,7 +120,7 @@
                                 {{focus}}{% if not loop.last %}, {% endif %} 
                                 {% endfor %} <br>
                                 <b>I said I would:</b> {{checkin.todaynarrative}} <br>
-                                {% if checkin.yesterdayrating %}
+                                {% if checkin and checkin.yesterdayrating %}
                                 <b>Rating of last checkin</b> ({{moment(checkin.previousreference.createdate).calendar()}}): {{checkin.yesterdayrating}} <br>
                                 {% if checkin.yesterdaynarrative %}
                                 <b>Notes on rating:</b> {{checkin.yesterdaynarrative}} <br>

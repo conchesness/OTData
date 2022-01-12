@@ -206,29 +206,37 @@ def groupaddresses():
 
     form = SimpleForm()
     parents=""
+    mmerge=""
 
     if form.validate_on_submit():
         students=form.field.data
         stuGroup = students.split(",")
         students = ",".join(stuGroup)
         
+        
         for email in stuGroup:
             email=email.strip()
+            
             try:
                 stu = User.objects.get(otemail=email)
             except:
                 if len(email)>1:
                     flash( f"couldn't find {email} in our records")
+            mmerge+=f"{stu.aeriesid},{stu.fname} {stu.lname},{email},{email};"
 
             if stu.aadultemail:
                 parents+=f"{stu.aadultemail}, "
+                mmerge+=f"{stu.aadultemail};"
 
             for adult in stu.adults:
                 if adult.email:
                     if stu.aadultemail and adult.email != stu.aadultemail:
                         parents+=f"{adult.email}, "
+                        mmerge+=f"{adult.email};"
                     elif not stu.aadultemail:
                         parents+=f"{adult.email}, "
+                        mmerge+=f"{adult.email};"
+            mmerge+="****"
     else:
         parents=None
         students=None
@@ -236,7 +244,7 @@ def groupaddresses():
     if request.args.get("emails"):
         form.field.data = request.args.get("emails")
     
-    return render_template("groups/groupaddresses.html", form=form, parents=parents,students=students)
+    return render_template("groups/groupaddresses.html", form=form, parents=parents,students=students, mmerge=mmerge)
 
 @app.route("/newgroup", methods=['GET','POST'])
 def newgroup():

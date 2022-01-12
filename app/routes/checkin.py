@@ -3,6 +3,7 @@ from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, request, Markup
 from app.classes.data import User, CheckIn, GoogleClassroom, Help, Token
 from app.classes.forms import BreakForm, CheckInForm, DateForm, StudentWasHereForm
+from .roster import getCourseWork
 from datetime import datetime as dt
 from datetime import timedelta
 from mongoengine import Q
@@ -51,6 +52,11 @@ def classdash(gclassid):
     assigns_choices = []
     numCount = 0
     strCount = 0
+    try:
+        gClassroom['courseworkdict']['courseWork']
+    except:
+        getCourseWork(gclassid)
+
     for ass in gClassroom['courseworkdict']['courseWork']:
         #Check to see if there is a number in the front of the title
         for i,letter in enumerate(ass['title']):

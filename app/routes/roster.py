@@ -14,14 +14,16 @@ import ast
 @app.route("/roster/<gclassid>", methods=['GET','POST'])
 def roster(gclassid):
     gclass = GoogleClassroom.objects.get(gclassid=gclassid)
-    for stu in gclass.groster['roster']:
-        print(f"cohort: {stu['sortCohort']} updateGClass: {stu['updateGClasses']}")
-
     try:
         otdstus = gclass.groster['roster']
     except:
         flash(Markup(f"You need to <a href='/getroster/{gclassid}'>update your roster from Google Classroom</a>."))
         return redirect(url_for('checkin'))
+        
+    for stu in gclass.groster['roster']:
+        print(f"cohort: {stu['sortCohort']} updateGClass: {stu['updateGClasses']}")
+
+
 
     otdstus = sorted(otdstus, key = lambda i: (i['sortCohort'],i['profile']['name']['fullName']))
    

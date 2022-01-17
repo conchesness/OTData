@@ -190,7 +190,16 @@ def missingclass(gclassid):
                     on ='courseWorkId', 
                     how ='inner')
    
-    gbDF = gbDF.drop(['creationTime_x','updateTime_x','dueTime','maxPoints','assignment','assigneeMode','courseId_y','description','materials','submissionModificationMode','creatorUserId','individualStudentsOptions','assignmentSubmission','draftGrade','shortAnswerSubmission'], 1)
+    gbDF = gbDF.drop(['creationTime_x','updateTime_x','dueTime','maxPoints','assignment','assigneeMode','courseId_y','description','materials','submissionModificationMode','creatorUserId','assignmentSubmission','draftGrade'], 1)
+    try:
+        gbDF = gbDF.drop(['shortAnswerSubmission'], 1)
+    except:
+        pass
+    try:
+        gbDF = gbDF.drop(['individualStudentsOptions'], 1)
+    except:
+        pass
+
     # drop all rows that are NOT late
     gbDF = gbDF.dropna(subset=['late'])
     # drop all rows that are turned_in

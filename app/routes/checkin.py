@@ -8,11 +8,6 @@ from datetime import datetime as dt
 from datetime import timedelta
 from mongoengine import Q
 import pytz as pytz
-import google.oauth2.credentials
-import googleapiclient.discovery
-from google.auth.exceptions import RefreshError
-from twilio.rest import Client
-from .credentials import twilio_account_sid, twilio_auth_token
 
 @app.route("/classdash/<gclassid>", methods=["GET","POST"])
 def classdash(gclassid):
@@ -146,20 +141,16 @@ def checkin():
 
 @app.route('/breakstart/<gclassid>', methods=['GET', 'POST'])
 def breakstart(gclassid):
+
     currUser = User.objects.get(gid=session['gid'])
     form = BreakForm()
+
+    if currUser.breakstart and dt.now().date() == currUser.breakstart.date():
+        flash('You already took a break today.')
+        return redirect(url_for('classdash',gclassid=gclassid)) 
+
     gClass = currUser.gclasses.filter(gclassid=gclassid)
     gClass = gClass[0]
-    # gclasses = []
-
-    # for gCourse in gCourses:
-    #     if gCourse.gclassroom:
-    #         tempname = gCourse.gclassroom.gclassdict['name']
-    #         if not gCourse.status:
-    #             gCourse.status = ""
-    #         # a list of tuples for the form
-    #         if gCourse.status == "Active":
-    #             gclasses.append((gCourse.gclassroom.gclassid, tempname))
 
     form.gclassid.choices = [(gClass.gclassid,gClass.classname)]
 
@@ -171,6 +162,7 @@ def breakstart(gclassid):
         tokens = None
 
     if form.validate_on_submit():
+
         if form.duration.data > 10:
             spend = form.duration.data - 10
             if spend > tokencount:
@@ -186,7 +178,7 @@ def breakstart(gclassid):
             breakclass = form.gclassid.data
         )
         #return redirect(url_for('checkin')) 
-        return redirect(url_for('classdash',gclassid=form.gclassid.data)) 
+        return redirect(url_for('classdash',gclassid=gclassid)) 
 
     form.duration.data = 10
     return render_template('breakstart.html',tokencount=tokencount, form=form)

@@ -145,7 +145,7 @@ def breakstart(gclassid):
     currUser = User.objects.get(gid=session['gid'])
     form = BreakForm()
 
-    if currUser.breakstart and dt.now().date() == currUser.breakstart.date():
+    if currUser.breakstart and dt.now().date() == currUser.breakstart.date() and currUser.breakclass == gclassid:
         flash('You already took a break today.')
         return redirect(url_for('classdash',gclassid=gclassid)) 
 

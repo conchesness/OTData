@@ -35,7 +35,7 @@
             </th>
         </tr>
       </thead>
-      {% if gcourses %}
+      {% if gCourses %}
       {% for class in gCourses | sort(attribute="status") %}
           <tr>
             <td nowrap>
@@ -77,7 +77,7 @@
               {% endif %}
             </td>
             <td>
-              {% if class.status.lower() == 'active' %}
+              {% if class.status and class.status.lower() == 'active' %}
               <a href="/classdash/{{class.gclassid}}">
               {% endif %}
                 {% if class.classname and class.classname != class.gclassroom.gclassdict.name %}
@@ -85,7 +85,7 @@
                 {% else %}
                   {{class.gclassroom.gclassdict.name}}
                 {% endif %}
-              {% if class.status.lower() == 'active' %}
+              {% if class.status and class.status.lower() == 'active' %}
               </a>
               {% endif %}
             </td>

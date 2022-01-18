@@ -35,6 +35,7 @@
             </th>
         </tr>
       </thead>
+      {% if gcourses %}
       {% for class in gCourses | sort(attribute="status") %}
           <tr>
             <td nowrap>
@@ -92,6 +93,7 @@
               {{class.gclassroom.gteacherdict['name']['fullName']}}
           </tr>
     {% endfor %}
+    {% endif %}
       </table>
     {% endif %}
   </div>

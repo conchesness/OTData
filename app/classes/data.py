@@ -93,7 +93,7 @@ class CheckIn(Document):
     user_agent = StringField()
     locationData = DictField()
     desc = StringField()
-    status = StringField()
+    status = StringField(default='inactive')
     synchronous = BooleanField()
     createdBy = ReferenceField('User') # Only present if not created by student
 

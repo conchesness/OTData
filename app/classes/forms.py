@@ -10,6 +10,15 @@ from wtforms import widgets, SelectMultipleField, StringField, SubmitField, vali
 import datetime as d
 import pytz
 
+class BreakSettingsForm(FlaskForm):
+    breakstartdate = DateField(default=d.datetime.now(pytz.timezone('US/Pacific')))
+    breakstarthrs = SelectField(choices=[(8,8),(9,9),(10,10),(11,11),(12,12),(13,1),(14,2),(15,3)])
+    breakstartmins = IntegerField(IntegerField(validators=[(NumberRange(min=0, max=59, message="Must be a number between 0 and 59."))]))
+    classenddate = DateField(default=d.datetime.now(pytz.timezone('US/Pacific')))
+    classendhrs = SelectField(choices=[(8,8),(9,9),(10,10),(11,11),(12,12),(13,1),(14,2),(15,3)])
+    classendmins = IntegerField(IntegerField(validators=[(NumberRange(min=0, max=59, message="Must be a number between 0 and 59."))]))
+    submit = SubmitField("Submit")
+
 class SimpleForm(FlaskForm):
     field = TextAreaField(validators=[InputRequired()])
     submit = SubmitField("Submit")

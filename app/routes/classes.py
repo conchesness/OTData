@@ -145,8 +145,10 @@ def mywork():
     return render_template('mywork.html',displayDFHTML=displayDFHTML)
 
 
+@app.route('/missingclass/<gclassid>/<getparents>')
 @app.route('/missingclass/<gclassid>')
-def missingclass(gclassid):
+def missingclass(gclassid,getparents=0):
+    getparents = int(getparents)
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
 
     #Get all the student submissions
@@ -215,7 +217,6 @@ def missingclass(gclassid):
     gbDFpivot.reset_index()
     gbDFpivot.rename(columns={"index": "email"}, inplace=True)
 
-
     gbDFpivot = pd.merge(stusDF, 
                     gbDFpivot, 
                     on ='email', 
@@ -229,13 +230,44 @@ def missingclass(gclassid):
     gbDFpivot.drop(['alternateLink','userId'],1,inplace=True)
 
     gbDFpivot = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
+    stuListDF = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
+    stuListDF.drop(['missingLink'],1,inplace=True)
+    stuList = stuListDF.values.tolist()
+    mmerge=""
+    if getparents == 1:
+        print('Get Parents')
+        for stu in stuList:
+        
+            email=stu[1].strip()
+            missing = stu[2]
+            
+            try:
+                stu = User.objects.get(otemail=email)
+            except:
+                if len(email)>1:
+                    flash( f"couldn't find {email} in our records")
+            mmerge+=f"{stu.aeriesid},{stu.fname} {stu.lname},{email},{email};"
+
+            if stu.aadultemail:
+                mmerge+=f"{stu.aadultemail};"
+
+            for adult in stu.adults:
+                if adult.email:
+                    if stu.aadultemail and adult.email != stu.aadultemail:
+                        mmerge+=f"{adult.email};"
+                    elif not stu.aadultemail:
+                        mmerge+=f"{adult.email};"
+
+            mmerge+=f",{missing}"
+            mmerge+="****"
+
     gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a target="_blank" href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
     gbDFpivot.reset_index(inplace=True)
-    gbDFpivot.drop(['index','missingLink','email'],1,inplace=True)
+    gbDFpivot.drop(['index','missingLink'],1,inplace=True)
 
     displayDFHTML = Markup(gbDFpivot.to_html(escape=False))
 
-    return render_template('missingclass.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML)
+    return render_template('missingclass.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML,stuList=mmerge)
 
 @app.route('/studsubs/<gclassid>')
 def studsubs(gclassid):

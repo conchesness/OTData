@@ -297,6 +297,10 @@ class PlanSettings(Document):
     seasonspringbegin = DateField(unique=True)
     semestertwobegin = DateField(unique=True)
 
+class Settings(Document):
+    breakCanStart = DateTimeField()
+    currClassEnd = DateTimeField()
+
 class Intervention(EmbeddedDocument):
     status = StringField()
     statusother = StringField()

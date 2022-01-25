@@ -178,7 +178,15 @@
     <!--Break Column-->
     <div class="row">
     <div class="col mx-3 pb-3 border border-3">
-        <h3 class="display-5 mb-0">Break</h3>
+        <h3 class="display-5 mb-0">
+          Break
+          {% if session.role.lower() == 'teacher' %}
+            <a href="/breaksettings/{{gClassroom.gclassid}}">
+              <img src="/static/edit.png" width="40">
+            </a>
+          {% endif %}
+          Break Can Start {{moment(breaksettings.breakCanStart).calendar()}}
+        </h3>
 
       <p class="my-0">Please checkin first.</p>
       <div class="m-0" id="breakstarted">
@@ -193,10 +201,11 @@
 
       <iframe class="mb-3" width="100%" height="100%" src="/breaks/{{gClassroom.gclassid}}" id="breaksFrame" title="Breaks Frame"></iframe>
       {% for break in breaks %}
-      <br>
+      <br><br>
       {% endfor %}
     </div>
   </div>
+  
 
     {% if session.role.lower()=="teacher" %}
     <a href="/tokens/award/{{gClassroom.gclassid}}">Award Tokens</a>

@@ -1,8 +1,8 @@
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, request, Markup
-from app.classes.data import User, CheckIn, GoogleClassroom, Help, Token
-from app.classes.forms import BreakForm, CheckInForm, DateForm, StudentWasHereForm
+from app.classes.data import User, CheckIn, GoogleClassroom, Help, Token, Settings
+from app.classes.forms import BreakForm, CheckInForm, DateForm, StudentWasHereForm, BreakSettingsForm
 from .roster import getCourseWork
 from datetime import datetime as dt
 from datetime import timedelta
@@ -120,7 +120,9 @@ def classdash(gclassid):
         form.desc.data = None
         form.status.data = None
 
-    return render_template('classdash.html',helps=helps, approveHelps=approveHelps, breaks=breaks,tokens=tokens,myHelps=myHelps,myOffers=myOffers, currUser=currUser,gClassroom=gClassroom,lastCheckIn=lastCheckIn,form=form)
+    breaksettings = Settings.objects().first()
+
+    return render_template('classdash.html',helps=helps, approveHelps=approveHelps, breaks=breaks,tokens=tokens,myHelps=myHelps,myOffers=myOffers, currUser=currUser,gClassroom=gClassroom,lastCheckIn=lastCheckIn,form=form, breaksettings=breaksettings)
 
 @app.route('/breaks/<gclassid>')
 def breaks(gclassid):
@@ -138,6 +140,39 @@ def checkin():
     gCourses = currUser.gclasses
 
     return render_template('checkin.html', gCourses=gCourses, currUser=currUser)
+
+@app.route('/breaksettings/<gClassid>', methods=['GET', 'POST'])
+def breaksettings(gClassid):
+    form=BreakSettingsForm()
+    breakSettings = Settings.objects().first()
+    
+    # update the settings 
+    try:
+        breakSettings.update(
+            breakCanStart = dt.utcnow().date(),
+            currClassEnd = dt.utcnow().date()
+        )
+    # if there is no settings record, this creates it.
+    except:
+        Settings(
+            breakCanStart = dt.utcnow().date(),
+            currClassEnd = dt.utcnow().date()
+        ).save()
+
+    if form.validate_on_submit():
+        print(f"mins: {form.breakstartmins.data}")
+        breakStartDT = dt.strptime(f'{form.breakstartdate.data}  {form.breakstarthrs.data}:{form.breakstartmins.data}', '%Y-%m-%d %H:%M')
+        breakStartDT = pytz.timezone('US/Pacific').localize(breakStartDT)
+        classEndDT = dt.strptime(f'{form.classenddate.data}  {form.classendhrs.data}:{form.classendmins.data}', '%Y-%m-%d %H:%M')
+        classEndDT = pytz.timezone('US/Pacific').localize(classEndDT)
+        breakSettings.update(
+            breakCanStart = breakStartDT,
+            currClassEnd = classEndDT
+        )
+        return redirect(url_for('classdash',gclassid=gClassid))
+
+    return render_template('breaksettings.html',gClassid=gClassid, form=form)
+        
 
 @app.route('/breakstart/<gclassid>', methods=['GET', 'POST'])
 def breakstart(gclassid):

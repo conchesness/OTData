@@ -155,7 +155,7 @@ def missingclass(gclassid,getparents=0):
     try:
         subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
     except:
-        flash(Markup(f'You need to <a href="/getstudsubs/{{gclassid}}">update you info from Google Clasroom.</a>'))
+        flash(Markup(f'You need to <a href="/getstudsubs/{gclassid}">update your info from Google Classroom.</a>'))
         return redirect(url_for('checkin'))
 
     subsDF = subsDF.drop('id', 1)
@@ -276,7 +276,7 @@ def studsubs(gclassid):
     try:
         subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
     except:
-        flash(Markup(f'You need to <a href="/getstudsubs/{{gclassid}}">update you info from Google Clasroom.</a>'))
+        flash(Markup(f'You need to <a href="/getstudsubs/{gclassid}">update your info from Google Clasrroom.</a>'))
         return redirect(url_for('checkin'))
 
     subsDF = subsDF.drop('id', 1)

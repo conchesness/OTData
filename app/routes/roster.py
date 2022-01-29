@@ -19,11 +19,6 @@ def roster(gclassid):
     except:
         flash(Markup(f"You need to <a href='/getroster/{gclassid}'>update your roster from Google Classroom</a>."))
         return redirect(url_for('checkin'))
-        
-    for stu in gclass.groster['roster']:
-        print(f"cohort: {stu['sortCohort']} updateGClass: {stu['updateGClasses']}")
-
-
 
     otdstus = sorted(otdstus, key = lambda i: (i['sortCohort'],i['profile']['name']['fullName']))
    
@@ -84,7 +79,6 @@ def getroster(gclassid):
                         stu['sortCohort'] = otdStuClass.sortcohort
                 except KeyError:
                     pass
-            print(f"{i}/{length} sort cohort: {stu['sortCohort']} updateGClass: {stu['updateGClasses']}")
             stus.append(stu)
     
     stus = sorted(stus, key = lambda i: (i['sortCohort'],i['profile']['name']['familyName']))

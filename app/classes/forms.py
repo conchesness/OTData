@@ -23,6 +23,11 @@ class SimpleForm(FlaskForm):
     field = TextAreaField(validators=[InputRequired()])
     submit = SubmitField("Submit")
 
+class GroupMsgForm(FlaskForm):
+    msg = TextAreaField(validators=[InputRequired()])
+    parents = BooleanField(default=False)
+    submit = SubmitField("Submit")
+
 class DateForm(FlaskForm):
     querydate = DateField("Date", id="queryDate")
     submitDateForm = SubmitField("Submit", id="submitDateForm")
@@ -284,4 +289,17 @@ class PostGradForm(FlaskForm):
     pg_city = StringField(validators=[(validators.Optional())])
     pg_state = StringField(validators=[(validators.Optional())])
     pg_zip = IntegerField(validators=[(validators.Optional())])
+    submit = SubmitField("Submit")
+
+class ScheduleForm(FlaskForm):
+    active = BooleanField(validators=[InputRequired()])
+    name = StringField(validators=[InputRequired()])
+    submit = SubmitField("Submit")
+
+class ScheduleClassForm(FlaskForm):
+    per = IntegerField(validators=[InputRequired()])
+    startHr = IntegerField(validators=[InputRequired()])
+    startMin = IntegerField(validators=[InputRequired()])
+    endHr = IntegerField(validators=[InputRequired()])
+    endMin = IntegerField(validators=[InputRequired()])
     submit = SubmitField("Submit")

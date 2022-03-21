@@ -28,7 +28,7 @@ auth_token = twilio_auth_token
 
 # API Docs: https://www.twilio.com/docs/sms/api/message-resource
 
-def txtGroupFunc(groupid,msg):
+def txtGroupFunc(groupid,msg,pars=0):
     phnums = []
     group = Group.objects.get(pk=groupid)
     for stu in group.students:
@@ -36,6 +36,18 @@ def txtGroupFunc(groupid,msg):
             phnums.append(stu.mobile)
         else:
             flash(f"{stu.fname} {stu.lname} does not have a mobile phone number in OTData.")
+        if pars == 1 and stu.adults:
+            for adult in stu.adults:
+                if adult.mobile:
+                    phnums.append(adult.mobile)
+        elif pars==1 and (stu.adult1phone or stu.adult2phone):
+            if stu.adult1phone:
+                phnums.append(stu.adult1phone)
+            if stu.adult2phone:
+                phnums.append(stu.adult2phone)
+
+    #deduplicate the phnums
+    phnums = set(phnums)
 
     client = Client(account_sid, auth_token)
 
@@ -49,10 +61,14 @@ def txtGroupFunc(groupid,msg):
                 )
         except Exception as error:
             flash(f"Got this error: {error} when trying to send a msg to +1{phnum}")
+            isStu = False
             for stu in group.students:
                 if stu.mobile == phnum:
                     flash(f"The student with this number is {stu.fname} {stu.lname}")
+                    isStu = True
                     break
+            if not isStu:  
+                flash("Probably an adult's number.")
 
     return 
 

@@ -431,7 +431,6 @@ def editrostersortorder(gclassid,sort=None):
     form=SortOrderCohortForm()
 
     if form.validate_on_submit():
-        #otStudent = User.objects.get(gid = form.gid.data)
         otStudent = User.objects.get(otemail = form.gmail.data)
 
         try:
@@ -456,8 +455,6 @@ def editrostersortorder(gclassid,sort=None):
             gclassroom.update(
                 groster=groster
             )
-
-
 
     for i in range(len(groster['roster'])):
 

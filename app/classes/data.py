@@ -1,10 +1,9 @@
 
+#from typing_extensions import Required
 from mongoengine import EmbeddedDocumentListField, DictField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, CASCADE
 from flask_mongoengine import Document
 from bson.objectid import ObjectId
 import datetime as d
-# from wtforms import validators
-# from wtforms.fields.core import IntegerField, SelectField
 
 class Adult(EmbeddedDocument):
     preferredcontact = BooleanField()
@@ -426,3 +425,19 @@ class Group(Document):
     name = StringField()
     desc = StringField()
     students = ListField(ReferenceField('User'))
+
+class ScheduleClass(EmbeddedDocument):
+    oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
+    per = IntField(required=True)
+    startHr = IntField(required=True)
+    startMin = IntField(required=True)
+    days = ListField(required=True)
+    endHr = IntField(required=True)
+    endMin = IntField(required=True)
+
+class Schedule(Document):
+    active = BooleanField(required=True,default=True)
+    name = StringField(required=True, unique=True)
+    classes = EmbeddedDocumentListField(ScheduleClass)
+    
+

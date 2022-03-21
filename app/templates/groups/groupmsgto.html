@@ -22,7 +22,8 @@
         <form method=post>
             {{ form.hidden_tag() }}
             <table class="table">
-            <tr><td>Message<br>{{form.field(rows="10", cols="80")}}</td></tr>
+            <tr><td>Send to Parents too? {{form.parents()}}</td></tr>
+            <tr><td>Message<br>{{form.msg(rows="10", cols="80")}}</td></tr>
             <tr><td colspan="2">{{form.submit()}}</td></tr>
             </table>
         </form>

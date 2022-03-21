@@ -4,7 +4,7 @@ from app import app
 
 from flask import render_template, flash, Markup, session, request
 from app.classes.data import User, Group
-from app.classes.forms import ListQForm, SimpleForm, GroupsForm
+from app.classes.forms import ListQForm, SimpleForm, GroupsForm, GroupMsgForm
 from .msgs import txtGroupFunc
 from mongoengine import Q
 from .users import formatphone
@@ -299,11 +299,15 @@ def groupmsgto(groupid):
         flash(f"That groupd doesn't exist.")
         return redirect(url_for('profile'))
 
-    form = SimpleForm()
+    form = GroupMsgForm()
 
     if form.validate_on_submit():
-        txtGroupFunc(groupid,form.field.data)
-        flash(f"Message: {form.field.data} sent to group: {group.name}")
+        if form.parents.data == True:
+            pars=1
+        else:
+            pars=0
+        txtGroupFunc(groupid,form.msg.data,pars)
+        flash(f"Message: {form.msg.data} sent to group: {group.name}")
 
         return redirect(url_for('profile'))
 

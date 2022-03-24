@@ -41,7 +41,6 @@ def userModified(editUser):
     editUser.lastedited.append([dt.datetime.utcnow(),currUser]) 
     if len(editUser.lastedited) > 20:
         editUser.lastedited.pop(0)
-    print(editUser.casemanager)
     editUser.save()
 
 # Function to strip non-numbers from mobile text 
@@ -399,7 +398,6 @@ def editprofile(aeriesid=None):
     # googleId from the active session to load the right record
 
     if session['role'].lower() != 'student' and aeriesid:
-        print('bob')
         editUser = User.objects.get(aeriesid=aeriesid)
     else:
         editUser = User.objects.get(gid=session['gid'])

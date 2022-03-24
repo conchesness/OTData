@@ -61,7 +61,8 @@
     <tr>
         <th>ID</th><th>name</th><th>Email</th><th>cohort</th><th>ethnicity</th><th>grade</th><th>gender</th>
     </tr>
-{% for user in users | sort(attribute="lname,fname") %}
+{% if users %}
+{% for user in users | sort(attribute="alname,afname") %}
     <tr>
         <td>{{user.aeriesid}}</td>
         <td><a href="/profile/{{user.aeriesid}}">{{user.fname}} {{user.lname}}</a></td>
@@ -72,6 +73,7 @@
         <td>{{user.agender}}</td>
     </tr>
 {% endfor %}
+{% endif %}
 </table>
 <hr>
 <a id="students"></a>

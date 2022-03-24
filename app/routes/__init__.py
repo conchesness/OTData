@@ -17,4 +17,4 @@ from .ztemp import *
 from .help import *
 from .sandbox import *
 from .misc import *
-from .zscripts import *
+#from .zscripts import *

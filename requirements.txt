@@ -54,3 +54,5 @@ Werkzeug==2.0.3
 wincertstore==0.2
 WTForms==2.3.3
 WTForms-Components==0.10.4
+pandas==1.4.1
+numpy==1.21.5

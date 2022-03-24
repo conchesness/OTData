@@ -9,7 +9,8 @@ import base64
 import re
 
 app = Flask(__name__)
-app.jinja_options['extensions'].append('jinja2.ext.do')
+#app.jinja_options['extensions'].append('jinja2.ext.do')
+app.jinja_env.add_extension('jinja2.ext.do')
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY") # or os.urandom(20)
 # you must change the next line to be link to your database at mongodb.com
 connect("otdata", host=f"{os.environ.get('mongodb_host')}/otdata?retryWrites=true&w=majority")

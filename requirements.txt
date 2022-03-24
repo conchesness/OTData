@@ -12,7 +12,7 @@ email-validator==1.1.2
 Flask==2.0.3
 Flask-Moment==0.11.0
 flask-mongoengine==0.9.5
-Flask-WTF==0.14.2
+Flask-WTF==1.0.0
 google-api-python-client==1.7.11
 google-auth==2.6.0
 google-auth-httplib2==0.1.0

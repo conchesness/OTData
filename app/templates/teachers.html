@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block body %}
+{% if teachers %}
+{% for teacher in teachers %}
+{{teacher.tnum}}, {{teacher.tdept}}, {{teacher.taeriesname}}, {{teacher.trmphone}}, {{teacher.otemail}}, {{teacher.afname}}, {{teacher.alname}} <br>
+{% endfor %}
+{% endif %}
+
+{% endblock %}
+
+tnum = IntField()
+troom = StringField()
+tdept = StringField()
+taeriesname = StringField()
+trmphone = StringField()

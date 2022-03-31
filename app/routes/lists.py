@@ -90,9 +90,16 @@ def listq():
             genderquery = '(Q(role__iexact = "student"))'
 
         users = User.objects(eval(ethnicityquery) & eval(cohortquery) & eval(gradequery) & eval(genderquery))
-
-        return render_template('studentlistform.html',form=form, users=users, total=len(users))
+        if form.results.data == "map":
+            return render_template('usermap.html',users=users)
+        else:
+            return render_template('studentlistform.html',form=form, users=users, total=len(users))
     return render_template('studentlistform.html',form=form, users=None, total=None)
+
+@app.route('/usermap')
+def usermap():
+    return render_template('usermap.html')
+
 
 @app.route('/logins')
 def logins():

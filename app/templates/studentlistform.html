@@ -44,6 +44,7 @@
         {% for cohort in form.cohort %}
             {{cohort}} {{cohort.label}} <br>
         {% endfor %}
+        Display results: {{form.results()}} <br>
         {{form.submit()}}
         </div>
         

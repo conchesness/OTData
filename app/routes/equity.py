@@ -6,7 +6,7 @@ from flask import render_template, redirect, url_for, flash
 @app.route('/equity')
 def equity(currdir=None):
     charts = {}
-    root = './app/static/Fall2020'
+    root = './app/static/Spring2022'
     for info in os.walk(root, topdown=True): 
         rootDirs = info[1]
         break

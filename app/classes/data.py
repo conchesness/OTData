@@ -1,6 +1,6 @@
 
 #from typing_extensions import Required
-from mongoengine import EmbeddedDocumentListField, DictField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, CASCADE
+from mongoengine import EmbeddedDocumentListField, DictField, FloatField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, CASCADE
 from flask_mongoengine import Document
 from bson.objectid import ObjectId
 import datetime as d
@@ -166,6 +166,8 @@ class User(Document):
     gclassguardianinvites = DictField(default={})
     
     # Data that can be edited
+    lat = FloatField()
+    lon = FloatField()
     fname = StringField()
     lname = StringField()
     isadmin = BooleanField(default=False)

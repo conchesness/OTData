@@ -199,6 +199,7 @@ class ListQForm(FlaskForm):
     grade = MultiCheckboxField("Grade: ", choices=[])
     gender = MultiCheckboxField("Gender: ", choices=[])
     ethnicity = MultiCheckboxField("Ethnicity: ", choices=[])
+    results = SelectField("Results", choices=[('list','list'),('map','map')])
     submit = SubmitField("Submit")
 
 class SortOrderCohortForm(FlaskForm):

@@ -124,7 +124,8 @@
                         <b>Adult Email:</b>  {{currUser.aadultemail}} <br>
                         <b>Address:</b> <br>
                         <span class="ms-2">{{currUser.astreet}} </span><br>
-                        <span class="ms-2">{{currUser.acity}} {{currUser.astate}}  {{currUser.azipcode}}</span>
+                        <span class="ms-2">{{currUser.acity}} {{currUser.astate}}  {{currUser.azipcode}}</span> <br>
+                        <span class="ms-2"> <b>lat:</b> {{currUser.lat}} <b>lon:</b> {{currUser.lon}}</span>
                     </p>
                 </div>
             </div>
@@ -266,7 +267,7 @@
             </table>
         </div>
     </div>
-    {% endif %}<!-- CheckIns -->
+    {% endif %}<!-- End CheckIns -->
 
     <div class="row mt-3" id="StudentAdults">
         <h2>

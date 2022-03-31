@@ -14,6 +14,7 @@ import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import datetime as dt
 import re
+import time
 
 # List of email addresses for Admin users
 admins = ['stephen.wright@ousd.org','sara.ketcham@ousd.org','jelani.noble@ousd.org']
@@ -41,6 +42,40 @@ def userModified(editUser):
     editUser.lastedited.append([dt.datetime.utcnow(),currUser]) 
     if len(editUser.lastedited) > 20:
         editUser.lastedited.pop(0)
+
+    if editUser.ustreet:
+        street = editUser.ustreet
+    else:
+        street = editUser.astreet
+
+    if editUser.ucity:
+        city = editUser.ucity
+    else:
+        city = editUser.acity
+
+    if editUser.ustate:
+        state = editUser.ustate
+    else:
+        state = editUser.astate
+
+    if editUser.uzipcode:
+        zipcode = editUser.uzipcode
+    else:
+        zipcode = editUser.azipcode
+
+    url = f"https://nominatim.openstreetmap.org/search?street={street}&city={city}&state={state}&postalcode={zipcode}&format=json&addressdetails=1&email=stephen.wright@ousd.org"
+    r = requests.get(url)
+    try:
+        r = r.json()
+    except:
+        pass
+    else:
+        if len(r) != 0:
+            editUser.lat = float(r[0]['lat'])
+            editUser.lon = float(r[0]['lon'])
+            flash('Updated lat/lon')
+    flash('User edited.')
+
     editUser.save()
 
 # Function to strip non-numbers from mobile text 

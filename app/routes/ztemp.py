@@ -6,49 +6,49 @@ from mongoengine import Q
 import requests
 import time
 
-@app.route('/addlatlon')
-def addlatlon():
+# @app.route('/addlatlon')
+# def addlatlon():
 
-    query = Q(cohort__icontains="computer") & Q(astreet__exists=True) & Q(acity__exists=True) & Q(astate__exists=True) & Q(azipcode__exists=True) & Q(lat__exists=False) & Q(lon__exists=False)
+#     query = Q(astreet__exists=True) & Q(acity__exists=True) & Q(astate__exists=True) & Q(azipcode__exists=True) & Q(lat__exists=False) & Q(lon__exists=False)
 
-    users = User.objects(query)
-    total = len(users)
-    for i,user in enumerate(users):
+#     users = User.objects(query)
+#     total = len(users)
+#     for i,user in enumerate(users):
 
-        if user.ustreet:
-            street = user.ustreet
-        else:
-            street = user.astreet
+#         if user.ustreet:
+#             street = user.ustreet
+#         else:
+#             street = user.astreet
 
-        if user.ucity:
-            city = user.ucity
-        else:
-            city = user.acity
+#         if user.ucity:
+#             city = user.ucity
+#         else:
+#             city = user.acity
 
-        if user.ustate:
-            state = user.ustate
-        else:
-            state = user.astate
+#         if user.ustate:
+#             state = user.ustate
+#         else:
+#             state = user.astate
 
-        if user.uzipcode:
-            zipcode = user.uzipcode
-        else:
-            zipcode = user.azipcode
+#         if user.uzipcode:
+#             zipcode = user.uzipcode
+#         else:
+#             zipcode = user.azipcode
 
-        url = f"https://nominatim.openstreetmap.org/search?street={street}&city={city}&state={state}&postalcode={zipcode}&format=json&addressdetails=1&email=stephen.wright@ousd.org"
-        r = requests.get(url)
-        try:
-            r = r.json()
-        except:
-            pass
-        else:
-            if len(r) != 0:
-                user.lat = float(r[0]['lat'])
-                user.lon = float(r[0]['lon'])
-                user.save()
-                print(f"{i}/{total}: {user.lat} {user.lon}")
-                time.sleep(2)
-    return render_template("index.html")
+#         url = f"https://nominatim.openstreetmap.org/search?street={street}&city={city}&state={state}&postalcode={zipcode}&format=json&addressdetails=1&email=stephen.wright@ousd.org"
+#         r = requests.get(url)
+#         try:
+#             r = r.json()
+#         except:
+#             pass
+#         else:
+#             if len(r) != 0:
+#                 user.lat = float(r[0]['lat'])
+#                 user.lon = float(r[0]['lon'])
+#                 user.save()
+#                 print(f"{i}/{total}: {user.lat} {user.lon}")
+#                 time.sleep(2)
+#     return render_template("index.html")
 
 # @app.route('/deleteopenhelps')
 # def deleteopenhelps():

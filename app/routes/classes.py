@@ -1,6 +1,6 @@
 from app import app
 from .users import credentials_to_dict
-from flask import render_template, redirect, session, flash, url_for, Markup
+from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
 from app.classes.data import User, GoogleClassroom
 from app.classes.forms import GClassForm
 import mongoengine.errors
@@ -144,130 +144,129 @@ def mywork():
     
     return render_template('mywork.html',displayDFHTML=displayDFHTML)
 
+# TODO delete this route
+# @app.route('/missingclass/<gclassid>/<getparents>')
+# @app.route('/missingclass/<gclassid>')
+# def missingclass(gclassid,getparents=0):
+#     getparents = int(getparents)
+#     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
 
-@app.route('/missingclass/<gclassid>/<getparents>')
-@app.route('/missingclass/<gclassid>')
-def missingclass(gclassid,getparents=0):
-    getparents = int(getparents)
-    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+#     #Get all the student submissions
+#     try:
+#         subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
+#     except:
+#         flash(Markup(f'You need to <a href="/getstudsubs/{gclassid}">update your info from Google Classroom.</a>'))
+#         return redirect(url_for('checkin'))
 
-    #Get all the student submissions
-    try:
-        subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
-    except:
-        flash(Markup(f'You need to <a href="/getstudsubs/{gclassid}">update your info from Google Classroom.</a>'))
-        return redirect(url_for('checkin'))
+#     subsDF = subsDF.drop('id', 1)
 
-    subsDF = subsDF.drop('id', 1)
+#     subsDFlink = subsDF.drop_duplicates(subset=['userId'])
+#     subsDFlink = subsDFlink[['userId','alternateLink']]
+#     subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[row.alternateLink.find('student/')+7:]+"/m", axis=1)
 
-    subsDFlink = subsDF.drop_duplicates(subset=['userId'])
-    subsDFlink = subsDFlink[['userId','alternateLink']]
-    subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[row.alternateLink.find('student/')+7:]+"/m", axis=1)
+#     #Create a list of students
+#     dictfordf = {}
+#     for row in gClassroom.groster['roster']:
+#         newRow = {'userId':row['userId'],'name':row['profile']['name']['fullName'],'email':row['profile']['emailAddress']}
+#         dictfordf[row['userId']] = newRow
 
-    #Create a list of students
-    dictfordf = {}
-    for row in gClassroom.groster['roster']:
-        newRow = {'userId':row['userId'],'name':row['profile']['name']['fullName'],'email':row['profile']['emailAddress']}
-        dictfordf[row['userId']] = newRow
+#     stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
 
-    stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
+#     #Merge the students with the assignments
+#     gbDF = pd.merge(stusDF, 
+#                       subsDF, 
+#                       on ='userId', 
+#                       how ='inner')
 
-    #Merge the students with the assignments
-    gbDF = pd.merge(stusDF, 
-                      subsDF, 
-                      on ='userId', 
-                      how ='inner')
+#     #Get all the assignments
+#     dictfordf = {}
+#     for row in gClassroom.courseworkdict['courseWork']:
+#         dictfordf[row['id']] = row
 
-    #Get all the assignments
-    dictfordf = {}
-    for row in gClassroom.courseworkdict['courseWork']:
-        dictfordf[row['id']] = row
+#     courseworkDF = pd.DataFrame.from_dict(dictfordf, orient='index')
+#     courseworkDF.rename(columns={"id": "courseWorkId"}, inplace=True)
 
-    courseworkDF = pd.DataFrame.from_dict(dictfordf, orient='index')
-    courseworkDF.rename(columns={"id": "courseWorkId"}, inplace=True)
-
-    #merge in all the assignments
-    gbDF = pd.merge(courseworkDF, 
-                    gbDF, 
-                    on ='courseWorkId', 
-                    how ='inner')
+#     #merge in all the assignments
+#     gbDF = pd.merge(courseworkDF, 
+#                     gbDF, 
+#                     on ='courseWorkId', 
+#                     how ='inner')
    
-    gbDF = gbDF.drop(['creationTime_x','updateTime_x','dueTime','maxPoints','assignment','assigneeMode','courseId_y','description','materials','submissionModificationMode','creatorUserId','assignmentSubmission','draftGrade'], 1)
-    try:
-        gbDF = gbDF.drop(['shortAnswerSubmission'], 1)
-    except:
-        pass
-    try:
-        gbDF = gbDF.drop(['individualStudentsOptions'], 1)
-    except:
-        pass
+#     gbDF = gbDF.drop(['creationTime_x','updateTime_x','dueTime','maxPoints','assignment','assigneeMode','courseId_y','description','materials','submissionModificationMode','creatorUserId','assignmentSubmission','draftGrade'], 1)
+#     try:
+#         gbDF = gbDF.drop(['shortAnswerSubmission'], 1)
+#     except:
+#         pass
+#     try:
+#         gbDF = gbDF.drop(['individualStudentsOptions'], 1)
+#     except:
+#         pass
 
-    # drop all rows that are NOT late
-    gbDF = gbDF.dropna(subset=['late'])
-    # drop all rows that are turned_in
-    index_names = gbDF[ gbDF['state_y'] == "TURNED_IN" ].index
-    gbDF.drop(index_names, inplace = True)
-    # drop all rows with a grade including zero
-    index_names = gbDF[ gbDF['assignedGrade'] >= 0 ].index
-    gbDF.drop(index_names, inplace = True)
+#     # drop all rows that are NOT late
+#     gbDF = gbDF.dropna(subset=['late'])
+#     # drop all rows that are turned_in
+#     index_names = gbDF[ gbDF['state_y'] == "TURNED_IN" ].index
+#     gbDF.drop(index_names, inplace = True)
+#     # drop all rows with a grade including zero
+#     index_names = gbDF[ gbDF['assignedGrade'] >= 0 ].index
+#     gbDF.drop(index_names, inplace = True)
 
-    gbDFpivot = pd.pivot_table(data=gbDF,index=['email'],aggfunc={'email':len})
+#     gbDFpivot = pd.pivot_table(data=gbDF,index=['email'],aggfunc={'email':len})
 
-    gbDFpivot.rename(columns={"email": "TotalMissing"}, inplace=True)
-    gbDFpivot.reset_index()
-    gbDFpivot.rename(columns={"index": "email"}, inplace=True)
+#     gbDFpivot.rename(columns={"email": "TotalMissing"}, inplace=True)
+#     gbDFpivot.reset_index()
+#     gbDFpivot.rename(columns={"index": "email"}, inplace=True)
 
-    gbDFpivot = pd.merge(stusDF, 
-                    gbDFpivot, 
-                    on ='email', 
-                    how ='inner')
+#     gbDFpivot = pd.merge(stusDF, 
+#                     gbDFpivot, 
+#                     on ='email', 
+#                     how ='inner')
 
-    gbDFpivot = pd.merge(subsDFlink, 
-                gbDFpivot, 
-                on ='userId', 
-                how ='inner')
+#     gbDFpivot = pd.merge(subsDFlink, 
+#                 gbDFpivot, 
+#                 on ='userId', 
+#                 how ='inner')
 
-    gbDFpivot.drop(['alternateLink','userId'],1,inplace=True)
+#     gbDFpivot.drop(['alternateLink','userId'],1,inplace=True)
 
-    gbDFpivot = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
-    stuListDF = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
-    stuListDF.drop(['missingLink'],1,inplace=True)
-    stuList = stuListDF.values.tolist()
-    mmerge=""
-    if getparents == 1:
-        print('Get Parents')
-        for stu in stuList:
+#     gbDFpivot = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
+#     stuListDF = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
+#     stuListDF.drop(['missingLink'],1,inplace=True)
+#     stuList = stuListDF.values.tolist()
+#     mmerge=""
+#     if getparents == 1:
+#         for stu in stuList:
         
-            email=stu[1].strip()
-            missing = stu[2]
+#             email=stu[1].strip()
+#             missing = stu[2]
             
-            try:
-                stu = User.objects.get(otemail=email)
-            except:
-                if len(email)>1:
-                    flash( f"couldn't find {email} in our records")
-            mmerge+=f"{stu.aeriesid},{stu.fname} {stu.lname},{email},{email};"
+#             try:
+#                 stu = User.objects.get(otemail=email)
+#             except:
+#                 if len(email)>1:
+#                     flash( f"couldn't find {email} in our records")
+#             mmerge+=f"{stu.aeriesid},{stu.fname} {stu.lname},{email},{email};"
 
-            if stu.aadultemail:
-                mmerge+=f"{stu.aadultemail};"
+#             if stu.aadultemail:
+#                 mmerge+=f"{stu.aadultemail};"
 
-            for adult in stu.adults:
-                if adult.email:
-                    if stu.aadultemail and adult.email != stu.aadultemail:
-                        mmerge+=f"{adult.email};"
-                    elif not stu.aadultemail:
-                        mmerge+=f"{adult.email};"
+#             for adult in stu.adults:
+#                 if adult.email:
+#                     if stu.aadultemail and adult.email != stu.aadultemail:
+#                         mmerge+=f"{adult.email};"
+#                     elif not stu.aadultemail:
+#                         mmerge+=f"{adult.email};"
 
-            mmerge+=f",{missing}"
-            mmerge+="****"
+#             mmerge+=f",{missing}"
+#             mmerge+="****"
 
-    gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a target="_blank" href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
-    gbDFpivot.reset_index(inplace=True)
-    gbDFpivot.drop(['index','missingLink'],1,inplace=True)
+#     gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a target="_blank" href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
+#     gbDFpivot.reset_index(inplace=True)
+#     gbDFpivot.drop(['index','missingLink'],1,inplace=True)
 
-    displayDFHTML = Markup(gbDFpivot.to_html(escape=False))
+#     displayDFHTML = Markup(gbDFpivot.to_html(escape=False))
 
-    return render_template('missingclass.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML,stuList=mmerge)
+#     return render_template('missingclass.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML,stuList=mmerge)
 
 @app.route('/studsubs/<gclassid>')
 def studsubs(gclassid):
@@ -307,14 +306,49 @@ def studsubs(gclassid):
 
     gbDF.fillna('', inplace=True)
     gbDF['late'] = gbDF['late'].astype('bool')
-    #gbDF.replace("True", 1)
-    print(gbDF.dtypes)
     gbDF = pd.pivot_table(data=gbDF,index=['email'],aggfunc={'late':np.sum,'email':len})
     gbDF['On Time %'] = 100-(gbDF['late'] / gbDF['email'] * 100)
     gbDF.rename(columns={"email": "total"}, inplace=True)
     gbDF = gbDF.sort_values(by=['On Time %'], ascending=False)
     median = round(gbDF['On Time %'].median(),2)
     mean = round(gbDF['On Time %'].mean(), 2)
+
+    
+    #gbDF = gbDF.sort_values(by=['TotalMissing'], ascending=False)
+    # stuListDF = gbDF.sort_values(by=['TotalMissing'], ascending=False)
+    # stuListDF.drop(['missingLink'],1,inplace=True)\
+    stuList = gbDF.reset_index(level=0)
+    stuList = stuList.values.tolist()
+    mmerge='<table><tr><th>ID</th><th>StudentName</th><th>StudentEmail</th><th>Emails</th><th>NumMissing</th></tr>'
+    for stu in stuList:
+        mmerge+='<tr>'
+        emails=""
+        email=stu[0].strip()
+        missing = stu[2]
+        
+        try:
+            stu = User.objects.get(otemail=email)
+        except:
+            if len(email)>1:
+                flash( f"couldn't find {email} in our records")
+        mmerge+=f"<td>{stu.aeriesid}</td><td>{stu.fname} {stu.lname}</td><td>{email}</td>"
+        emails+=f"{email}"
+
+        if stu.aadultemail:
+            emails+=f", {stu.aadultemail};"
+
+        for adult in stu.adults:
+            if adult.email:
+                if stu.aadultemail and adult.email != stu.aadultemail:
+                    emails+=f", {adult.email};"
+                elif not stu.aadultemail:
+                    emails+=f", {adult.email};"
+
+        mmerge+=f"<td>{emails}</td><td>{missing}</td>"
+        mmerge+='</tr>'
+    mmerge+="</table>"
+    parents=Markup(render_template_string(mmerge))
+
 
     #plotting boxplot 
     #plt.boxplot([x for x in gbDF['On Time %']],labels=[x for x in gbDF.index], showmeans=True) 
@@ -336,7 +370,7 @@ def studsubs(gclassid):
     #stusDFHTML = Markup(pd.DataFrame.to_html(stusDF))
     #subsDFHTML = Markup(pd.DataFrame.to_html(subsDF))
 
-    return render_template('studsubs.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML,median=median,mean=mean)
+    return render_template('studsubs.html',gClassroom=gClassroom,parents=parents,displayDFHTML=displayDFHTML,median=median,mean=mean)
 
 
 @app.route('/getstudsubs/<gclassid>')

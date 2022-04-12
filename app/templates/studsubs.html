@@ -24,6 +24,36 @@ Last <a href="/getstudsubs/{{gClassroom.gclassid}}">Update</a> of data: {{moment
       {{displayDFHTML}}
    </div>   
 </div>
+{% if parents %}
+<script type="text/javascript">
+   function copyToClipboard(elementId) {
+
+      // Create a "hidden" input
+      var aux = document.createElement("input");
+
+      // Assign it the value of the specified element
+      aux.setAttribute("value", document.getElementById(elementId).innerHTML);
+
+      // Append it to the body
+      document.body.appendChild(aux);
+
+      // Highlight its content
+      aux.select();
+
+      // Copy the highlighted text
+      document.execCommand("copy");
+
+      // Remove it from the body
+      document.body.removeChild(aux);
+
+   }
+</script>
+   <br><br>
+   <button onclick="copyToClipboard('mmerge')">Copy table (then past in excel)</button>
+   <div id="mmerge">
+    {{parents}}
+   </div>
+{% endif %}
 </div>
 
 

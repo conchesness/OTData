@@ -18,6 +18,8 @@
               <img width="25" src="/static/delete.png"><b>D</b>elete
               {% if not session.role.lower() == 'student' %}<br>
                 <img width="25" src="/static/roster.png"><b>R</b>oster<br>
+                <img width="25" src="/static/missing.png"><b>M</b>issing work<br>
+                <img width="25" src="/static/update.png"><b>U</b>date CourseWork<br>                
                 <img width="25" src="/static/checkin.png"><b>C</b>heckins
               {% endif %}
             </td>
@@ -49,14 +51,14 @@
               <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
                 <img width="25" src="/static/roster.png">
               </a>
-              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Student Submissions" href="/studsubs/{{class.gclassid}}">
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="# of Missing Assignments" href="/studsubs/{{class.gclassid}}">
+                <img width="25" src="/static/missing.png">
+              </a>
+              <!-- <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Missing Assignments" href="/missingclass/{{class.gclassid}}">
+                <img width="25" src="/static/missing.png">
+              </a> -->
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Update CourseWork for Checkin" href="/getcoursework/{{class.gclassid}}">
                 <img width="25" src="/static/update.png">
-              </a>
-              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="CourseWork" href="/missingclass/{{class.gclassid}}">
-                Missing - 
-              </a>
-              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="CourseWork" href="/getcoursework/{{class.gclassid}}">
-                Update CourseWork
               </a>
               <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
                 <img width="25" src="/static/checkin.png">

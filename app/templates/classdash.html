@@ -179,13 +179,12 @@
     <div class="row">
     <div class="col mx-3 pb-3 border border-3">
         <h3 class="display-5 mb-0">
-          Break
+          Break Can Start {{moment(breaksettings.breakCanStart).calendar()}} 
           {% if session.role.lower() == 'teacher' %}
-            <a href="/breaksettings/{{gClassroom.gclassid}}">
-              <img src="/static/edit.png" width="40">
-            </a>
-          {% endif %}
-          Break Can Start {{moment(breaksettings.breakCanStart).calendar()}}
+          <a href="/breaksettings/{{gClassroom.gclassid}}">
+            <img src="/static/edit.png" width="40">
+          </a>
+        {% endif %}
         </h3>
 
       <p class="my-0">Please checkin first.</p>

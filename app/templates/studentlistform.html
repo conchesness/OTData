@@ -67,7 +67,11 @@
     <tr>
         <td>{{user.aeriesid}}</td>
         <td><a href="/profile/{{user.aeriesid}}">{{user.fname}} {{user.lname}}</a></td>
-        <td>{{user.otemail}}</td>
+        {% if user.grade > 12 and user.personalemail %}
+            <td>{{user.personalemail}}</td>
+        {% else %}
+            <td>{{user.otemail}}</td>
+        {% endif %}
         <td>{{user.cohort}}</td>
         <td>{{user.aethnicity}}</td>
         <td>{{user.grade}}</td>
@@ -84,7 +88,11 @@
 <a href="#parents">parent emails</a>
 <h1>Student emails</h1>
 {% for user in users %}
+    {% if user.grade > 12 and user.personalemail %}
+    {{user.personalemail}},
+    {% else %}
     {{user.otemail}},
+    {% endif %}
 {%endfor%}
 <hr>
 <a id="parents"></a>

@@ -319,6 +319,8 @@ def studsubs(gclassid):
     # stuListDF.drop(['missingLink'],1,inplace=True)\
     stuList = gbDF.reset_index(level=0)
     stuList = stuList.values.tolist()
+
+    # mmerge table code
     mmerge='<table><tr><th>ID</th><th>StudentName</th><th>StudentEmail</th><th>Emails</th><th>NumMissing</th></tr>'
     for stu in stuList:
         mmerge+='<tr>'

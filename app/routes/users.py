@@ -113,7 +113,7 @@ def before_request():
     # If you have urls that you want your user to be able to see without logging in add them here.
     # TODO create a decorator or something for this
     unauthPaths = ['/','/home','/authorize','/login','/oauth2callback','/static','/logout','/revoke','/msgreply','/msgstatus']   
-    communityPaths = ['/profile','/editprofile','/findstufromadult','/addstutoadult']
+    communityPaths = ['/profile','/editprofile','/findstufromadult','/addstutoadult','/equity']
     studentPaths = ['/student','/breaks','/classdash','/assignments','/comp','/help','/breakstart','/postgrad','/cc','/plan','/profile','/editprofile','/addadult','/editadult','/deleteadult','/sendstudentemail','/checkin','/deletecheckin','/editgclass','/deletegclass','/gclasses','/comp','/missingassignmentsstu'] 
     # this is some tricky code designed to send the user to the page they requested even if they have to first go through
     # a authorization process.

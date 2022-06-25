@@ -37,7 +37,7 @@ Pages:&nbsp;
 {% for page in pagination.iter_pages() %}
     {% if page %}
         {% if page != pagination.page %}
-            <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+            <a href="{{ url_for(endpoint, page=page, query=query) }}">{{ page }}</a>
         {% else %}
             <strong>{{ page }}</strong>
         {% endif %}
@@ -55,7 +55,7 @@ Pages:&nbsp;
 
 {# Display a page of courses #}
 <table class="table">
-    <tr><th>Aeries Name</th><th>Course Number</th><th>Department</th><th>A-G</th><th># of Secions</th></tr>
+    <tr><th>Name<br><small>aeries name</small></th><th>Course Number</th><th>Department</th><th>A-G</th><th># of Secions</th></tr>
     {% for course in courses.items %}
         <tr>
             {% if course.name %}

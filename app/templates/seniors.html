@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<table>
+    <tr><th></th><th>name</th><th>post grad plans</th><th>personal email</th><th>shirt size</th><th>github</th></tr>
+    {% for stu in students | sort(attribute="lname") %}
+    <tr>
+        <td>__________</td>
+        <td>{{stu.fname}} {{stu.lname}}</td>
+        <td>
+            {% if stu.postgrads %}
+                {{stu.postgrads[0].org}}
+            {% else %}
+                ____________________
+            {% endif %}
+        </td>
+        <td>{% if stu.personalemail %}{{stu.personalemail}}{% else %}________________{%endif%}</td>
+        <td>{{stu.shirtsize}}</td>
+        <td>github_______ <br></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

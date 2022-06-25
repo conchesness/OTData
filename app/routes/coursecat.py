@@ -4,6 +4,7 @@ from app.classes.data import User, Section, Course
 from app.classes.forms import CourseForm, SectionForm
 import datetime as d
 from mongoengine import Q
+from bs4 import BeautifulSoup
 
 @app.route("/ccteachers/<sort>")
 @app.route("/ccteachers")
@@ -17,13 +18,14 @@ def teachersections(teacherid):
     sections = Section.objects(teacher=teacher)
     return render_template('coursecat/teachersections.html',sections=sections,teacher=teacher)
 
+@app.route("/cccourses/<page>/<query>",methods=['GET','POST'])
 @app.route("/cccourses/<page>",methods=['GET','POST'])
 @app.route("/cccourses", methods=['GET','POST'])
-def courses(page=1):
+def courses(page=1,query=None):
+
     form=CourseForm()
     page=int(page)
-    ignore=['Y3801','Y8301','Z4101']
-    courses = Course.objects(aeriesnum__nin = ignore).paginate(page=page, per_page=10)
+    ignoreList=['Y3801','Y8301','Z4101']
 
     if form.validate_on_submit():
         q = Q(aeriesnum__exists=True)
@@ -59,10 +61,43 @@ def courses(page=1):
             q6 = None
 
         query = q & q1 & q2 & q3 & q4 & q5 & q6
-        
+        page=1
         courses=Course.objects(query).paginate(page=page, per_page=10)
+        return render_template("coursecat/courses.html",courses=courses,form=form,query=query)
+    
+    # if there is an active query that was sent via the url
+    if query:
+        # remove the html
+        query = BeautifulSoup(query,features="html.parser")
+        query = query.get_text().replace('&amp;','&')
+        # turn it in to a query object
+        query = eval(query)
+        try:
+            query.children
+        except AttributeError:
+            pass
+        except Exception as error:
+            flash(f"function 'courses' caused error: {type(error)}")
+        else:
+            for item in query.children:
+                for key, value in item.query.items():
+                    if not key == 'aeriesnum__exists':
 
-    return render_template("coursecat/courses.html",courses=courses,form=form)
+                        if key == 'name__exists':
+                            form.notupdated.data = True
+
+                        fieldNameEnd = key.find('__')
+                        if fieldNameEnd > 0:
+                            key = key[:fieldNameEnd]
+
+                        formAttribute=getattr(form, key)
+                        formAttribute.data = value
+        courses=Course.objects(query).paginate(page=page, per_page=10)
+    else:
+        courses = Course.objects(aeriesnum__nin = ignoreList).paginate(page=page, per_page=10)
+
+    return render_template("coursecat/courses.html",courses=courses,form=form,query=query)
+
 
 @app.route('/cccourse/<coursenum>')
 def course(coursenum):

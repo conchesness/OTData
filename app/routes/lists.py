@@ -503,3 +503,7 @@ def mailmerge():
     print(mmlist)
     return render_template('array.html', array=mmlist, nested=True)
 
+@app.route("/csseniors")
+def csseniors():
+    seniors = User.objects(grade = 12, cohort__icontains = "computer")
+    return render_template("seniors.html",students=seniors)

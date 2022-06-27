@@ -1,10 +1,7 @@
 from app import app
 from flask import render_template, redirect, session, flash, url_for, request, Markup
-from app.classes.data import Schedule, ScheduleClass
-from app.classes.forms import ScheduleClassForm, ScheduleForm
-from datetime import datetime as dt
-from datetime import timedelta
-import pytz as pytz
+from app.classes.data import Schedule
+from app.classes.forms import  ScheduleForm
 
 @app.route('/schedules')
 def schedules():

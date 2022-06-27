@@ -6,8 +6,9 @@
         {{ dateForm.hidden_tag() }}{{ dateForm.querydate() }} 
         <span class="loadingModal">{{dateForm.submitDateForm()}}</span>
     </form>
+
     {% if gclassname %}
-    <h3>Checkins for <span class="today">Today </span>{{gclassname}}</h3>
+    <h3><span class="showDate"></span> in {{gclassname}}</h3>
     {% endif %}
 
     {% for field in dateForm.errors %}
@@ -99,7 +100,7 @@
         {{querydate.strftime('%m/%d/%y')}}, {{checkin.student.fname}} {{checkin.student.lname}}, {{checkin.student.aeriesid}}, E <br>
         {% endfor %}
     {% else %}
-        <br> <h3>No checkins yet for this class on this date.</h3>
+        No checkins. <br>
         <h2>All students</h2>
         {% if stuForm %}
             <form method=post>
@@ -120,27 +121,23 @@
 </div>
 
 <script type="text/javascript">
-
+    // momentjs has a lot more options than flask-moment
+    // I use it here because falsk-moment assumes are datetimes are UTC and this is sent as 
+    // 'US/Pacific' not naive and momentjs can recognize that.
+    // Also, I can customize how moment.calendar() writes, in this case, removing the time.
     jQuery(document).ready(function() {
-        var today = new Date();
-        var monthStringDate = (today.getMonth()+1).toString();
+ 
+        var searchDateMoment = moment('{{searchdatetime}}').calendar(null,{
+            lastDay : '[Yesterday]',
+            sameDay : '[Today]',
+            nextDay : '[Tomorrow]',
+            lastWeek : '[Last] dddd',
+            nextWeek : 'dddd',
+            sameElse : 'L'
+        })
 
-        if (monthStringDate.length == 1) {
-            monthStringDate = '0'+monthStringDate;
-        }
+        $('.showDate').html(searchDateMoment);
 
-        var dayStringDate = today.getDate().toString();
-        if (dayStringDate.length == 1) {
-            dayStringDate = '0'+dayStringDate;
-        }
-
-        var todayStringDate = today.getFullYear()+"-"+monthStringDate+"-"+dayStringDate;
-        var searchDate = '{{searchdatetime}}'.substring(0,10);
-
-        $('.today').hide();
-        if (todayStringDate == searchDate) {
-            $('.today').show();
-        }
     });
 
 </script>

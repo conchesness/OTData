@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt 
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
@@ -11,7 +14,7 @@ import datetime as dt
 from .roster import getCourseWork
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt 
+
 
 
 @app.route('/addgclass/<gmail>/<gclassid>')

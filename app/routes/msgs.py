@@ -8,7 +8,7 @@ from mongoengine import Q
 from app.classes.data import User, Message, Group
 from app.classes.forms import TxtMessageForm
 import datetime as d
-import pytz
+from zoneinfo import ZoneInfo
 # This is for the Twilio Credentials
 from .credentials import twilio_account_sid, twilio_auth_token
 # Download the helper library from https://www.twilio.com/docs/python/install
@@ -257,7 +257,7 @@ def msgs(daysago=7):
     daysago = int(daysago)
     # sync Twilio to Mongo
     # get twilio msgs from the last two weeks
-    datesearch = d.datetime.now(pytz.timezone("America/Los_Angeles")) - d.timedelta(days=daysago)
+    datesearch = d.datetime.now(ZoneInfo("US/Pacific")) - d.timedelta(days=daysago)
     msgs = Message.objects(datetimesent__gt = datesearch)
     flash(Markup(f"<h3>All messages from the last {daysago} days </h3>or since {datesearch}.<br>"))
 
@@ -267,7 +267,7 @@ def msgs(daysago=7):
 @app.route('/msgs/undelivered')
 def undelivered(daysago = 7):
     daysago = int(daysago)
-    datesearch = d.datetime.now(pytz.timezone("America/Los_Angeles")) - d.timedelta(days=daysago)
+    datesearch = d.datetime.now(ZoneInfo("US/Pacific")) - d.timedelta(days=daysago)
     undmsgs = Message.objects(status='undelivered', datetimesent__gt = datesearch)
     flash(Markup(f"<h3>Undelivered messages from the last {daysago} days</h3>or since {datesearch}.<br>"))
 
@@ -277,7 +277,7 @@ def undelivered(daysago = 7):
 @app.route('/msgs/replies')
 def replies(daysago = 7):
     daysago = int(daysago)
-    datesearch = d.datetime.now(pytz.timezone("America/Los_Angeles")) - d.timedelta(days=daysago)
+    datesearch = d.datetime.now(ZoneInfo("US/Pacific")) - d.timedelta(days=daysago)
     undmsgs = Message.objects(direction='Incoming', datetimesent__gt = datesearch)
     flash(Markup(f"<h3>Replies from the last {daysago} days</h3>or since {datesearch}.<br>"))
 

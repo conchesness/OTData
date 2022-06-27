@@ -8,13 +8,13 @@ from wtforms_components import TimeField
 from wtforms.validators import URL, NumberRange, Email, Optional, InputRequired, ValidationError
 from wtforms import widgets, SelectMultipleField, StringField, SubmitField, validators, TextAreaField, HiddenField, IntegerField, SelectField, FileField, BooleanField
 import datetime as d
-import pytz
+from zoneinfo import ZoneInfo
 
 class BreakSettingsForm(FlaskForm):
-    breakstartdate = DateField(default=d.datetime.now(pytz.timezone('US/Pacific')))
+    breakstartdate = DateField(default=d.datetime.now(ZoneInfo('US/Pacific')))
     breakstarthrs = SelectField(choices=[(8,8),(9,9),(10,10),(11,11),(12,12),(13,1),(14,2),(15,3)])
     breakstartmins = IntegerField(IntegerField(validators=[(NumberRange(min=0, max=59, message="Must be a number between 0 and 59."))]))
-    classenddate = DateField(default=d.datetime.now(pytz.timezone('US/Pacific')))
+    classenddate = DateField(default=d.datetime.now(ZoneInfo('US/Pacific')))
     classendhrs = SelectField(choices=[(8,8),(9,9),(10,10),(11,11),(12,12),(13,1),(14,2),(15,3)])
     classendmins = IntegerField(IntegerField(validators=[(NumberRange(min=0, max=59, message="Must be a number between 0 and 59."))]))
     submit = SubmitField("Submit")
@@ -69,7 +69,7 @@ class TxtMessageForm(FlaskForm):
 class StudentNoteForm(FlaskForm):
     content = TextAreaField("Note:")
     type_ = SelectField("Type:",choices=[('---','---'),('Mtg', 'Mtg'),('Call','Call'),('Note','Note')])
-    date = DateField(default=d.datetime.now(pytz.timezone('US/Pacific')))
+    date = DateField(default=d.datetime.now(ZoneInfo('US/Pacific')))
     submit = SubmitField("Submit")
 
 class StudentForm(FlaskForm):

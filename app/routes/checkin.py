@@ -6,8 +6,8 @@ from app.classes.forms import BreakForm, CheckInForm, DateForm, StudentWasHereFo
 from .roster import getCourseWork
 from datetime import datetime as dt
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 from mongoengine import Q
-import pytz as pytz
 
 @app.route("/classdash/<gclassid>", methods=["GET","POST"])
 def classdash(gclassid):
@@ -90,7 +90,7 @@ def classdash(gclassid):
         # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
         # All dates retrieved from the DB are in UTC
 
-        if lastCheckIn and lastCheckIn.gclassid and lastCheckIn.createdate.date() == dt.now(pytz.utc).date() and str(lastCheckIn.gclassid) == str(gclassid):
+        if lastCheckIn and lastCheckIn.gclassid and lastCheckIn.createdate.date() == dt.utcnow().date() and str(lastCheckIn.gclassid) == str(gclassid):
             flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
             return redirect(url_for('classdash',gclassid=gclassid))
 
@@ -162,9 +162,9 @@ def breaksettings(gClassid):
     if form.validate_on_submit():
         print(f"mins: {form.breakstartmins.data}")
         breakStartDT = dt.strptime(f'{form.breakstartdate.data}  {form.breakstarthrs.data}:{form.breakstartmins.data}', '%Y-%m-%d %H:%M')
-        breakStartDT = pytz.timezone('US/Pacific').localize(breakStartDT)
+        breakStartDT = breakStartDT.replace(tzinfo=ZoneInfo('US/Pacific')) 
         classEndDT = dt.strptime(f'{form.classenddate.data}  {form.classendhrs.data}:{form.classendmins.data}', '%Y-%m-%d %H:%M')
-        classEndDT = pytz.timezone('US/Pacific').localize(classEndDT)
+        classEndDT = classEndDT.replace(tzinfo=ZoneInfo('US/Pacific'))
         breakSettings.update(
             breakCanStart = breakStartDT,
             currClassEnd = classEndDT
@@ -208,7 +208,7 @@ def breakstart(gclassid):
                     token.delete()
 
         currUser.update(
-            breakstart = dt.now(pytz.timezone('US/Pacific')),
+            breakstart = dt.now(ZoneInfo('US/Pacific')),
             breakduration = form.duration.data,
             breakclass = form.gclassid.data
         )
@@ -225,10 +225,7 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
         return redirect('index.html')
     currUser = User.objects.get(id=session['currUserId'])
 
-    searchdatetime = searchdatetime.astimezone(pytz.utc)
-    #searchdatetime = searchdatetime - timedelta(hours = searchdatetime.hour)
-    #Since 4pm is the latest checkin time I set the time after that for manual checkin
-    #searchdatetime = searchdatetime + timedelta(hours = 20, minutes = 1)
+    searchdatetime = searchdatetime.replace(tzinfo=ZoneInfo('UTC')) 
 
     newCheckIn = CheckIn(
                     createdate = searchdatetime,
@@ -267,7 +264,7 @@ def checkinsfor(gclassid,sndrmdr=0):
     try:
         session['searchdatetime']
     except KeyError:
-        searchdate = dt.now(pytz.timezone('US/Pacific')).date()
+        searchdate = dt.now(ZoneInfo('US/Pacific')).date()
         searchdatetime = dt(searchdate.year, searchdate.month, searchdate.day)
         session['searchdatetime'] = searchdatetime
     
@@ -279,9 +276,10 @@ def checkinsfor(gclassid,sndrmdr=0):
         session['searchdatetime'] = searchdatetime
     else:
         searchdatetime = session['searchdatetime']
-
-    tz = pytz.timezone('US/Pacific')
-    searchdatetime = tz.localize(searchdatetime)
+    
+    # flask-moment can't recognize timezone and assumes all tz it gets are utc
+    # To parse the tz you have to use momentjs which is what I did in the template
+    searchdatetime = searchdatetime.replace(tzinfo=ZoneInfo('US/Pacific'))    
 
     dateForm.querydate.data = searchdatetime.date()
 
@@ -319,15 +317,6 @@ def checkinsfor(gclassid,sndrmdr=0):
 
     # sort the list of tuples by its second item which is student's name
     notcheckedstuschoices = sorted(notcheckedstuschoices, key = lambda i: (i[1]))
-
-
-    # lst = len(notcheckedstuschoices)  
-    # for i in range(0, lst):  
-    #     for j in range(0, lst-i-1):  
-    #         if (notcheckedstuschoices[j][1] > notcheckedstuschoices[j + 1][1]):  
-    #             temp = notcheckedstuschoices[j]  
-    #             notcheckedstuschoices[j]= notcheckedstuschoices[j + 1]  
-    #             notcheckedstuschoices[j + 1]= temp  
 
     stuForm.student.choices = notcheckedstuschoices
 

@@ -1,7 +1,7 @@
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, request, Markup
-from app.classes.data import User, CheckIn, GoogleClassroom, Help, Token, Settings
+from app.classes.data import GEnrollment, User, CheckIn, GoogleClassroom, Help, Token, Settings
 from app.classes.forms import BreakForm, CheckInForm, DateForm, StudentWasHereForm, BreakSettingsForm
 from .roster import getCourseWork
 from datetime import datetime as dt
@@ -12,7 +12,11 @@ from mongoengine import Q
 @app.route("/classdash/<gclassid>", methods=["GET","POST"])
 def classdash(gclassid):
     currUser = User.objects.get(pk = session['currUserId'])
-    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    try:
+        gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    except Exception as error:
+        flash(f"Google Classroom doesn't exist: {error}")
+        return redirect(url_for('checkin'))
 
     # Only get this is the user is a Teacher
     if currUser.role.lower() == "teacher":
@@ -52,14 +56,15 @@ def classdash(gclassid):
     except:
         getCourseWork(gclassid)
 
-    for ass in gClassroom['courseworkdict']['courseWork']:
-        #Check to see if there is a number in the front of the title
-        for i,letter in enumerate(ass['title']):
-            if letter != ".":
-                try:
-                    int(letter)
-                except:
-                    break
+    if gClassroom['courseworkdict'] and gClassroom['courseworkdict']['courseWork']:
+        for ass in gClassroom['courseworkdict']['courseWork']:
+            #Check to see if there is a number in the front of the title
+            for i,letter in enumerate(ass['title']):
+                if letter != ".":
+                    try:
+                        int(letter)
+                    except:
+                        break
 
         if i == 0:
             sortValue = 0
@@ -137,9 +142,9 @@ def breaks(gclassid):
 @app.route("/checkin", methods=['GET', 'POST'])
 def checkin():
     currUser = User.objects.get(pk = session['currUserId'])
-    gCourses = currUser.gclasses
+    enrollments = GEnrollment.objects(owner=currUser)
 
-    return render_template('checkin.html', gCourses=gCourses, currUser=currUser)
+    return render_template('checkin.html', enrollments=enrollments, currUser=currUser)
 
 @app.route('/breaksettings/<gClassid>', methods=['GET', 'POST'])
 def breaksettings(gClassid):
@@ -160,7 +165,6 @@ def breaksettings(gClassid):
         ).save()
 
     if form.validate_on_submit():
-        print(f"mins: {form.breakstartmins.data}")
         breakStartDT = dt.strptime(f'{form.breakstartdate.data}  {form.breakstarthrs.data}:{form.breakstartmins.data}', '%Y-%m-%d %H:%M')
         breakStartDT = breakStartDT.replace(tzinfo=ZoneInfo('US/Pacific')) 
         classEndDT = dt.strptime(f'{form.classenddate.data}  {form.classendhrs.data}:{form.classendmins.data}', '%Y-%m-%d %H:%M')
@@ -228,7 +232,6 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
     searchdatetime = searchdatetime.replace(tzinfo=ZoneInfo('UTC')) 
 
     newCheckIn = CheckIn(
-                    createdate = searchdatetime,
                     gclassname = gclassname,
                     student = student,
                     createdBy = currUser,
@@ -279,20 +282,22 @@ def checkinsfor(gclassid,sndrmdr=0):
     
     # flask-moment can't recognize timezone and assumes all tz it gets are utc
     # To parse the tz you have to use momentjs which is what I did in the template
-    searchdatetime = searchdatetime.replace(tzinfo=ZoneInfo('US/Pacific'))    
+    utcsearchdatetime = searchdatetime.astimezone(ZoneInfo("UTC")).date()
 
     dateForm.querydate.data = searchdatetime.date()
 
-    query = (Q(gclassid = gclassid) & (Q(createdate__gt = searchdatetime) & Q(createdate__lt = searchdatetime + timedelta(days=1))) )
+
+    query = (Q(gclassid = gclassid) & (Q(createdate__gt = utcsearchdatetime) & Q(createdate__lt = utcsearchdatetime + timedelta(days=1))))
+
     checkins = CheckIn.objects(query)
 
-    students = gClassroom.groster['roster']
+    enrollments = GEnrollment.objects(gclassroom=gClassroom)
 
     # This is a list of gids for the students that checked in
     checkingids = [checkin.student.gid for checkin in checkins]
 
     # This is a list of gids for the students in the Google Classroom
-    rostergids = [student['userId'] for student in students]
+    rostergids = [enrollment.owner.id for enrollment in enrollments]
 
     # This is a list of gids for of students on the google roster but not in the checked in
     notcheckedingids = [rostergid for rostergid in rostergids if rostergid not in checkingids]
@@ -300,18 +305,18 @@ def checkinsfor(gclassid,sndrmdr=0):
     notcheckedstus = []
     notcheckedstuschoices = []
 
-    for stu in students:
-        if stu['userId'] in notcheckedingids:
+    for enrollment in enrollments:
+        if enrollment.owner.id in notcheckedingids:
             try:
-                notcheckedstus.append(stu['otdobject'])
+                notcheckedstus.append(enrollment.owner)
             except:
-                flash(f"{stu['profile']['name']['fullName']} may not have an account in OTData or you may need to update the roster for this class.")
+                flash(f"{enrollment} may not have an account in OTData or you may need to update the roster for this class.")
             else:
-                try:
-                    notcheckedstuschoices.append((stu['otdobject']['aeriesid'],Markup(f"{stu['sortCohort']}: {stu['otdobject']['lname']}, {stu['otdobject']['fname']} <a href='/profile/{stu['otdobject']['aeriesid']}'>&#128279;</a>")))
-                except:
-                    notcheckedstuschoices.append((stu['otdobject']['aeriesid'],Markup(f"{stu['otdobject']['lname']}, {stu['otdobject']['fname']} <a href='/profile/{stu['otdobject']['aeriesid']}'>&#128279;</a>")))
-
+                if enrollment.sortCohort == "~":
+                    sortCohort = ""
+                else:
+                    sortCohort = enrollment.sortCohort + ':'
+                notcheckedstuschoices.append((enrollment.owner.aeriesid,Markup(f"{sortCohort} {enrollment.owner.lname}, {enrollment.owner.fname} <a href='/profile/{enrollment.owner.aeriesid}'>&#128279;</a>")))
 
     # If there are students who did not checkin get a list of all their user objects
 

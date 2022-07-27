@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1>{{gclass.gclassdict.name}}</h1>
+<br>
+<br>
+<a class="btn-sm btn-primary" data-bs-toggle="collapse" href="#collapseCourseWork" role="button" aria-expanded="false" aria-controls="collapseCourseWork">
+    Assignments
+</a>
+
+<div class="collapse" id="collapseCourseWork">
+    <a href="/roster/{{gclass.gclassdict['id']}}">Update</a>
+    
+    <div class="row">
+    {% for ass in gCourseWork %}
+        <div class="col-3">
+            {{ass.courseworkdict['title']}} {{ass.courseworkdict['workType']}} 
+        </div>
+    {% endfor %}
+    </div>
+</div>
+
+<br><br>
+<a class="btn-sm btn-primary" data-bs-toggle="collapse" href="#collapseRoster" role="button" aria-expanded="false" aria-controls="collapseRoster">
+    Roster
+</a>
+
+<div class="collapse" id="collapseRoster">
+    <a href="/roster/{{gclass.gclassdict['id']}}">Update</a>
+    
+    <div class="row">
+    {% for enrollment in enrollments %}
+        <div class="col-3">
+            {{ enrollment.owner.fname }} {{ enrollment.owner.lname }}
+        </div>
+    {% endfor %}
+    </div>
+</div>
+<br> <br>
+<a class="btn-sm btn-primary" data-bs-toggle="collapse" href="#collapseGoogleDetails" role="button" aria-expanded="false" aria-controls="collapseGoogleDetails">
+    Google Classroom Settings
+</a>
+<div class="collapse" id="collapseGoogleDetails">
+    <table class="table">
+    {% for item in gclass.gclassdict %}
+    <tr>
+        <th>{{item}}</th>
+        <td>{{gclass.gclassdict[item]}}</td>
+    </tr>
+    {% endfor %}
+    </table>
+</div>
+{% endblock %}

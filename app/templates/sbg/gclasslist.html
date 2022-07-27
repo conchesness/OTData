@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<a href="/getgclasses">Update</a> <br>
+{% if enrollments %}
+
+    {% for enrollment in enrollments | sort(attribute="status") %}
+        {{enrollment.status}} <a href="/gclass/{{enrollment.gclassroom.gclassdict.id}}">{{enrollment.gclassroom.gclassdict.name}}</a> <br>
+
+    {% endfor %}
+
+{% endif %}
+
+{% endblock %}

@@ -11,11 +11,10 @@
         
         <tr>
             <td>
-                {{groster.roster[i].sortCohort}}
+                {{groster[i].sortCohort}}
             </td>
             <td>
-                {{groster.roster[i].profile.name.fullName}}
-                {% if groster.roster[i].updateGClasses.lower() == "true" %}(u){% endif %}
+                {{groster[i].owner.fname}} {{groster[i].owner.lname}}
                 
                 <form method=post>
                 {{forms["form"+i|string].hidden_tag()}}

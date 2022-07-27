@@ -6,7 +6,8 @@
     <div class="row">
         <div class="col">
             <h1>Google Roster for {{gclassname}}</h1>
-            <em>Email addresses for students and parents of this class at the bottom of the page.</em>
+            <em>Email addresses for students and parents of this class at the bottom of the page.</em> <br>
+            <a href="/getroster/{{gclassid}}">Update roster from google</a>
         </div>
     </div>
     <div class="row">
@@ -17,6 +18,9 @@
                 </tr>
                 </tr>
                 <tr>
+                    <th>
+
+                    </th>
                     <th>
                         <a href="/rostersort/{{gclassid}}" class="btn btn-primary btn-sm" role="button">Cohorts</a>
 
@@ -29,31 +33,38 @@
                     <th>Pending Invites<br><small>to someone</small></th>
                     <th>Invite These Adults<br><small>click their names</small></th>
                 </tr>
+            {% if otdstus %}
             {% for stu in otdstus %}
-            {% if stu['otdobject'] %}
                 <tr>
+                    <td nowrap>
+                        <a data-toggle="tooltip" data-placement="top" title='Delete' href="/genrollment/delete/{{stu.id}}/{{stu.gclassroom.gclassid}}">
+                            <img src="/static/delete.png" width="20">
+                        </a>
+                        <br>
+                        <small>{{moment(stu.createdate).calendar()}}</small>    
+                    </td>
                     <td>
-                        {% if stu.sortCohort %}{{stu.sortCohort}}{% endif %}
+                        {% if stu.owner.sortCohort %}{{stu.owner.sortCohort}}{% endif %}
                     </td>
                     <td nowrap>
-                        <a href="/profile/{{stu['otdobject'].aeriesid}}">{{stu['otdobject'].afname}} {{stu['otdobject'].alname}}</a> 
-                        {% if stu.updateGClasses == "True" %}
-                        <a data-toggle="tooltip" data-placement="top" title="Update the student's classes" href="/addgclass/{{stu.profile.emailAddress}}/{{gclassid}}">(u)</a>
-                        {% endif %}
-                        <br>
-                        {% if stu.cohort %}
-                            {% if stu['otdobject'].cohort[:7] == "Oakland" and stu['otdobject'].cohort[13:16] == "Eng" %}
-                                <small>{{stu['otdobject'].cohort[13:]}}</small>
-                            {% elif stu['otdobject'].cohort[:7] == "Oakland" %}
-                                <small>{{stu['otdobject'].cohort[14:]}}</small>
-                            {% else %}
-                                <small>{{stu['otdobject'].cohort}}</small>   
-                            {% endif %}   
-                        {% endif %}         
+                        <a href="/profile/{{stu.owner.aeriesid}}">{{stu.owner.afname}} {{stu.owner.alname}}</a> 
+                        {% if stu.owner.updateGClasses == "True" %}
+                            <a data-toggle="tooltip" data-placement="top" title="Update the student's classes" href="/addgclass/{{stu.owner.profile.emailAddress}}/{{gclassid}}">(u)</a>
+                        {% endif %} 
+                        <br> 
+                        {% if stu.owner.cohort %}
+                        {% if stu.owner.cohort[:7] == "Oakland" and stu.owner.cohort[13:16] == "Eng" %}
+                            <small>{{stu.owner.cohort[13:]}}</small>
+                        {% elif stu.owner.cohort[:7] == "Oakland" %}
+                            <small>{{stu.owner.cohort[14:]}}</small>
+                        {% else %}
+                            <small>{{stu.owner.cohort}}</small>   
+                        {% endif %}   
+                    {% endif %}
                     </td>
                     <td>
-                        {% if stu['otdobject'].gclassguardians %}
-                        {% for guardian in stu['otdobject'].gclassguardians.guardians %}
+                        {% if stu.owner.gclassguardians %}
+                        {% for guardian in stu.owner.gclassguardians.guardians %}
                             {% if guardian.guardianProfile and guardian.guardianProfile.id %}
                                 {{guardian.guardianProfile.name.fullName}}
                             {% endif %}
@@ -61,28 +72,27 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if stu['otdobject'].gclassguardianinvites %}
-                        {% for invite in stu['otdobject'].gclassguardianinvites.guardianInvitations %}
+                        {% if stu.owner.gclassguardianinvites %}
+                        {% for invite in stu.owner.gclassguardianinvites.guardianInvitations %}
                         <small>{{invite.creationTime[5:10]}}-{{invite.creationTime[2:4]}}</small> <br>
                         {% endfor %}
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/inviteguardians/{{stu['otdobject'].gid}}/{{gclassid}}/{{gclassname}}">
-                            {% if stu['otdobject'].adults %}
-                            {% for adult in stu['otdobject'].adults %}
+                        <a href="/inviteguardians/{{stu.owner.gid}}/{{gclassid}}/{{gclassname}}">
+                            {% if stu.owner.adults %}
+                            {% for adult in stu.owner.adults %}
                                 {{adult.fname}} {{adult.lname}}, 
                             {% endfor %}
-                            {% elif stu['otdobject'].aadults %}
-                                {{stu['otdobject'].aadults}}
+                            {% elif stu.owner.aadults %}
+                                {{stu.owner.aadults}}
                             {% endif %}
                         </a>
                     </td>
                 </tr>
-            {% else %}
-                <tr><td></td><td>{{stu['profile']['name']['fullName']}} is not in OTData </td></tr>
-            {% endif %}
+
             {% endfor %}
+            
             </table>
             <br>
             <small>
@@ -93,35 +103,40 @@
             </small>
             <br> <br>
             <b>Student Emails:</b>
-            
-            {% set cohort = {'currCohort' : otdstus[0].sortCohort} %}
-            <h3>{{otdstus[0]['otdobject'].sortCohort}}</h3>
+            <!-- This gets the sortCohort from the students record and uses it if it is different that what is in otdstus
+                 TODO this needs to be fixed so that it makes more sense. It may not be necessary because roster.py 
+                 also gets this value from the User's record in the getroster function.-->
+            {% set cohort = {'currCohort' : otdstus.sortCohort} %}
+            <h3>{{otdstus.sortCohort}}</h3>
 
             {% for stu in otdstus %}
-                {% if stu.sortCohort != cohort.currCohort %}
-                    <h3>{{stu.sortCohort}}</h3>
-                    {% do cohort.update({'currCohort' : stu.sortCohort}) %}
+                {% if stu.owner.sortCohort != cohort.currCohort %}
+                    <h3>{{stu.owner.sortCohort}}</h3>
+                    {% do cohort.update({'currCohort' : stu.owner.sortCohort}) %}
                 {% endif %}
-                {{ stu.profile.emailAddress }}, 
+                {{ stu.owner.otemail }}, 
             {% endfor %}
 
             <br> <br>
             <b>Parent Emails:</b> 
-            {% set cohort = {'currCohort' : otdstus[0].sortCohort} %}
-            <h3>{{otdstus[0].sortCohort}}</h3>
+            {% set cohort = {'currCohort' : otdstus.sortCohort} %}
+            <h3>{{otdstus.sortCohort}}</h3>
             {% for stu in otdstus %}
-                {% if stu.sortCohort != cohort.currCohort %}
-                    <h3>{{stu.sortCohort}}</h3>
-                    {% do cohort.update({'currCohort' : stu.sortCohort}) %}
+                {% if stu.owner.sortCohort != cohort.currCohort %}
+                    <h3>{{stu.owner.sortCohort}}</h3>
+                    {% do cohort.update({'currCohort' : stu.owner.sortCohort}) %}
                 {% endif %}
-                {% if stu['otdobject'] and stu['otdobject'].adults %}
-                    {% for adult in stu['otdobject'].adults %}
+                {% if stu and stu.owner.adults %}
+                    {% for adult in stu.owner.adults %}
                         {{ adult.email }}, 
                     {% endfor %}
-                {% elif stu['otdobject'] and stu['otdobject'].aadultemail %}
-                    {{stu['otdobject'].aadultemail}},
+                {% elif stu and stu.owner.aadultemail %}
+                    {{stu.owner.aadultemail}},
                 {% endif %}
-            {% endfor %}        
+            {% endfor %}   
+        {% else %}
+        No Roster
+        {% endif %}     
         </div>
     </div>
 </div>

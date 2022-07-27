@@ -500,7 +500,6 @@ def mailmerge():
         row.append(emails)
     
         mmlist.append(row)
-    print(mmlist)
     return render_template('array.html', array=mmlist, nested=True)
 
 @app.route("/csseniors")

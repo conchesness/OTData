@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h1>Standards</h1>
+<a href="/standard/new">New Standard</a> <br>
+<table class="table">
+    <tr><td></td><th>Standard</th><th>Description</th><th>Class</th><th>Teacher</th></tr>
+    {% for standard in standards %}
+        <tr>
+            <td>
+                <a href="/standard/edit/{{standard.id}}"><img width="20" src="/static/edit.png"></a>
+                <a href="/standard/delete/{{standard.id}}"><img width="20" src="/static/delete.png"></a>
+            </td>
+            <td>{{standard.name}}</td>
+            <td>{{standard.desc}}</td>
+            <td>{{standard.gclass.gclassdict['name']}}</td>
+            <td>{{standard.gclass.teacher.fname}} {{standard.gclass.teacher.lname}}</td>
+        </tr> 
+    {% endfor %}
+</table>
+<br><br>
+
+{% endblock %}

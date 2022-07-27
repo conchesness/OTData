@@ -20,7 +20,8 @@ SCOPESOT = [
     'https://www.googleapis.com/auth/classroom.coursework.students',
     'https://www.googleapis.com/auth/classroom.coursework.me.readonly',
     #'https://www.googleapis.com/auth/classroom.profile.photos',
-    'https://www.googleapis.com/auth/classroom.guardianlinks.students'
+    'https://www.googleapis.com/auth/classroom.guardianlinks.students',
+    'https://www.googleapis.com/auth/classroom.topics'
     ]
  
 SCOPESCOMMUNITY = [

@@ -13,9 +13,9 @@ app = Flask(__name__)
 app.jinja_env.add_extension('jinja2.ext.do')
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY") # or os.urandom(20)
 # you must change the next line to be link to your database at mongodb.com
-connect("otdata", host=f"{os.environ.get('mongodb_host')}/otdata?retryWrites=true&w=majority")
+# connect("otdata", host=f"{os.environ.get('mongodb_host')}/otdata?retryWrites=true&w=majority")
 # Sandbox DB
-# connect("otdatasb", host=f"{os.environ.get('mongodb_host')}/otdatasb?retryWrites=true&w=majority")
+connect("otdatasb", host=f"{os.environ.get('mongodb_host')}/otdatasb?retryWrites=true&w=majority")
 
 moment = Moment(app)
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
-from app.classes.data import User, GoogleClassroom
+from app.classes.data import GEnrollment, User, GoogleClassroom
 from app.classes.forms import GClassForm
 import mongoengine.errors
 import google.oauth2.credentials
@@ -26,15 +26,7 @@ def addgclass(gmail,gclassid):
         flash(f"Got an error: {error}")
         flash("I can't find this user in OTData.")
         return redirect(url_for('roster',gclassid=gclassid))
-    
-    try:
-        stu.gclasses.get(gclassid=gclassid)
-    except mongoengine.errors.DoesNotExist:
-        pass
-    else:
-        flash(f"{stu.fname} {stu.lname} already has this class stored in OTData.")
-        return redirect(url_for('roster',gclassid=gclassid))
-    
+
     try:
         gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     except Exception as error:
@@ -42,13 +34,20 @@ def addgclass(gmail,gclassid):
         flash(f"Could not find this class in list of Google Classrooms at OTData.")
         return redirect(url_for('roster',gclassid=gclassid))
     else:
-        stu.gclasses.create(
-            gclassid=gclassid,
-            gclassroom = gClassroom
-            )
-        stu.save()
-        flash(f"This class has been added to the OTData classes for {stu.fname} {stu.lname}.")
+        try:
+            stu.gclasses.get(gclassid=gclassid)
+        except mongoengine.errors.DoesNotExist:
+            stu.gclasses.create(
+                gclassid=gclassid,
+                gclassroom = gClassroom
+                )
+            stu.save()
+        else:
+            flash(f"{stu.fname} {stu.lname} already has this class stored in OTData.")
+            return redirect(url_for('roster',gclassid=gclassid))
 
+    flash(f"This class has been added to the OTData classes for {stu.fname} {stu.lname}.")
+    
     return redirect(url_for('roster',gclassid=gclassid))
 
 @app.route('/student/getstudentwork/<gclassid>')
@@ -84,7 +83,6 @@ def getstudentwork(gclassid):
 
         studSubsAll.extend(studSubs['studentSubmissions'])
         pageToken = studSubs.get('nextPageToken')
-        print(counter)
         counter=counter+1
         if not pageToken:
             break
@@ -110,7 +108,6 @@ def mywork():
     for myClass in myClasses:
         myWorkList = myWorkList + myClass.submissions['mySubmissions']
         if not myClass.gclassroom.courseworkdict or myClass.gclassroom.courseworkupdate - dt.timedelta(1) > dt.datetime.utcnow():
-            print(myClass.gclassroom.courseworkupdate - dt.timedelta(1) > dt.datetime.utcnow())
             courseWork = getCourseWork(myClass.gclassid)
             if courseWork == "refresh":
                 return redirect(url_for('authorize'))
@@ -169,7 +166,7 @@ def mywork():
 
 #     #Create a list of students
 #     dictfordf = {}
-#     for row in gClassroom.groster['roster']:
+#     for row in gClassroom.groster:
 #         newRow = {'userId':row['userId'],'name':row['profile']['name']['fullName'],'email':row['profile']['emailAddress']}
 #         dictfordf[row['userId']] = newRow
 
@@ -274,6 +271,7 @@ def mywork():
 @app.route('/studsubs/<gclassid>')
 def studsubs(gclassid):
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    enrollments = GEnrollment.objects(gclassroom=gClassroom)
 
     try:
         subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
@@ -283,10 +281,12 @@ def studsubs(gclassid):
 
     subsDF = subsDF.drop('id', 1)
 
+    subsDF = subsDF[['userId', 'courseId', 'courseWorkId', 'creationTime', 'updateTime', 'state', 'alternateLink', 'courseWorkType', 'assignmentSubmission', 'submissionHistory', 'late', 'draftGrade', 'assignedGrade']]
+
     dictfordf = {}
-    for row in gClassroom.groster['roster']:
-        newRow = {'userId':row['userId'],'name':row['profile']['name']['fullName'],'email':row['profile']['emailAddress']}
-        dictfordf[row['userId']] = newRow
+    for row in enrollments:
+        newRow = {'userId':row['owner']['gid'],'fname':row['owner']['fname'],'lname':row['owner']['lname'],'email':row['owner']['otemail']}
+        dictfordf[row['owner']['id']] = newRow
 
     stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
 
@@ -316,10 +316,6 @@ def studsubs(gclassid):
     median = round(gbDF['On Time %'].median(),2)
     mean = round(gbDF['On Time %'].mean(), 2)
 
-    
-    #gbDF = gbDF.sort_values(by=['TotalMissing'], ascending=False)
-    # stuListDF = gbDF.sort_values(by=['TotalMissing'], ascending=False)
-    # stuListDF.drop(['missingLink'],1,inplace=True)\
     stuList = gbDF.reset_index(level=0)
     stuList = stuList.values.tolist()
 
@@ -377,9 +373,14 @@ def studsubs(gclassid):
 
     return render_template('studsubs.html',gClassroom=gClassroom,parents=parents,displayDFHTML=displayDFHTML,median=median,mean=mean)
 
+# TODO split this in to a get and view function. Save the studsubs to the enrollments?
+# @app.route('/studsubs/<gclassid>')
+# def getstudsubs(gclassid,stuid=None):
+#     pass
 
+@app.route('/getstudsubs/<gclassid>/<stuid>')
 @app.route('/getstudsubs/<gclassid>')
-def getstudsubs(gclassid):
+def getstudsubs(gclassid,stuid=None):
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     # setup the Google API access credentials
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
@@ -409,10 +410,12 @@ def getstudsubs(gclassid):
 
         studSubsAll.extend(studSubs['studentSubmissions'])
         pageToken = studSubs.get('nextPageToken')
-        print(counter)
         counter=counter+1
         if not pageToken:
             break
+
+    for sub in studSubsAll:
+        break
 
     dictfordf = {}
     for row in studSubsAll:
@@ -429,7 +432,7 @@ def getstudsubs(gclassid):
 
     return redirect(url_for('studsubs',gclassid=gclassid))
 
-
+## Replicated in sbg.py as gclasslist
 # this function exists to update the stored values for one or more google classrooms
 @app.route('/gclasses')
 def gclasses(gclassid=None):
@@ -532,33 +535,39 @@ def gclasses(gclassid=None):
 @app.route('/editgclass/<gclassid>', methods=['GET', 'POST'])
 def editgclass(gclassid):
     currUser = User.objects.get(pk=session['currUserId'])
-    editGClass = currUser.gclasses.get(gclassid = gclassid)
+    gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    enrollment = GEnrollment.objects.get(owner=currUser,gclassroom=gclassroom)
     
     form = GClassForm()
 
     if form.validate_on_submit():
-        currUser.gclasses.filter(gclassid = gclassid).update(
-            classname = form.classname.data, 
+        enrollment.update(
+            classnameByUser = form.classname.data, 
             status = form.status.data
         )
 
-        currUser.gclasses.filter(gclassid = gclassid).save()
         return redirect(url_for('checkin'))
 
-    if editGClass.classname:
-        form.classname.data = editGClass.classname
+    if enrollment.classnameByUser:
+        form.classname.data = enrollment.classnameByUser
     else:
-        form.classname.data = editGClass.gclassroom.gclassdict['name']
+        form.classname.data = enrollment.gclassroom.gclassdict['name']
     
-    if editGClass.status:
-        form.status.data = editGClass.status
+    if enrollment.status:
+        form.status.data = enrollment.status
 
-    return render_template('editgclass.html', form = form, editGClass = editGClass)
+    return render_template('editgclass.html', form = form, editGClass = enrollment)
 
 @app.route('/deletegclass/<gclassid>', methods=['GET', 'POST'])
 def deletegclass(gclassid):
-    currUser = User.objects.get(pk=session['currUserId'])
-    currUser.gclasses.filter(gclassid = gclassid).delete()
-    currUser.gclasses.filter(gclassid = gclassid).save()
-
+    
+    if session['role'].lower() == "student":
+        flash("Students can't delete enrollments.")
+    else:
+        currUser = User.objects.get(pk=session['currUserId'])
+        gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+        enrollment = GEnrollment.objects.get(owner=currUser,gclassroom=gclassroom)
+        enrollment.delete()
+        flash("deleted")
+    
     return redirect(url_for('checkin'))

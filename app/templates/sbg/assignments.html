@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<!-- Available variables: asses, gClass -->
+
+    <h1>Assignments for <a href="/gclass/{{gClass.gclassid}}">{{gClass.gclassdict.name}}</a></h1>
+    <a href="/getcoursework/{{gClass.gclassid}}">Update Assignments</a> <br>
+    
+    <table class="table">
+        <tr><th>Title</th><th>Mastery</th><th>Standards</th><th>Type</th><th>Due</th><th>Max Points</th></tr>
+    {% for ass in asses %}
+    <tr>
+        <td>
+            <a href="/assignment/{{ass.id}}">{{ass.courseworkdict.title}}</a>
+            <a target="_blank" href="{{ass.courseworkdict.alternateLink}}"><img width="10" src="/static/google.png"></a> 
+        </td>
+        <td>
+            {% if ass.courseworkdict['gradeCategory'] %}
+                {{ ass.courseworkdict['gradeCategory']['name'] }}
+            {% endif %}
+        </td>
+        <td>
+            {% if ass.standards|length > 0 %}
+                {% for standard in ass.standards %}
+                    {% if ass.standards|length == loop.index %}
+                        {{ standard.name }}
+                    {% else %}
+                        {{standard.name}},
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                ---
+            {% endif %}
+        </td>
+        <td>
+            {{ass.courseworkdict.workType}}
+        </td>
+        <td>
+            {% if ass.courseworkdict.dueDate %}
+                {{ass.courseworkdict.dueDate.month}}/{{ass.courseworkdict.dueDate.day}}/{{ass.courseworkdict.dueDate.year}}
+            {% endif %}
+        </td>
+        <td>
+            {% if ass.courseworkdict.maxPoints %}
+                {{ass.courseworkdict.maxPoints}}
+            {% elif ass.courseworkdict.gradeCategory %}
+                {{ass.courseworkdict.gradeCategory.defaultGradeDenominator}}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

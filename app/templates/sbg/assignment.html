@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h4><a href="/gclass/assignments/{{ass.gclassroom.gclassid}}">{{ass.gclassroom.gclassdict.name}}</a></h4>
+
+<h1>{{ass.courseworkdict.title}}</h1>
+<h5>Standards: 
+    {% for standard in ass.standards %}
+        {% if ass.standards|length > loop.index %}
+            {{standard.name}},
+        {% else %}
+            {{standard.name}}
+        {% endif %}
+    {% endfor %}
+</h5>
+{{ass.courseworkdict.description}}
+
+
+{% for field in form.errors %}
+{% for error in form.errors[field] %}
+    <div class="alert alert-error">
+        <strong>Error!</strong>{{field}}: {{error}}
+    </div>
+{% endfor %}
+{% endfor %}
+<br><br> <b>Edit Standards</b> <br>
+<form method=post>
+{{ form.hidden_tag() }}
+{% for standard in form.standards %}
+    {{standard}} {{standard.label}}
+{% endfor %}
+{{form.submit()}}
+</form> <br>
+<a href="/standard/list">See all Standards</a> <br>
+<br><br>
+
+{% for item in ass %}
+{% if item == 'courseworkdict' %}
+<b>courseworkdict:</b> <br>
+    {% for item in ass.courseworkdict %}
+        &emsp;<b>{{item}}:</b> {{ass.courseworkdict[item]}} <br>
+    {% endfor %}
+{% else %}
+    <b>{{item}}:</b> {{ass[item]}} <br>
+{% endif %}
+{% endfor %}
+
+<br><br>
+
+{% endblock %}

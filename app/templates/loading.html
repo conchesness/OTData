@@ -7,6 +7,7 @@
         <img src="/static/loading.gif">
     </center>
     <br>
+    {% if total %}
     <div class="row">
         {% for i in range(total) %}
             <div class="col-1 border {% if i < nextIndex %}bg-success{% else %}bg-secondary{% endif %}"><br></div>
@@ -15,13 +16,12 @@
     <center>
         <h1>{{nextIndex}} / {{total}}</h1>
     </center>
+    {% endif %}
     <br>
 </div>
 
-
-
 <script type="text/javascript">
-    window.location.replace('{{url}}/{{nextIndex}}');
+    window.location.replace('{{url}}');
 </script>
 
 {% endblock %}

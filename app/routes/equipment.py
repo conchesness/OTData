@@ -8,7 +8,6 @@ from  datetime import datetime, date
 @app.route('/comp/list')
 def complist():
     computers = Equipment.objects()
-    print(computers)
     return (render_template('computers.html', computers = computers))
 
 @app.route('/comp/new', methods=['GET', 'POST'])

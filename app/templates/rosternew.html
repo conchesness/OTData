@@ -44,7 +44,7 @@
                         <small>{{moment(stu.createdate).calendar()}}</small>    
                     </td>
                     <td>
-                        {% if stu.owner.sortCohort %}{{stu.owner.sortCohort}}{% endif %}
+                        {% if stu.owner.sortCohort %}{{stu.owner.sortCohort}}{%else%}-{% endif %}
                     </td>
                     <td nowrap>
                         <a href="/profile/{{stu.owner.aeriesid}}">{{stu.owner.afname}} {{stu.owner.alname}}</a> 

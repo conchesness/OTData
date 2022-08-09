@@ -138,8 +138,8 @@ class User(Document):
     # Data that can be edited
     lat = FloatField()
     lon = FloatField()
-    fname = StringField()
-    lname = StringField()
+    fname = StringField(default=afname)
+    lname = StringField(default=alname)
     isadmin = BooleanField(default=False)
     pronouns = StringField()
     ufname = StringField()
@@ -391,8 +391,8 @@ class Schedule(Document):
     classes = EmbeddedDocumentListField(ScheduleClass)
     
 class StudentSubmission(Document):
-    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
-    student = ReferenceField('User', required=True)
+    #student = ReferenceField('User', required=True)
+    stugid = StringField(required=True)
     gclassroom = ReferenceField('GoogleClassroom', required=True)
     studsubid = StringField(unique=True, required=True)
     studsubdict = DictField(required=True)

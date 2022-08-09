@@ -12,6 +12,8 @@ import googleapiclient.discovery
 from google.auth.exceptions import RefreshError
 import ast
 
+# This function retreives all the assignments from Google and stores them in a dictionary
+# field on the GoogleClassroom record in the database. 
 def getCourseWork(gclassid):
     pageToken = None
     assignmentsAll = {}
@@ -20,7 +22,9 @@ def getCourseWork(gclassid):
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
     else:
-        return redirect('/authorize')    
+        flash("need to refresh your connection to Google Classroom.")
+        return "refresh"
+        # return redirect('/authorize')    
     
     session['credentials'] = credentials_to_dict(credentials)
     classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
@@ -39,6 +43,7 @@ def getCourseWork(gclassid):
             flash('Your login has expired. You need to re-login.')
             return "refresh"
         elif errorDict['error']['status'] == "PERMISSION_DENIED":
+            flash("You do not have permission to get assignments from Google for this class.")
             return "refresh"
         else:
             flash(f"Got unknown Error: {errorDict}")
@@ -47,7 +52,7 @@ def getCourseWork(gclassid):
     topics = topics['topic']
 
     # Topic dictionary
-    # {'topic': [{'courseId': '450501150888', 'topicId': '487477497511', 'name': 'Dual Enrollment', 'updateTime': '2022-05-20T20:55:41.926Z'}, {'courseId': '450501150888', 'topicId': '505672056559', 'name': 'Final Project', 'updateTime': '2022-05-12T14:58:57.683Z'}, {'courseId': '450501150888', 'topicId': '485278955186', 'name': 'Data', 'updateTime': '2022-04-26T15:06:17.856Z'}, {'courseId': '450501150888', 'topicId': '499746506037', 'name': 'AP Test', 'updateTime': '2022-04-19T14:38:23.571Z'}, {'courseId': '450501150888', 'topicId': '465875906224', 'name': 'AP Create Task', 'updateTime': '2022-04-19T14:35:36.202Z'}, {'courseId': '450501150888', 'topicId': '499963674375', 'name': 'College Admissions/Extracurriculars', 'updateTime': '2022-04-12T15:09:31.055Z'}, {'courseId': '450501150888', 'topicId': '451384718116', 'name': 'Meta', 'updateTime': '2022-04-12T15:08:15.762Z'}, {'courseId': '450501150888', 'topicId': '499929022347', 'name': 'KT', 'updateTime': '2022-04-11T17:25:10.329Z'}, {'courseId': '450501150888', 'topicId': '492894602389', 'name': 'Not Doing the AP Test', 'updateTime': '2022-03-29T16:36:34.493Z'}, {'courseId': '450501150888', 'topicId': '469015977415', 'name': 'Lists and Traversals', 'updateTime': '2022-02-10T15:30:13.072Z'}, {'courseId': '450501150888', 'topicId': '451202417325', 'name': 'Turtle!', 'updateTime': '2022-02-07T17:06:07.185Z'}]}
+    # [{'courseId': '450501150888', 'topicId': '487477497511', 'name': 'Dual Enrollment', 'updateTime': '2022-05-20T20:55:41.926Z'}, {...}]
 
     # TODO get all assignments and add as dict to gclassroom record
     while True:
@@ -58,20 +63,6 @@ def getCourseWork(gclassid):
                     ).execute()
         except RefreshError:
             return "refresh"
-        except Exception as error:
-            x, y = error.args     # unpack args
-            if isinstance(y, bytes):
-                y = y.decode("UTF-8")
-            errorDict = ast.literal_eval(y)
-            if errorDict['error'] == 'invalid_grant':
-                flash('Your login has expired. You need to re-login.')
-                return "refresh"
-            elif errorDict['error']['status'] == "PERMISSION_DENIED":
-                return "refresh"
-            else:
-                flash(f"Got unknown Error: {errorDict}")
-                return False
-
         except Exception as error:
             x, y = error.args     # unpack args
             if isinstance(y, bytes):
@@ -97,9 +88,14 @@ def getCourseWork(gclassid):
 
     for ass in assignmentsAll['courseWork']:
         for topic in topics:
+            try:
+                ass['topicId']
+            except:
+                ass['topicId'] = None
             if topic['topicId'] == ass['topicId']:
                 ass['topic'] = topic['name']
                 break
+
         
     gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     gclassroom.update(courseworkdict = assignmentsAll, courseworkupdate = dt.utcnow())
@@ -120,10 +116,14 @@ def roster(gclassid):
 
     otdstus = []
     for enrollment in enrollments:
-        if enrollment.owner.role.lower() == "student":
+        if enrollment.owner.role.lower() == 'student' and enrollment.owner.lname and enrollment.owner.fname:
             otdstus.append(enrollment)
-
-    otdstus = sorted(otdstus, key = lambda i: (i.sortCohort,i.owner.lname,i.owner.fname))
+        elif enrollment.owner.role.lower() == 'student':
+            flash(f"Something's wrong with this students record so they were not included in the roster.: {enrollment.owner.otemail}")
+    try:
+        otdstus = sorted(otdstus, key = lambda i: (i.sortCohort,i.owner.lname,i.owner.fname))
+    except Exception as error:
+        flash(f"Sort failed in the roster route with error: {error}")
 
     return render_template('rosternew.html',gclassname=gclassroom.gclassdict['name'], gclassid=gclassid, otdstus=otdstus)
 
@@ -416,6 +416,10 @@ def getcw(gclassid,stage=0, index=0):
         for gAss in gClassroom.courseworkdict['courseWork'][index:index+numIterations]:
             index=index+1
             # TODO save assignment to gcoursework document
+            try:
+                gAss['topic']
+            except:
+                gAss['topic'] = None
             newCourseWork = CourseWork(
                 courseworkdict = gAss,
                 courseworkid = gAss['id'],
@@ -528,22 +532,12 @@ def nummissing(gclassid,index=0):
 def missingassignmentslist(aeriesid):
     stu = User.objects.get(aeriesid=aeriesid)
     for gclass in stu.gclasses:
-        # if gclass.missingasses:
-        #     for missingAss in gclass.missingasses:
-        #         if missingAss in 
-        # update the assignment list if there is none
         if gclass.status and gclass.status.lower() == "active":
-            getCourseWorkResult = getCourseWork(gclass.gclassid)
-            if getCourseWorkResult == "AUTHORIZE":
+            result = getCourseWork(gclass.gclassid)
+            if result == "refresh":
                 return redirect(url_for('authorize'))
-            elif getCourseWorkResult == "PERMISSION_DENIED":
-                flash(f"You do not have permission to access {gclass.gclassroom.gclassdict['name']} for this student.")
-            elif not getCourseWorkResult:
-                flash(f"An error occured. I was unable to update the assignment list for {gclass.gclassroom.gclassdict['name']}.")
-            elif getCourseWorkResult:
-                flash(f"Saved assignment list for {gclass.gclassroom.gclassdict['name']}")
-
-    return render_template('missasslist.html.j2',stu=stu)
+            elif result == False:
+                return redirect(url_for('checkin'))
 
 @app.route('/rostersort/<gclassid>/<sort>', methods=['GET', 'POST'])
 @app.route('/rostersort/<gclassid>', methods=['GET', 'POST'])

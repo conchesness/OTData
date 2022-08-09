@@ -2,18 +2,34 @@
 
 {% block body %}
 
-<h4><a href="/gclass/assignments/{{ass.gclassroom.gclassid}}">{{ass.gclassroom.gclassdict.name}}</a></h4>
+<h4>{{ass.gclassroom.gclassdict.name}}</h4> 
+<a href="/gclass/assignments/{{ass.gclassroom.gclassid}}">All Assignments</a> <br>
+<a href="/standard/list">All Standards</a> <br>
 
 <h1>{{ass.courseworkdict.title}}</h1>
 <h5>Standards: 
-    {% for standard in ass.standards %}
-        {% if ass.standards|length > loop.index %}
-            {{standard.name}},
-        {% else %}
-            {{standard.name}}
-        {% endif %}
-    {% endfor %}
+    {% if ass.standards|length == 0 %}
+    None
+    {% else %}
+        {% for standard in ass.standards %}
+            {% if ass.standards|length > loop.index %}
+                {{standard.name}},
+            {% else %}
+                {{standard.name}}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 </h5>
+{% if ass.courseworkdict['gradeCategory'] %}
+    <h5>
+        Category: {{ass.courseworkdict['gradeCategory']['name']}}
+    </h5>
+{% endif %}
+{% if ass.topic %}
+    <h5>
+        Topic: {{ass.topic}}
+    </h5>
+{% endif %}
 {{ass.courseworkdict.description}}
 
 
@@ -32,7 +48,6 @@
 {% endfor %}
 {{form.submit()}}
 </form> <br>
-<a href="/standard/list">See all Standards</a> <br>
 <br><br>
 
 {% for item in ass %}

@@ -2,11 +2,10 @@ from app import app
 from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
 from app.classes.data import User, GoogleClassroom, GEnrollment, CourseWork, Standard
 from app.classes.forms import AssignmentForm, StandardForm
-import mongoengine.errors
+from bson.objectid import ObjectId
 import google.oauth2.credentials
 import googleapiclient.discovery
 from google.auth.exceptions import RefreshError
-import datetime as dt
 from .users import credentials_to_dict
 #from .roster import getCourseWork
 
@@ -166,9 +165,11 @@ def standardedit(standardid):
     form = StandardForm()
     standardEdit = Standard.objects.get(id = standardid)
     if form.validate_on_submit():
+        print(form.gclass.data)
         standardEdit.update(
             name = form.name.data,
-            desc = form.desc.data
+            desc = form.desc.data,
+            gclass = ObjectId(form.gclass.data)
             )
         return redirect(url_for('standardlist'))
     if session['role'].lower() == 'teacher':

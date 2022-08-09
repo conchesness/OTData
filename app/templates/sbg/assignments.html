@@ -5,14 +5,20 @@
 
     <h1>Assignments for <a href="/gclass/{{gClass.gclassid}}">{{gClass.gclassdict.name}}</a></h1>
     <a href="/getcoursework/{{gClass.gclassid}}">Update Assignments</a> <br>
+    <a href="/ontimeperc/{{gClass.gclassid}}">On Time Percentages</a> <br>
     
     <table class="table">
-        <tr><th>Title</th><th>Mastery</th><th>Standards</th><th>Type</th><th>Due</th><th>Max Points</th></tr>
+        <tr><th>Title</th><th>Topic</th><th>Category</th><th>Standards</th><th>Type</th><th>Due</th><th>Max Points</th></tr>
     {% for ass in asses %}
     <tr>
         <td>
             <a href="/assignment/{{ass.id}}">{{ass.courseworkdict.title}}</a>
             <a target="_blank" href="{{ass.courseworkdict.alternateLink}}"><img width="10" src="/static/google.png"></a> 
+        </td>
+        <td>
+            {% if ass.topic %}
+                {{ ass.topic }}
+            {% endif %}           
         </td>
         <td>
             {% if ass.courseworkdict['gradeCategory'] %}

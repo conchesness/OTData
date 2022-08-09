@@ -1,10 +1,12 @@
 import matplotlib
+
+from app.routes.coursecat import course
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt 
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
-from app.classes.data import GEnrollment, User, GoogleClassroom
+from app.classes.data import GEnrollment, StudentSubmission, User, GoogleClassroom
 from app.classes.forms import GClassForm
 import mongoengine.errors
 import google.oauth2.credentials
@@ -144,142 +146,22 @@ def mywork():
     
     return render_template('mywork.html',displayDFHTML=displayDFHTML)
 
-# TODO delete this route
-# @app.route('/missingclass/<gclassid>/<getparents>')
-# @app.route('/missingclass/<gclassid>')
-# def missingclass(gclassid,getparents=0):
-#     getparents = int(getparents)
-#     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
 
-#     #Get all the student submissions
-#     try:
-#         subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
-#     except:
-#         flash(Markup(f'You need to <a href="/getstudsubs/{gclassid}">update your info from Google Classroom.</a>'))
-#         return redirect(url_for('checkin'))
-
-#     subsDF = subsDF.drop('id', 1)
-
-#     subsDFlink = subsDF.drop_duplicates(subset=['userId'])
-#     subsDFlink = subsDFlink[['userId','alternateLink']]
-#     subsDFlink['missingLink'] = subsDFlink.apply(lambda row: row.alternateLink[0:47]+"/sp"+row.alternateLink[row.alternateLink.find('student/')+7:]+"/m", axis=1)
-
-#     #Create a list of students
-#     dictfordf = {}
-#     for row in gClassroom.groster:
-#         newRow = {'userId':row['userId'],'name':row['profile']['name']['fullName'],'email':row['profile']['emailAddress']}
-#         dictfordf[row['userId']] = newRow
-
-#     stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
-
-#     #Merge the students with the assignments
-#     gbDF = pd.merge(stusDF, 
-#                       subsDF, 
-#                       on ='userId', 
-#                       how ='inner')
-
-#     #Get all the assignments
-#     dictfordf = {}
-#     for row in gClassroom.courseworkdict['courseWork']:
-#         dictfordf[row['id']] = row
-
-#     courseworkDF = pd.DataFrame.from_dict(dictfordf, orient='index')
-#     courseworkDF.rename(columns={"id": "courseWorkId"}, inplace=True)
-
-#     #merge in all the assignments
-#     gbDF = pd.merge(courseworkDF, 
-#                     gbDF, 
-#                     on ='courseWorkId', 
-#                     how ='inner')
-   
-#     gbDF = gbDF.drop(['creationTime_x','updateTime_x','dueTime','maxPoints','assignment','assigneeMode','courseId_y','description','materials','submissionModificationMode','creatorUserId','assignmentSubmission','draftGrade'], 1)
-#     try:
-#         gbDF = gbDF.drop(['shortAnswerSubmission'], 1)
-#     except:
-#         pass
-#     try:
-#         gbDF = gbDF.drop(['individualStudentsOptions'], 1)
-#     except:
-#         pass
-
-#     # drop all rows that are NOT late
-#     gbDF = gbDF.dropna(subset=['late'])
-#     # drop all rows that are turned_in
-#     index_names = gbDF[ gbDF['state_y'] == "TURNED_IN" ].index
-#     gbDF.drop(index_names, inplace = True)
-#     # drop all rows with a grade including zero
-#     index_names = gbDF[ gbDF['assignedGrade'] >= 0 ].index
-#     gbDF.drop(index_names, inplace = True)
-
-#     gbDFpivot = pd.pivot_table(data=gbDF,index=['email'],aggfunc={'email':len})
-
-#     gbDFpivot.rename(columns={"email": "TotalMissing"}, inplace=True)
-#     gbDFpivot.reset_index()
-#     gbDFpivot.rename(columns={"index": "email"}, inplace=True)
-
-#     gbDFpivot = pd.merge(stusDF, 
-#                     gbDFpivot, 
-#                     on ='email', 
-#                     how ='inner')
-
-#     gbDFpivot = pd.merge(subsDFlink, 
-#                 gbDFpivot, 
-#                 on ='userId', 
-#                 how ='inner')
-
-#     gbDFpivot.drop(['alternateLink','userId'],1,inplace=True)
-
-#     gbDFpivot = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
-#     stuListDF = gbDFpivot.sort_values(by=['TotalMissing'], ascending=False)
-#     stuListDF.drop(['missingLink'],1,inplace=True)
-#     stuList = stuListDF.values.tolist()
-#     mmerge=""
-#     if getparents == 1:
-#         for stu in stuList:
-        
-#             email=stu[1].strip()
-#             missing = stu[2]
-            
-#             try:
-#                 stu = User.objects.get(otemail=email)
-#             except:
-#                 if len(email)>1:
-#                     flash( f"couldn't find {email} in our records")
-#             mmerge+=f"{stu.aeriesid},{stu.fname} {stu.lname},{email},{email};"
-
-#             if stu.aadultemail:
-#                 mmerge+=f"{stu.aadultemail};"
-
-#             for adult in stu.adults:
-#                 if adult.email:
-#                     if stu.aadultemail and adult.email != stu.aadultemail:
-#                         mmerge+=f"{adult.email};"
-#                     elif not stu.aadultemail:
-#                         mmerge+=f"{adult.email};"
-
-#             mmerge+=f",{missing}"
-#             mmerge+="****"
-
-#     gbDFpivot['TotalMissing'] = gbDFpivot.apply(lambda row: f'<a target="_blank" href="{row.missingLink}">{row.TotalMissing}</a>', axis=1)
-#     gbDFpivot.reset_index(inplace=True)
-#     gbDFpivot.drop(['index','missingLink'],1,inplace=True)
-
-#     displayDFHTML = Markup(gbDFpivot.to_html(escape=False))
-
-#     return render_template('missingclass.html',gClassroom=gClassroom,displayDFHTML=displayDFHTML,stuList=mmerge)
-
-@app.route('/studsubs/<gclassid>')
-def studsubs(gclassid):
+@app.route('/ontimeperc/<gclassid>')
+def ontimeperc(gclassid):
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     enrollments = GEnrollment.objects(gclassroom=gClassroom)
+    if len(enrollments) < 2:
+        flash("There's no students in your roster.  You need to update your roster")
+        return redirect(url_for('roster',gclassid=gclassid))
 
     try:
         subsDF = pd.DataFrame.from_dict(gClassroom.studsubsdict['studsubs'], orient='index')
     except:
-        flash(Markup(f'You need to <a href="/getstudsubs/{gclassid}">update your info from Google Clasrroom.</a>'))
-        return redirect(url_for('checkin'))
+        flash(Markup(f'You need to <a href="/getstudsubs/{gclassid}">update student submissions.</a>'))
+        return redirect(url_for('gclass',gclassid=gclassid))
 
-    subsDF = subsDF.drop('id', 1)
+    subsDF = subsDF.drop(columns='id')
 
     subsDF = subsDF[['userId', 'courseId', 'courseWorkId', 'creationTime', 'updateTime', 'state', 'alternateLink', 'courseWorkType', 'assignmentSubmission', 'submissionHistory', 'late', 'draftGrade', 'assignedGrade']]
 
@@ -289,7 +171,7 @@ def studsubs(gclassid):
         dictfordf[row['owner']['id']] = newRow
 
     stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
-
+    
     gbDF = pd.merge(stusDF, 
                       subsDF, 
                       on ='userId', 
@@ -306,7 +188,6 @@ def studsubs(gclassid):
                     gbDF, 
                     on ='courseWorkId', 
                     how ='inner')
-
     gbDF.fillna('', inplace=True)
     gbDF['late'] = gbDF['late'].astype('bool')
     gbDF = pd.pivot_table(data=gbDF,index=['email'],aggfunc={'late':np.sum,'email':len})
@@ -373,20 +254,14 @@ def studsubs(gclassid):
 
     return render_template('studsubs.html',gClassroom=gClassroom,parents=parents,displayDFHTML=displayDFHTML,median=median,mean=mean)
 
-# TODO split this in to a get and view function. Save the studsubs to the enrollments?
-# @app.route('/studsubs/<gclassid>')
-# def getstudsubs(gclassid,stuid=None):
-#     pass
-
-@app.route('/getstudsubs/<gclassid>/<stuid>')
-@app.route('/getstudsubs/<gclassid>')
-def getstudsubs(gclassid,stuid=None):
+def getStudSubs(gclassid,courseWorkId="-"):
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     # setup the Google API access credentials
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
     else:
-        return redirect('/authorize')
+        flash('Had to reauthorize your Google credentials.')
+        return "refresh"
     session['credentials'] = credentials_to_dict(credentials)
     classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
     studSubsAll = []
@@ -398,24 +273,38 @@ def getstudsubs(gclassid,stuid=None):
             studSubs = classroom_service.courses().courseWork().studentSubmissions().list(
                 courseId=gclassid,
                 #states=['TURNED_IN','RETURNED','RECLAIMED_BY_STUDENT'],
-                courseWorkId='-',
+                courseWorkId=courseWorkId,
                 pageToken=pageToken
                 ).execute()
         except RefreshError:
             flash('Had to reauthorize your Google credentials.')
-            return redirect('/authorize')
+            return "refresh"
 
         except Exception as error:
-            print(error)
+            flash(f'Unknown error: {error}')
+            return "Refresh"
 
         studSubsAll.extend(studSubs['studentSubmissions'])
         pageToken = studSubs.get('nextPageToken')
         counter=counter+1
         if not pageToken:
             break
+    
+    subsLength = len(studSubsAll)
+    for i,sub in enumerate(studSubsAll):
+        newSub = StudentSubmission(
+            stugid = sub['userId'],
+            gclassroom = gClassroom,
+            studsubid = sub['id'],
+            studsubdict = sub,
+            lastupdate = dt.datetime.utcnow()
+        )
+        notSaved = 0
+        try:
+            newSub.save()
+        except mongoengine.errors.NotUniqueError:
+            pass
 
-    for sub in studSubsAll:
-        break
 
     dictfordf = {}
     for row in studSubsAll:
@@ -426,11 +315,23 @@ def getstudsubs(gclassid,stuid=None):
         studsubsdict = studSubsAll
     )
 
-    getCourseWork(gclassid)
+    return studSubsAll
 
-    gClassroom.reload()
+@app.route('/getstudsubs/<gclassid>/<courseWorkId>')
+@app.route('/getstudsubs/<gclassid>')
+def getstudsubs(gclassid,courseWorkId="-"):
 
-    return redirect(url_for('studsubs',gclassid=gclassid))
+    courseWork = getCourseWork(gclassid)
+    if courseWork == "refresh":
+        return redirect(url_for('authorize'))
+    elif courseWork == False:
+        return redirect(url_for('checkin'))
+
+    studSubsAll = getStudSubs(gclassid,courseWorkId)
+    if studSubsAll == "refresh":
+        return redirect(url_for('authorize'))
+
+    return redirect(url_for('ontimeperc',gclassid=gclassid))
 
 ## Replicated in sbg.py as gclasslist
 # this function exists to update the stored values for one or more google classrooms

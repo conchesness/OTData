@@ -54,7 +54,11 @@ def classdash(gclassid):
     try:
         gClassroom['courseworkdict']['courseWork']
     except:
-        getCourseWork(gclassid)
+        result = getCourseWork(gclassid)
+        if result == "refresh":
+            return redirect(url_for('authorize'))
+        elif result == False:
+            return redirect(url_for('checkin'))
 
     if gClassroom['courseworkdict'] and gClassroom['courseworkdict']['courseWork']:
         for ass in gClassroom['courseworkdict']['courseWork']:

@@ -67,11 +67,13 @@
               {% endif %}
             </td>
             {% if session['role'].lower() == 'student' %}
-            <td>
+            <td>Coming Soon
+              {#              
               <a href="/student/getstudentwork/{{enrollment.gclassroom.gclassdict.id}}"><img width="25" src="/static/update.png"></a>
-              {% if class.submissionsupdate %}
-                <small>{{moment(class.submissionsupdate).calendar()}}</small>
+              {% if enrollment.submissionsupdate %}
+                <small>{{moment(enrollment.submissionsupdate).calendar()}}</small>
               {% endif %}
+              #}
             </td>
             {% endif %}
             <td>

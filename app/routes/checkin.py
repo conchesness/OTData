@@ -70,15 +70,16 @@ def classdash(gclassid):
                     except:
                         break
 
-        if i == 0:
-            sortValue = 0
-            strCount = strCount + 1
-        else:
-            sortValue = float(ass['title'][0:i])
-            numCount = numCount + 1
+            if i == 0:
+                sortValue = 0
+                strCount = strCount + 1
+            else:
+                sortValue = float(ass['title'][0:i])
+                numCount = numCount + 1
 
-        choice = (sortValue,ass['title'])
-        assigns_choices.append(choice)
+            choice = (sortValue,ass['title'])
+            print(choice)
+            assigns_choices.append(choice)
     if strCount > numCount:
         assigns_choices = []
         for ass in gClassroom['courseworkdict']['courseWork']:
@@ -192,10 +193,12 @@ def breakstart(gclassid):
         flash('You already took a break today.')
         return redirect(url_for('classdash',gclassid=gclassid)) 
 
-    gClass = currUser.gclasses.filter(gclassid=gclassid)
-    gClass = gClass[0]
+    #gEnrollment = GEnrollment.objects.get(gclassroom=gclassid,owner=session['currUserId'])
+    #gClass = gEnrollment.gclassroom
 
-    form.gclassid.choices = [(gClass.gclassid,gClass.classname)]
+    gClass = GoogleClassroom.objects.get(gclassid=gclassid)
+    print(gClass.gclassdict)
+    form.gclassid.choices = [(gClass.gclassdict['id'],gClass.gclassdict['name'])]
 
     try:
         tokencount = Token.objects(owner = currUser).count()

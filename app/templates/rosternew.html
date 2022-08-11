@@ -70,11 +70,13 @@
                     <td>
                         <a href="/inviteguardians/{{stu['otdobject'].gid}}/{{gclassid}}/{{gclassname}}">
                             {% if stu['otdobject'].adults %}
+                            (ot)
                             {% for adult in stu['otdobject'].adults %}
-                                <em>{{adult.fname}} {{adult.lname}}</em>, 
+                                {{adult.fname}} {{adult.lname}}, 
                             {% endfor %}
+                            <br>
                             {% elif stu['otdobject'].aadults %}
-                                {{stu['otdobject'].aadults}}
+                                (a){{stu['otdobject'].aadults}}
                             {% endif %}
                         </a>
                     </td>

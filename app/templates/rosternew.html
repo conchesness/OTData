@@ -40,6 +40,7 @@
                         {% if stu.updateGClasses == "True" %}
                         <a data-toggle="tooltip" data-placement="top" title="Update the student's classes" href="/addgclass/{{stu.profile.emailAddress}}/{{gclassid}}">(u)</a>
                         {% endif %}
+                        {% if stu.mobile %}(m){% endif %}
                         <br>
                         {% if stu.cohort %}
                             {% if stu['otdobject'].cohort[:7] == "Oakland" and stu['otdobject'].cohort[13:16] == "Eng" %}
@@ -70,11 +71,11 @@
                     <td>
                         <a href="/inviteguardians/{{stu['otdobject'].gid}}/{{gclassid}}/{{gclassname}}">
                             {% if stu['otdobject'].adults %}
-                            (ot)
+                            <b>(ot)
                             {% for adult in stu['otdobject'].adults %}
                                 {{adult.fname}} {{adult.lname}}, 
                             {% endfor %}
-                            <br>
+                            </b>
                             {% elif stu['otdobject'].aadults %}
                                 (a){{stu['otdobject'].aadults}}
                             {% endif %}
@@ -89,9 +90,10 @@
             <br>
             <small>
                 * Student does not have a record on OTData. Probably 'cause they are frosh on new to the school this year <br>
-                (l) Student has NOT logged in to OTData <br>
-                (e) Student has NOT edited their record <br>
-                (a) Student has NOT added their adults to their record
+                (m) Student has a mobile <br>
+                (u) Student does not have this class as sctive <br>
+                (ot) Parents are rom OTData  <br>
+                (a) parents are from aeries
             </small>
             <br> <br>
             <b>Student Emails:</b>

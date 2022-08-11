@@ -99,7 +99,9 @@
             <b>Student Emails:</b>
             
             {% set cohort = {'currCohort' : otdstus[0].sortCohort} %}
+            {% if otdstus[0]['otdobject']  %}
             <h3>{{otdstus[0]['otdobject'].sortCohort}}</h3>
+            {% endif %}
 
             {% for stu in otdstus %}
                 {% if stu.sortCohort != cohort.currCohort %}

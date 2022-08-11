@@ -40,7 +40,7 @@
                         {% if stu.updateGClasses == "True" %}
                         <a data-toggle="tooltip" data-placement="top" title="Update the student's classes" href="/addgclass/{{stu.profile.emailAddress}}/{{gclassid}}">(u)</a>
                         {% endif %}
-                        {% if stu.mobile %}(m){% endif %}
+                        {% if stu['otdobject'].mobile %}(m){% endif %}
                         <br>
                         {% if stu.cohort %}
                             {% if stu['otdobject'].cohort[:7] == "Oakland" and stu['otdobject'].cohort[13:16] == "Eng" %}

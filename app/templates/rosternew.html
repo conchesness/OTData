@@ -71,7 +71,7 @@
                         <a href="/inviteguardians/{{stu['otdobject'].gid}}/{{gclassid}}/{{gclassname}}">
                             {% if stu['otdobject'].adults %}
                             {% for adult in stu['otdobject'].adults %}
-                                {{adult.fname}} {{adult.lname}}, 
+                                <em>{{adult.fname}} {{adult.lname}}</em>, 
                             {% endfor %}
                             {% elif stu['otdobject'].aadults %}
                                 {{stu['otdobject'].aadults}}

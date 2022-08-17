@@ -59,6 +59,7 @@
                             <small>{{stu.owner.cohort}}</small>   
                         {% endif %}   
                     {% endif %}
+
                     </td>
                     <td>
                         {% if stu.owner.gclassguardians %}
@@ -84,6 +85,7 @@
                             {% endfor %}
                             {% elif stu.owner.aadults %}
                                 {{stu.owner.aadults}}
+
                             {% endif %}
                         </a>
                     </td>
@@ -95,9 +97,10 @@
             <br>
             <small>
                 * Student does not have a record on OTData. Probably 'cause they are frosh on new to the school this year <br>
-                (l) Student has NOT logged in to OTData <br>
-                (e) Student has NOT edited their record <br>
-                (a) Student has NOT added their adults to their record
+                (m) Student has a mobile <br>
+                (u) Student does not have this class as sctive <br>
+                (ot) Parents are rom OTData  <br>
+                (a) parents are from aeries
             </small>
             <br> <br>
             <b>Student Emails:</b>
@@ -106,6 +109,7 @@
                  also gets this value from the User's record in the getroster function.-->
             {% set cohort = {'currCohort' : otdstus.sortCohort} %}
             <h3>{{otdstus.sortCohort}}</h3>
+
 
             {% for stu in otdstus %}
                 {% if stu.owner.sortCohort != cohort.currCohort %}

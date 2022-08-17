@@ -1,4 +1,4 @@
-from app.routes.coursecat import course
+#from app.routes.coursecat import course
 from app import app
 from .scopes import SCOPESOT, SCOPESCOMMUNITY
 from flask import render_template, redirect, url_for, request, session, flash, Markup

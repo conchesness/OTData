@@ -7,6 +7,7 @@ from .students import *
 from .msgs import *
 from .lists import *
 from .classes import *
+from .sbg import *
 from .checkin import *
 from .roster import *
 from .equipment import *

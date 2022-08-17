@@ -5,22 +5,23 @@
   <div class="row">
   <div class="col-12">
     {% if currUser.id|string() == session.currUserId|string() %} <br>
-      <a href="/gclasses" class="btn btn-info btn-sm" role="button">Update All My Classes from Google</a> <-- This script takes a little while to run.
+      <a href="/getgclasses" class="btn btn-info btn-sm" role="button">Update All My Classes from Google</a> <-- This script takes a little while to run.
     {% endif %}
 
     <h1>My Google Classes</h1>
-    {% if gCourses %}
+    <a href="/standard/list">Standards</a>
+    {% if enrollments %}
       <table class="table">
         <thead class="thead-light">
         <tr>
             <td nowrap>
-              <img width="25" src="/static/edit.png"><b>E</b>dit <br>
-              <img width="25" src="/static/delete.png"><b>D</b>elete
-              {% if not session.role.lower() == 'student' %}<br>
-                <img width="25" src="/static/roster.png"><b>R</b>oster<br>
-                <img width="25" src="/static/missing.png"><b>M</b>issing work<br>
-                <img width="25" src="/static/update.png"><b>U</b>date CourseWork<br>                
-                <img width="25" src="/static/checkin.png"><b>C</b>heckins
+              <img width="25" src="/static/edit.png">Edit <br>
+              
+              {% if not session.role.lower() == 'student' %}
+                <img width="25" src="/static/delete.png">Delete <br>
+                <img width="25" src="/static/roster.png">Roster<br>
+                <img width="25" src="/static/task.png">View Assignments<br>                
+                <img width="25" src="/static/checkin.png">Checkins
               {% endif %}
             </td>
             {% if session.role.lower() == 'student' %}
@@ -37,65 +38,64 @@
             </th>
         </tr>
       </thead>
-      {% if gCourses %}
-      {% for class in gCourses | sort(attribute="status") %}
+
+      {% for enrollment in enrollments | sort(attribute="status") %}
           <tr>
             <td nowrap>
-              <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{class.gclassid}}">
+              <a data-toggle="tooltip" data-placement="top" title="Edit Name" href="/editgclass/{{enrollment.gclassroom.gclassdict.id}}">
                 <img width="25" src="/static/edit.png">
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Delete" href="/deletegclass/{{class.gclassid}}">
+              <a data-toggle="tooltip" data-placement="top" title="Delete" href="/deletegclass/{{enrollment.gclassroom.gclassdict.id}}">
                 <img width="25" src="/static/delete.png">
               </a>
               {% if session['role'].lower() != 'student' %}
-              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Get Roster" href="/roster/{{class.gclassid}}">
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="View Roster" href="/roster/{{enrollment.gclassroom.gclassdict.id}}">
                 <img width="25" src="/static/roster.png">
               </a>
-              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="# of Missing Assignments" href="/studsubs/{{class.gclassid}}">
+              <!-- <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="# of Missing Assignments" href="/studsubs/{{enrollment.gclassroom.gclassdict.id}}">
                 <img width="25" src="/static/missing.png">
               </a>
-              <!-- <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Missing Assignments" href="/missingclass/{{class.gclassid}}">
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Missing Assignments" href="/missingclass/{{enrollment.gclassroom.gclassdict.id}}">
                 <img width="25" src="/static/missing.png">
               </a> -->
-              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="Update CourseWork for Checkin" href="/getcoursework/{{class.gclassid}}">
-                <img width="25" src="/static/update.png">
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="View Assignments" href="/gclass/assignments/{{enrollment.gclassroom.gclassdict.id}}">
+                <img width="25" src="/static/task.png">
               </a>
-              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="See CheckIns" href="/checkinsfor/{{class.gclassid}}">
+              <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="View CheckIns" href="/checkinsfor/{{enrollment.gclassroom.gclassdict.id}}">
                 <img width="25" src="/static/checkin.png">
               </a>
               {% endif %}
             </td>
             {% if session['role'].lower() == 'student' %}
-            <td>
-              <a href="/student/getstudentwork/{{class.gclassid}}"><img width="25" src="/static/update.png"></a>
-              {% if class.submissionsupdate %}
-                <small>{{moment(class.submissionsupdate).calendar()}}</small>
+            <td>Coming Soon
+              {#              
+              <a href="/student/getstudentwork/{{enrollment.gclassroom.gclassdict.id}}"><img width="25" src="/static/update.png"></a>
+              {% if enrollment.submissionsupdate %}
+                <small>{{moment(enrollment.submissionsupdate).calendar()}}</small>
               {% endif %}
+              #}
             </td>
             {% endif %}
             <td>
-              {% if class.status %}
-                {{ class.status }}
+              {% if enrollment.status %}
+                {{ enrollment.status }}
               {% endif %}
             </td>
             <td>
-              {% if class.status and class.status.lower() == 'active' %}
-              <a href="/classdash/{{class.gclassid}}">
-              {% endif %}
-                {% if class.classname and class.classname != class.gclassroom.gclassdict.name %}
-                  {{class.classname}} <br> <small>({{class.gclassroom.gclassdict.name}})</small>
-                {% else %}
-                  {{class.gclassroom.gclassdict.name}}
-                {% endif %}
-              {% if class.status and class.status.lower() == 'active' %}
+              <a href="/classdash/{{enrollment.gclassroom.gclassdict.id}}">
+                  {% if enrollment.classnameByUser %}
+                    {{enrollment.classnameByUser}} <br>
+                    <small>({{enrollment.gclassroom.gclassdict.name}})</small>
+                  {% else %}
+                    {{enrollment.gclassroom.gclassdict.name}}
+                  {% endif %}
               </a>
-              {% endif %}
             </td>
             <td>
-              {{class.gclassroom.gteacherdict['name']['fullName']}}
+              {{enrollment.gclassroom.gteacherdict['name']['fullName']}}
+            </td>
           </tr>
     {% endfor %}
-    {% endif %}
       </table>
     {% endif %}
   </div>

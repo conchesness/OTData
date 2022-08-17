@@ -304,3 +304,13 @@ class ScheduleClassForm(FlaskForm):
     endHr = IntegerField(validators=[InputRequired()])
     endMin = IntegerField(validators=[InputRequired()])
     submit = SubmitField("Submit")
+
+class StandardForm(FlaskForm):
+    name = StringField(validators=[InputRequired()])
+    desc = TextAreaField()
+    gclass = SelectField("Google Classroom", choices=[],validators=[InputRequired()],validate_choice=False)
+    submit = SubmitField("Submit")
+
+class AssignmentForm(FlaskForm):
+    standards = MultiCheckboxField("Standards",choices=[],validate_choice=False)
+    submit = SubmitField("Submit")

@@ -1,5 +1,6 @@
 
 #from typing_extensions import Required
+from ast import List
 from mongoengine import EmbeddedDocumentListField, DictField, FloatField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, CASCADE
 from flask_mongoengine import Document
 from bson.objectid import ObjectId
@@ -7,7 +8,7 @@ import datetime as d
 
 class Adult(EmbeddedDocument):
     preferredcontact = BooleanField()
-    oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
     fname = StringField()
     lname = StringField()
     mobile = IntField()
@@ -22,20 +23,6 @@ class Adult(EmbeddedDocument):
     notes = StringField()
     primarylang = StringField()
     needstranslation = BooleanField()
-
-# TODO get rid of this.  I don't think it is used anywhere.
-class Enrollment(EmbeddedDocument):
-    oid = ObjectIdField(sparse=True, required=True, default=ObjectId(), unique=True, primary_key=True)
-    section = ReferenceField('Section')
-    mp1 = StringField()
-    mp2 = StringField()
-    mp3 = StringField()
-    mp4 = StringField()
-    mp5 = StringField()
-    mp6 = StringField()
-    mp7 = StringField()
-    mp8 = StringField()
-    notes = ListField(StringField())
 
 class Communication(EmbeddedDocument): # Embedded on User Document
     oid = ObjectIdField(sparse=True, required=True, default=ObjectId(), unique=True, primary_key=True)
@@ -71,7 +58,7 @@ class Message(Document):
     }
 
 class Note(EmbeddedDocument): #Embedded on User Document
-    oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
     type_ = StringField() # Note, Mtg, Call
     date = DateField()
     author = ReferenceField('User')
@@ -85,7 +72,7 @@ class Note(EmbeddedDocument): #Embedded on User Document
 # instead of storing the id and name of the class
 class CheckIn(Document):
     createdate = DateTimeField(default=d.datetime.utcnow)
-    gclassid = IntField()
+    gclassid = StringField()
     googleclass = ReferenceField('GoogleClassroom')
     gclassname = StringField()
     student = ReferenceField('User')
@@ -105,26 +92,9 @@ class CheckIn(Document):
         'ordering': ['-createdate']
     }
 
-# This is an embedded document on the user that replaces sections
-# I stopped using Aeries classes but instead use Google Classrooms
-class GClass(EmbeddedDocument):
-    gclassid = StringField()
-    #gclassdict = DictField() # Depricated
-    #gteacher = DictField() # Depricated
-    status = StringField()
-    classname = StringField() # created by user for sorting
-    gclassroom = ReferenceField('GoogleClassroom')
-    nummissing = StringField()
-    nummissingupdate = DateTimeField()
-    missingasses = DictField()
-    missinglink = StringField()
-    # this is a value that designates cohort for a student with a class
-    sortcohort = StringField()
-    submissions = DictField()
-    submissionsupdate = DateTimeField()
 
 class PostGrad(EmbeddedDocument):
-    oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
     type_ = StringField()
     org = StringField()
     link = StringField()
@@ -168,8 +138,8 @@ class User(Document):
     # Data that can be edited
     lat = FloatField()
     lon = FloatField()
-    fname = StringField()
-    lname = StringField()
+    fname = StringField(default=afname)
+    lname = StringField(default=alname)
     isadmin = BooleanField(default=False)
     pronouns = StringField()
     ufname = StringField()
@@ -217,13 +187,6 @@ class User(Document):
     this_students_parents = ListField(ReferenceField('User'))
 
     # Related Data
-    # Sections and enrollments are not currently used
-    sections = ListField(ReferenceField('Section')) # Both Teacher Section and Student sections
-    enrollments = EmbeddedDocumentListField('Enrollment')
-    # Instead of sections I am using gclasses. 
-    # A GClass is a student's instance of a GoogleClassroom
-    # GoogleClassroom is a reference field on GClass
-    gclasses = EmbeddedDocumentListField('GClass', ordering='status')
     adults = EmbeddedDocumentListField('Adult')
     communications = EmbeddedDocumentListField('Communication')
     notes = EmbeddedDocumentListField('Note')
@@ -277,13 +240,13 @@ class Token(Document):
     note = StringField()
 
 class IdealOutcome(EmbeddedDocument):
-    oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
     name = StringField()
     example = StringField()
     description = StringField()
 
 class Theme(EmbeddedDocument):
-    oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
     old = BooleanField()
     name = StringField()
     timeframe = StringField()
@@ -327,21 +290,6 @@ class PlanCheckin(Document):
     yesterdaynarrative = StringField()
     todaynarrative = StringField()
     previousreference = ReferenceField('self')
-
-class GoogleClassroom(Document):
-    gteacherdict = DictField()
-    gclassdict = DictField()
-    courseworkdict = DictField()
-    courseworkupdate = DateTimeField()
-    studsubsdict = DictField()
-    gclassid = StringField()
-    teacher = ReferenceField('User')
-    # This is a list of possible cohorts for this class
-    sortcohorts = ListField()
-    groster = DictField()
-    aeriesid = StringField()
-    aeriesname = StringField()
-    pers = ListField()
 
 # used in CourseCatalog
 class Course(Document):
@@ -429,7 +377,7 @@ class Group(Document):
     students = ListField(ReferenceField('User'))
 
 class ScheduleClass(EmbeddedDocument):
-    oid = ObjectIdField(sparse=True, required=True, unique=True, primary_key=True)
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
     per = IntField(required=True)
     startHr = IntField(required=True)
     startMin = IntField(required=True)
@@ -442,4 +390,63 @@ class Schedule(Document):
     name = StringField(required=True, unique=True)
     classes = EmbeddedDocumentListField(ScheduleClass)
     
+class StudentSubmission(Document):
+    #student = ReferenceField('User', required=True)
+    stugid = StringField(required=True)
+    gclassroom = ReferenceField('GoogleClassroom', required=True)
+    studsubid = StringField(unique=True, required=True)
+    studsubdict = DictField(required=True)
+    lastupdate = DateTimeField(required=True)
+
+# a join table between GoogleClassroom and User
+class GEnrollment(Document):
+    gclassroom = ReferenceField('GoogleClassroom', required=True, sparse=True)
+    owner = ReferenceField('User', unique_with='gclassroom', sparse=True, required=True)
+    createdate = DateTimeField(default=d.datetime.utcnow)
+    status = StringField(default='~~~') # Created by student active, inacative, ignore
+    classnameByUser = StringField() # created by user for sorting
+    nummissingupdate = DateTimeField()
+    missingasses = DictField()
+    missinglink = StringField()
+    sortCohort = StringField(default='~')
+    submissionsupdate = DateTimeField()
+
+class Standard(Document):
+    name = StringField(required=True)
+    desc = StringField(required=True)
+    gclass = ReferenceField('GoogleClassroom', required=True, unique_with='name')
+    meta = {
+        'ordering': ['+name']
+    }
+
+class CourseWork(Document):
+    gclassroom = ReferenceField('GoogleClassroom', required=True)
+    courseworkid = StringField(unique=True, sparse=True, required=True)
+    courseworkdict = DictField()
+    createdate = DateTimeField(default=d.datetime.utcnow)
+    lastupdate = DateTimeField()
+    standards = ListField(ReferenceField('Standard'))
+    topic = StringField()
+
+# courseworkdict values: https://developers.google.com/classroom/reference/rest/v1/courses.courseWork
+
+class GoogleClassroom(Document):
+    teacher = ReferenceField('User')
+    gteacherdict = DictField()
+    gclassdict = DictField()
+    courseworkdict = DictField()
+    courseworkupdate = DateTimeField()
+    # TODO move this to CourseWork class
+    studsubsdict = DictField()
+    gclassid = StringField(unique=True)
+    teacher = ReferenceField('User')
+    # This is a list of possible cohorts for this class
+    sortcohorts = ListField()
+    #This filed is used to iteratively build the roster from Google Classroom
+    #It should be empty excetp during the process of retrieve=ing the roster
+    #From Google Classroom
+    grosterTemp = ListField(DictField())
+    aeriesid = StringField()
+    aeriesname = StringField()
+    pers = ListField()
 

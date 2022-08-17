@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, redirect, url_for, session, flash
-from app.classes.data import User, Section, Course
+from app.classes.data import User, Course
 from app.classes.forms import CourseForm, SectionForm
 import datetime as d
 from mongoengine import Q
@@ -172,7 +172,6 @@ def teacherclassedit(tnum,cnum):
     course=Course.objects.get(aeriesnum=cnum)
     section=Section.objects.get(course=course,teacher=teacher)
     currUser = User.objects.get(pk=session['currUserId'])
-    print(not session['courseCatAdmin'] and not session['isadmin'])
     if not currUser == section.teacher and not session['courseCatAdmin'] and not session['isadmin']:
         flash(f"You can't edit that section because it is not yours.")
         return redirect(url_for('teacherclass',tnum=tnum,cnum=cnum))

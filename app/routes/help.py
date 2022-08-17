@@ -45,12 +45,12 @@ def createhelp(gclassid):
         if not form.students.data:
             stuGIdList = [('----','!Anyone'),(gclass.gteacherdict['id'],f"!Teacher: {gclass.gteacherdict['name']['familyName']}")]
             try:
-                gclass.groster['roster']
+                gclass.groster
             except:
                 flash("There is no available roster for this class. This can only\
                     be created by the teacher.")
             else:
-                for stu in gclass.groster['roster']:
+                for stu in gclass.groster:
                     stuName = f"{stu['profile']['name']['givenName']} {stu['profile']['name']['familyName']}"
                     if stu['sortCohort']:
                         stuName = f"{stu['sortCohort']} {stuName}"
@@ -257,7 +257,7 @@ def tokensAward(gclassid):
     currUser = User.objects.get(id=session['currUserId'])
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     owners = []
-    for student in gClassroom.groster['roster']:
+    for student in gClassroom.groster:
         owner = (student['userId'], student['profile']['name']['fullName'])
         owners.append(owner)
 

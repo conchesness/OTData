@@ -48,9 +48,7 @@
                     </td>
                     <td nowrap>
                         <a href="/profile/{{stu.owner.aeriesid}}">{{stu.owner.afname}} {{stu.owner.alname}}</a> 
-                        {% if stu.owner.updateGClasses == "True" %}
-                            <a data-toggle="tooltip" data-placement="top" title="Update the student's classes" href="/addgclass/{{stu.owner.profile.emailAddress}}/{{gclassid}}">(u)</a>
-                        {% endif %} 
+                        <!--a data-toggle="tooltip" data-placement="top" title="Add student to the class" href="/addgclass/{{stu.owner.otemail}}/{{gclassid}}"><img width=20 src="/static/new.png"></a-->
                         <br> 
                         {% if stu.owner.cohort %}
                         {% if stu.owner.cohort[:7] == "Oakland" and stu.owner.cohort[13:16] == "Eng" %}
@@ -82,7 +80,7 @@
                         <a href="/inviteguardians/{{stu.owner.gid}}/{{gclassid}}/{{gclassname}}">
                             {% if stu.owner.adults %}
                             {% for adult in stu.owner.adults %}
-                                {{adult.fname}} {{adult.lname}}, 
+                                <em>{{adult.fname}} {{adult.lname}}</em>, 
                             {% endfor %}
                             {% elif stu.owner.aadults %}
                                 {{stu.owner.aadults}}

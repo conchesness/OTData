@@ -547,9 +547,8 @@ def editrostersortorder(gclassid,sort=None):
     enrollments = GEnrollment.objects(gclassroom=gclassroom)
     if sort:
         rosterToSort = enrollments
-        rosterToSort = sorted(rosterToSort, key = lambda i: (i['sortCohort'], i['owner']['lname'], i['owner']['fname']))
+        rosterToSort = sorted(rosterToSort, key = lambda i: (i['sortCohort'], i['owner']['alname'], i['owner']['afname']))
         groster = rosterToSort
-
     else:
         groster = enrollments
 
@@ -562,13 +561,13 @@ def editrostersortorder(gclassid,sort=None):
         try:
             enrollment = GEnrollment.objects.get(owner=otStudent, gclassroom=gclassroom)
         except mongoengine.errors.DoesNotExist:
-            flash(f"{otStudent.fname} {otStudent.alname} does not have this class in their classes list.")
+            flash(Markup(f"You need to <a href='/addgclass/{{otStudent.otemail}}/{{gclassid}}'>add {otStudent.fname} {otStudent.alname}</a> to the class."))
         else:
             enrollment.update(
                 sortCohort = form.sortOrderCohort.data
             )
             enrollments = GEnrollment.objects(gclassroom=gclassroom)
-            enrollments = sorted(enrollments, key = lambda i: (i['sortCohort'], i['owner']['lname'], i['owner']['fname']))
+            enrollments = sorted(enrollments, key = lambda i: (i['sortCohort'], i['owner']['alname'], i['owner']['afname']))
 
             groster = enrollments
 

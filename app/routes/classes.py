@@ -16,6 +16,8 @@ import datetime as dt
 from .roster import getCourseWork
 import pandas as pd
 import numpy as np
+from bson.objectid import ObjectId
+
 
 
 
@@ -24,26 +26,30 @@ def addgclass(gmail,gclassid):
 
     try:
         stu = User.objects.get(otemail=gmail)
-    except Exception as error:
-        flash(f"Got an error: {error}")
+    except mongoengine.errors.DoesNotExist:
         flash("I can't find this user in OTData.")
+        return redirect(url_for('roster',gclassid=gclassid))
+    except Exception as error:
+        flash(f"Got an unexcepted error: {error}")
         return redirect(url_for('roster',gclassid=gclassid))
 
     try:
         gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
-    except Exception as error:
-        flash(f"Got an error: {error}")
+    except mongoengine.errors.DoesNotExist:
         flash(f"Could not find this class in list of Google Classrooms at OTData.")
+        return redirect(url_for('roster',gclassid=gclassid))
+    except Exception as error:
+        flash(f"Got an unexpected error: {error}")
         return redirect(url_for('roster',gclassid=gclassid))
     else:
         try:
-            stu.gclasses.get(gclassid=gclassid)
+            enrollment = GEnrollment.objects.get(gclassroom=gClassroom,owner=stu)
         except mongoengine.errors.DoesNotExist:
-            stu.gclasses.create(
-                gclassid=gclassid,
-                gclassroom = gClassroom
+            newEnrollment = GEnrollment(
+                owner = stu,
+                gclassroom=ObjectId(gclassid)
                 )
-            stu.save()
+            newEnrollment.save()
         else:
             flash(f"{stu.fname} {stu.lname} already has this class stored in OTData.")
             return redirect(url_for('roster',gclassid=gclassid))

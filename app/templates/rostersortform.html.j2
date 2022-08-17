@@ -14,8 +14,9 @@
                 {{groster[i].sortCohort}}
             </td>
             <td>
-                {{groster[i].owner.fname}} {{groster[i].owner.lname}}
-                
+                {{groster[i].owner.afname}}&nbsp;
+                {{groster[i].owner.alname}}
+
                 <form method=post>
                 {{forms["form"+i|string].hidden_tag()}}
             </td>

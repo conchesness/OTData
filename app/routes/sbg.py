@@ -196,67 +196,57 @@ def standardDelete(standardid):
 # unset sections from the User document
 
 # to run this script you have to add 'sections' and 'enrollments' 
-# temporarily to the User class in data.py
-@app.route('/unsetfieldsfromuser')
-def unsetfieldsfromuser():
-    users = User.objects()
-    for i,user in enumerate(users):
-        try:
-            user.update(unset__sections = 1)
-        except:
-            print(f"{i}: no sections on {user.fname}")
-        else:
-            print(f"{i}: deleted sections from  {user.fname}")
+# # temporarily to the User class in data.py
+# @app.route('/unsetfieldsfromuser')
+# def unsetfieldsfromuser():
+#     users = User.objects()
+#     for i,user in enumerate(users):
+#         try:
+#             user.update(unset__sections = 1)
+#         except:
+#             print(f"{i}: no sections on {user.fname}")
+#         else:
+#             print(f"{i}: deleted sections from  {user.fname}")
 
-        try:
-            user.update(unset__enrollments = 1)
-        except:
-            print(f"{i}: no enrollments on {user.fname}")
-        else:
-            print(f"{i}: deleted enrollments from  {user.fname}")
+#         try:
+#             user.update(unset__enrollments = 1)
+#         except:
+#             print(f"{i}: no enrollments on {user.fname}")
+#         else:
+#             print(f"{i}: deleted enrollments from  {user.fname}")
 
-        try:
-            user.update(unset__gclasses = 1)
-        except:
-            print(f"{i}: no gclasses on {user.fname}")
-        else:
-            print(f"{i}: deleted gclasses from  {user.fname}")
+#         try:
+#             user.update(unset__gclasses = 1)
+#         except:
+#             print(f"{i}: no gclasses on {user.fname}")
+#         else:
+#             print(f"{i}: deleted gclasses from  {user.fname}")
 
-    return redirect(url_for('index'))
+#     return redirect(url_for('index'))
 
-@app.route('/unsetfieldsfromgoogleclassroom')
-def unsetgrosterfromgoogleclassroom():
-    gclassrooms = GoogleClassroom.objects()
-    length = len(gclassrooms)
-    for i,gclassroom in enumerate(gclassrooms):
+# @app.route('/unsetfieldsfromgoogleclassroom')
+# def unsetgrosterfromgoogleclassroom():
+#     gclassrooms = GoogleClassroom.objects()
+#     length = len(gclassrooms)
+#     for i,gclassroom in enumerate(gclassrooms):
 
-        try:
-            gclassroom.groster
-        except:
-            #print(f"{i}/{length}: no groster")
-            pass
-        else:
-            gclassroom.update(unset__groster = 1)
-            #print(f"{i}/{length}: deleted groster")
+#         try:
+#             gclassroom.groster
+#         except:
+#             #print(f"{i}/{length}: no groster")
+#             pass
+#         else:
+#             gclassroom.update(unset__groster = 1)
+#             #print(f"{i}/{length}: deleted groster")
 
-        if gclassroom.gteacherdict and not gclassroom.teacher:
+#         if gclassroom.gteacherdict and not gclassroom.teacher:
 
-            try:
-                teacher = User.objects.get(otemail = str(gclassroom.gteacherdict['emailAddress']))
-            except:
-                print("No teacher added")
-            else:
-                gclassroom.update(teacher = teacher)
-                print('teacher added')
+#             try:
+#                 teacher = User.objects.get(otemail = str(gclassroom.gteacherdict['emailAddress']))
+#             except:
+#                 print("No teacher added")
+#             else:
+#                 gclassroom.update(teacher = teacher)
+#                 print('teacher added')
 
-    return redirect(url_for('index'))
-
-@app.route('/scriptsforenrollments')
-def scriptsforenrollments():
-    enrollments = GEnrollment.objects()
-    for enrollment in enrollments:
-        print(enrollment.status)
-        if not enrollment.status:
-            enrollment.update(status='--')
-            print('yup')
-    return redirect(url_for('index'))
+#     return redirect(url_for('index'))

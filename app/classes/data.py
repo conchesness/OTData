@@ -109,6 +109,10 @@ class PostGrad(EmbeddedDocument):
     pg_zip = IntField()
 
 class User(Document):
+    # temp
+    # gclasses = StringField()
+    # sections = StringField()
+    # enrollments = StringField()
     # Immutable Data
     afname = StringField()
     alname = StringField()
@@ -431,6 +435,9 @@ class CourseWork(Document):
 # courseworkdict values: https://developers.google.com/classroom/reference/rest/v1/courses.courseWork
 
 class GoogleClassroom(Document):
+    #temp
+    # groster = StringField()
+    ####
     teacher = ReferenceField('User')
     gteacherdict = DictField()
     gclassdict = DictField()

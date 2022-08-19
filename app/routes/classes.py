@@ -7,7 +7,7 @@ from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
 from app.classes.data import GEnrollment, StudentSubmission, User, GoogleClassroom
-from app.classes.forms import GClassForm
+from app.classes.forms import AddToCohortForm, GClassForm
 import mongoengine.errors
 import google.oauth2.credentials
 import googleapiclient.discovery
@@ -18,8 +18,58 @@ import pandas as pd
 import numpy as np
 from bson.objectid import ObjectId
 
+@app.route('/addtocohort', methods=['GET', 'POST'])
+def addtocohort():
+    form = AddToCohortForm()
+    if form.validate_on_submit():
+        print(form.gclassmongoid.data)
+        gClass = GoogleClassroom.objects.get(gclassid=form.gclassmongoid.data)
+        if form.aeriesIds.data:
+            ids = form.aeriesIds.data.replace(" ", "")
+            ids = ids.strip(",")
+            ids = ids.split(",")
+            for id in ids:
+                try:
+                    student = User.objects.get(aeriesid=id)
+                except mongoengine.errors.DoesNotExist:
+                    flash(f"AeriesID: {id} does not exist in OTData.")
+                else:
+                    try:
+                        enrollment = GEnrollment.objects.get(gclassroom=gClass,owner=student)
+                    except mongoengine.errors.DoesNotExist:
+                        flash(f"There is no enrollment in this class for {student.fname} {student.lname}.")
+                    else:
+                        enrollment.update(
+                            sortCohort = form.sortCohort.data
+                        )
+        elif form.emails.data:
+            emails = form.emails.data.replace(" ", "")
+            emails = emails.strip(",")
+            emails = emails.split(",")
+            for email in emails:
+                try:
+                    student = User.objects.get(otemail=email)
+                except mongoengine.errors.DoesNotExist:
+                    flash(f"The email: {email} does not exist in OTData.")
+                else:
+                    try:
+                        enrollment = GEnrollment.objects.get(gclassroom=gClass,owner=student)
+                    except mongoengine.errors.DoesNotExist:
+                        flash(f"There is no enrollment in this class for {student.fname} {student.lname}.")
+                    else:
+                        enrollment.update(
+                            sortCohort = form.sortCohort.data
+                        )
+        else:
+            flash(f"You must include EITHER Aeries ID's or OT Emails")
+        return redirect(url_for('roster',gclassid=gClass.gclassid))
 
-
+    currUser = ObjectId(session['currUserId'])
+    activeEnrollments = GEnrollment.objects(owner=currUser,status="Active")
+    for enrollment in activeEnrollments:
+        form.gclassmongoid.choices.append((enrollment.gclassroom.gclassdict['id'],enrollment.gclassroom.gclassdict['name']))
+    return render_template('classes/addtocohortform.html', form=form)
+    
 
 @app.route('/addgclass/<gmail>/<gclassid>')
 def addgclass(gmail,gclassid):

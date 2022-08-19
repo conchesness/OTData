@@ -112,6 +112,7 @@ def before_request():
     # so that each path this is *not* in this list requires an authorization check.
     # If you have urls that you want your user to be able to see without logging in add them here.
     # TODO create a decorator or something for this
+    # TODO could just prefix the url with "/stu/" for studentpaths
     unauthPaths = ['/','/home','/authorize','/login','/oauth2callback','/static','/logout','/revoke','/msgreply','/msgstatus']   
     communityPaths = ['/profile','/editprofile','/findstufromadult','/addstutoadult','/equity']
     studentPaths = ['/getgclasses','/student','/breaks','/classdash','/assignments','/comp','/help','/breakstart','/postgrad','/cc','/plan','/profile','/editprofile','/addadult','/editadult','/deleteadult','/sendstudentemail','/checkin','/deletecheckin','/editgclass','/deletegclass','/gclasses','/comp','/missingassignmentsstu'] 

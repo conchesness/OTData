@@ -1,3 +1,4 @@
+from tokenize import String
 from typing import Text
 from flask.app import Flask
 from flask_wtf import FlaskForm
@@ -9,6 +10,13 @@ from wtforms.validators import URL, NumberRange, Email, Optional, InputRequired,
 from wtforms import widgets, SelectMultipleField, StringField, SubmitField, validators, TextAreaField, HiddenField, IntegerField, SelectField, FileField, BooleanField
 import datetime as d
 from zoneinfo import ZoneInfo
+
+class AddToCohortForm(FlaskForm):
+    emails = TextAreaField()
+    aeriesIds = TextAreaField()
+    sortCohort = StringField(validators=[InputRequired()])
+    gclassmongoid = SelectField(validators=[InputRequired()],choices=[],validate_choice=False)
+    submit = SubmitField()
 
 class BreakSettingsForm(FlaskForm):
     breakstartdate = DateField(default=d.datetime.now(ZoneInfo('US/Pacific')))

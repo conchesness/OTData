@@ -22,8 +22,9 @@
 
                     </th>
                     <th>
-                        <a href="/rostersort/{{gclassid}}" class="btn btn-primary btn-sm" role="button">Cohorts</a>
-
+                        Cohorts <br>
+                        <a href="/addtocohort" class="btn btn-primary btn-sm" role="button">Group</a>
+                        <a href="/rostersort/{{gclassid}}" class="btn btn-primary btn-sm" role="button">Individual</a>
                     </th>
                     <th>Student</th>
                     <th>
@@ -44,10 +45,10 @@
                         <small>{{moment(stu.createdate).calendar()}}</small>    
                     </td>
                     <td>
-                        {% if stu.owner.sortCohort %}{{stu.owner.sortCohort}}{%else%}-{% endif %}
+                        {{stu.sortCohort}}
                     </td>
                     <td nowrap>
-                        <a href="/profile/{{stu.owner.aeriesid}}">{{stu.owner.afname}} {{stu.owner.alname}}</a> 
+                        <a href="/profile/{{stu.owner.aeriesid}}">{{stu.owner.fname}} {{stu.owner.lname}}</a> 
                         <!--a data-toggle="tooltip" data-placement="top" title="Add student to the class" href="/addgclass/{{stu.owner.otemail}}/{{gclassid}}"><img width=20 src="/static/new.png"></a-->
                         <br> 
                         {% if stu.owner.cohort %}

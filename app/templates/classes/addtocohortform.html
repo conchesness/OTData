@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Add to Cohort</h1>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <form method=post>
+            {{ form.hidden_tag() }}
+            For Class: <br> {{form.gclassmongoid()}} <br> <br>
+            Aeries ID's <br>
+            {{form.aeriesIds()}} <br> <br>
+            OR Emails <br>
+            {{form.emails()}} <br> <br>
+            Cohort Name: {{form.sortCohort()}} <br> <br>
+            {{form.submit()}}
+        </form>
+        
+    </div>
+{% endblock %}

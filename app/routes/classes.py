@@ -40,7 +40,8 @@ def addtocohort():
                         flash(f"There is no enrollment in this class for {student.fname} {student.lname}.")
                     else:
                         enrollment.update(
-                            sortCohort = form.sortCohort.data
+                            sortCohort = form.sortCohort.data,
+                            status = "Active"
                         )
         elif form.emails.data:
             emails = form.emails.data.replace(" ", "")
@@ -58,7 +59,8 @@ def addtocohort():
                         flash(f"There is no enrollment in this class for {student.fname} {student.lname}.")
                     else:
                         enrollment.update(
-                            sortCohort = form.sortCohort.data
+                            sortCohort = form.sortCohort.data,
+                            status = "Active"
                         )
         else:
             flash(f"You must include EITHER Aeries ID's or OT Emails")

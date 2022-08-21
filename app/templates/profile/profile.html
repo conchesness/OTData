@@ -411,6 +411,34 @@
             {% endif %}
         {% endfor %}
         {% endif %}
+        {% if session.role.lower() != "student" %}
+                {% for comm in messages %}
+                <div class="{{threecolbreak}}">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Txt: {{moment(comm.datetimesent).calendar()}}</h5>
+                            <p class="card-text">
+                                <b>From:</b> 
+                                {% if from_user %}
+                                    {{comm.from_user.fname}} {{comm.from_user.lname}} ({{comm.from_user.role}}) <br>
+                                {% else %}
+                                    {{comm.from_}} <br>
+                                {% endif %}
+                                <b>Reply To:</b> 
+                                {% if reply_to %}
+                                    {{comm.reply_to.fname}} {{comm.reply_to.lname}} <br>
+                                {% else %}
+                                    {{comm.to}} <br>
+                                {% endif %}
+                                {% if comm.body %}
+                                        {{comm.body}}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
     </div><!--Activities-->
 
     <a id="compborrow"></a>

@@ -45,11 +45,17 @@
                         <small>{{moment(stu.createdate).calendar()}}</small>    
                     </td>
                     <td>
-                        {{stu.sortCohort}}
+                        {{stu.sortCohort}} <br> <small>{{stu.status}}</small> 
                     </td>
                     <td nowrap>
                         <a href="/profile/{{stu.owner.aeriesid}}">{{stu.owner.fname}} {{stu.owner.lname}}</a> 
-                        <!--a data-toggle="tooltip" data-placement="top" title="Add student to the class" href="/addgclass/{{stu.owner.otemail}}/{{gclassid}}"><img width=20 src="/static/new.png"></a-->
+                        {% if not stu.owner.adults %}
+                        (a)
+                        {% endif %}
+                        {% if not stu.owner.mobile %}
+                        (m)
+                        {% endif %}
+
                         <br> 
                         {% if stu.owner.cohort %}
                         {% if stu.owner.cohort[:7] == "Oakland" and stu.owner.cohort[13:16] == "Eng" %}
@@ -97,37 +103,34 @@
             </table>
             <br>
             <small>
-                * Student does not have a record on OTData. Probably 'cause they are frosh on new to the school this year <br>
-                (m) Student has a mobile <br>
-                (u) Student does not have this class as sctive <br>
-                (ot) Parents are rom OTData  <br>
-                (a) parents are from aeries
+                (m) Student has not added a mobile <br>
+                (a) No adults added
             </small>
             <br> <br>
             <b>Student Emails:</b>
             <!-- This gets the sortCohort from the students record and uses it if it is different that what is in otdstus
                  TODO this needs to be fixed so that it makes more sense. It may not be necessary because roster.py 
                  also gets this value from the User's record in the getroster function.-->
-            {% set cohort = {'currCohort' : otdstus.sortCohort} %}
+            {% set cohort = {'currCohort' : 'bob'} %}
             <h3>{{otdstus.sortCohort}}</h3>
 
 
             {% for stu in otdstus %}
-                {% if stu.owner.sortCohort != cohort.currCohort %}
-                    <h3>{{stu.owner.sortCohort}}</h3>
-                    {% do cohort.update({'currCohort' : stu.owner.sortCohort}) %}
+                {% if stu.sortCohort != cohort.currCohort %}
+                    <h3>{{stu.sortCohort}}</h3>
+                    {% do cohort.update({'currCohort' : stu.sortCohort}) %}
                 {% endif %}
                 {{ stu.owner.otemail }}, 
             {% endfor %}
 
             <br> <br>
             <b>Parent Emails:</b> 
-            {% set cohort = {'currCohort' : otdstus.sortCohort} %}
+            {% set cohort = {'currCohort' : ''} %}
             <h3>{{otdstus.sortCohort}}</h3>
             {% for stu in otdstus %}
-                {% if stu.owner.sortCohort != cohort.currCohort %}
-                    <h3>{{stu.owner.sortCohort}}</h3>
-                    {% do cohort.update({'currCohort' : stu.owner.sortCohort}) %}
+                {% if stu.sortCohort != cohort.currCohort %}
+                    <h3>{{stu.sortCohort}}</h3>
+                    {% do cohort.update({'currCohort' : stu.sortCohort}) %}
                 {% endif %}
                 {% if stu and stu.owner.adults %}
                     {% for adult in stu.owner.adults %}

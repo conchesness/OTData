@@ -2,7 +2,7 @@
 from app import app
 from .scopes import SCOPESOT, SCOPESCOMMUNITY
 from flask import render_template, redirect, url_for, request, session, flash, Markup
-from app.classes.data import User, CheckIn, Post, Group, Section
+from app.classes.data import User, CheckIn, Group, Section, Message
 from app.classes.forms import UserForm, AdultForm, CohortForm, PostGradForm
 from .credentials import GOOGLE_CLIENT_CONFIG
 from mongoengine import Q
@@ -370,6 +370,7 @@ def profile(aeriesid=None):
 
     if targetUser.role.lower() == "student":
         checkins = CheckIn.objects(student=targetUser).limit(15)
+        messages = Message.objects(student=targetUser).limit(6)
     else:
         checkins = None
 
@@ -414,12 +415,7 @@ def profile(aeriesid=None):
     else:
         groups=None
 
-    if targetUser.role.lower() == "teacher":
-        sections = Section.objects(teacher = targetUser)
-    else:
-        sections = None
-
-    return render_template("profile/profile.html",groups=groups,currUser=targetUser, data=session['gdata'], form=form, today=dttoday, checkins=checkins, sections=sections)
+    return render_template("profile/profile.html",groups=groups,currUser=targetUser, data=session['gdata'], form=form, today=dttoday, checkins=checkins, messages=messages)
 
 # to get an in depth description of how creating, editing and deleting database recodes work check
 # out the feedback.py file.

@@ -1,7 +1,7 @@
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, url_for, session, flash, Markup
-from app.classes.data import User
+from app.classes.data import GEnrollment, User
 from app.classes.forms import NewStudentForm, StudentForm, SendemailForm, StudentNoteForm
 from mongoengine import Q
 from googleapiclient.discovery import build
@@ -126,8 +126,10 @@ def sendstudentemail(aeriesid):
 
     # add teachers from the gclasses embedded doc
     emailList2=[]
-    if student.gclasses:
-        for gclass in student.gclasses:
+    enrollments = GEnrollment.objects(owner = student)
+    if len(enrollments)>0:
+        for enrollment in enrollments:
+            gclass = enrollment
             if gclass.gclassroom:
                 try:
                     teacheremail = gclass.gclassroom.gteacherdict['emailAddress']

@@ -1,8 +1,8 @@
-import matplotlib
+#import matplotlib
 
 from app.routes.coursecat import course
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt 
+#matplotlib.use('Agg')
+#import matplotlib.pyplot as plt 
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string

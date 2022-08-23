@@ -14,7 +14,7 @@ google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.4.1
 # Only needed for running on Google Cloud Run. Does not need to be installed locally.
 gunicorn==20.0.0
-#matplotlib==3.3.4
+matplotlib==3.3.4
 mongoengine==0.20.0
 numpy==1.23.0
 oauthlib==3.2.0

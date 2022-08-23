@@ -13,9 +13,10 @@ def createhelp(gclassid):
 
     currUser = User.objects.get(gid=session['gid'])
     # Only create a new help if there is not an active one for this class
-    gClass = currUser.gclasses.filter(gclassid=gclassid)
-    gClass = gClass[0]
-    query = Q(requester=currUser) & Q(gclass=gClass.gclassroom) & (Q(status = 'asked') | Q(status = 'offered'))
+    #gClass = currUser.gclasses.filter(gclassid=gclassid)
+    #gClass = gClass[0]
+    gClass = GoogleClassroom.objects.get(gclassid=gclassid)
+    query = Q(requester=currUser) & Q(gclass=gClass) & (Q(status = 'asked') | Q(status = 'offered'))
     lastHelp = Help.objects(query)
     if len(lastHelp) > 0:
         flash('You have an open help for this class. Delete or complete that Help first.')
@@ -37,7 +38,7 @@ def createhelp(gclassid):
     #         if gCourse.status == "Active":
     #             gclasses.append((gCourse.gclassroom.gclassid, tempname))
 
-    form.gclassid.choices = [(gClass.gclassid,gClass.classname)]
+    form.gclassid.choices = [(gClass.gclassid,gClass.gclassdict['name'])]
     isStuList = False
     if form.validate_on_submit():
         gclass = GoogleClassroom.objects.get(gclassid = form.gclassid.data)
@@ -45,15 +46,15 @@ def createhelp(gclassid):
         if not form.students.data:
             stuGIdList = [('----','!Anyone'),(gclass.gteacherdict['id'],f"!Teacher: {gclass.gteacherdict['name']['familyName']}")]
             try:
-                gclass.groster
+                gclass.grosterTemp
             except:
                 flash("There is no available roster for this class. This can only\
                     be created by the teacher.")
             else:
-                for stu in gclass.groster:
+                for stu in gclass.grosterTemp:
                     stuName = f"{stu['profile']['name']['givenName']} {stu['profile']['name']['familyName']}"
-                    if stu['sortCohort']:
-                        stuName = f"{stu['sortCohort']} {stuName}"
+                    # if stu['sortCohort']:
+                    #     stuName = f"{stu['sortCohort']} {stuName}"
                     stuGIdList.append((stu['userId'],stuName))
                 stuGIdList.sort(key=lambda tup: tup[1]) 
             form.students.choices = stuGIdList

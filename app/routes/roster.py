@@ -102,8 +102,9 @@ def getCourseWork(gclassid):
     return assignmentsAll
 
 
+@app.route("/roster/<gclassid>/<sort>", methods=['GET','POST'])
 @app.route("/roster/<gclassid>", methods=['GET','POST'])
-def roster(gclassid):
+def roster(gclassid, sort="cohort"):
     
     gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     otdstus = None
@@ -120,11 +121,16 @@ def roster(gclassid):
             otdstus.append(enrollment)
         elif enrollment.owner.role.lower() == 'student':
             flash(f"Something's wrong with this students record so they were not included in the roster.: {enrollment.owner.otemail}")
-    try:
-        otdstus = sorted(otdstus, key = lambda i: (i.sortCohort,i.owner.lname,i.owner.fname))
-    except Exception as error:
-        flash(f"Sort failed in the roster route with error: {error}")
-
+    if sort == "cohort":
+        try:
+            otdstus = sorted(otdstus, key = lambda i: (i.sortCohort,i.owner.lname,i.owner.fname))
+        except Exception as error:
+            flash(f"Sort failed in the roster route with error: {error}")
+    else:
+        try:
+            otdstus = sorted(otdstus, key = lambda i: (i.owner.lname,i.owner.fname))
+        except Exception as error:
+            flash(f"Sort failed in the roster route with error: {error}")
     return render_template('rosternew.html',gclassname=gclassroom.gclassdict['name'], gclassid=gclassid, otdstus=otdstus)
 
 @app.route("/getroster/<gclassid>/<index>", methods=['GET','POST'])

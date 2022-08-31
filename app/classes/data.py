@@ -379,20 +379,6 @@ class Group(Document):
     name = StringField()
     desc = StringField()
     students = ListField(ReferenceField('User'))
-
-class ScheduleClass(EmbeddedDocument):
-    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
-    per = IntField(required=True)
-    startHr = IntField(required=True)
-    startMin = IntField(required=True)
-    days = ListField(required=True)
-    endHr = IntField(required=True)
-    endMin = IntField(required=True)
-
-class Schedule(Document):
-    active = BooleanField(required=True,default=True)
-    name = StringField(required=True, unique=True)
-    classes = EmbeddedDocumentListField(ScheduleClass)
     
 class StudentSubmission(Document):
     #student = ReferenceField('User', required=True)
@@ -457,3 +443,7 @@ class GoogleClassroom(Document):
     aeriesname = StringField()
     pers = ListField()
 
+class ReqClass(Document):
+    name = StringField()
+    semester = StringField() #Fall, Spring
+    

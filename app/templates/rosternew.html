@@ -86,17 +86,39 @@
                         {% endfor %}
                         {% endif %}
                     </td>
-                    <td>
-                        <a href="/inviteguardians/{{stu.owner.gid}}/{{gclassid}}/{{gclassname}}">
+                    <td> 
+						{% set emailExists = namespace(found=false) %}
                             {% if stu.owner.adults %}
+                            <a href="/inviteguardians/{{stu.owner.gid}}/{{gclassid}}/{{gclassname}}">
                             {% for adult in stu.owner.adults %}
-                                <em>{{adult.fname}} {{adult.lname}}</em>, 
-                            {% endfor %}
-                            {% elif stu.owner.aadults %}
-                                {{stu.owner.aadults}}
-
+                                {% if adult.email %}
+                                    {% set emailExists.found = true %}
+                                    {{adult.fname}} {{adult.lname}}, 
+                                {% endif %}
+                            {% endfor %} <br>
+                            </a>
+                            {% for adult in stu.owner.adults %}
+                            {% if adult.email %}
+                                <small>{{adult.email}}</small>, 
                             {% endif %}
-                        </a>
+                            {% endfor %}
+
+                            {% elif stu.owner.aadults %}
+                                {% if stu.owner.aadultemail %}
+                                {% set emailExists.found = true %}
+                                <a href="/inviteguardians/{{stu.owner.gid}}/{{gclassid}}/{{gclassname}}">
+                                    {{stu.owner.aadults}}</a> <br>
+                                    <small>{{stu.owner.aadultemail}}</small>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if emailExists.found == false and stu.owner.aadultemail %}
+                            <a href="/inviteguardians/{{stu.owner.gid}}/{{gclassid}}/{{gclassname}}">
+                            {{stu.owner.aadults}}</a> <br>
+                            <small>{{stu.owner.aadultemail}}</small>
+                            {% endif %}
+                                    
+                        
                     </td>
                 </tr>
 
@@ -141,10 +163,37 @@
                 {% elif stu and stu.owner.aadultemail %}
                     {{stu.owner.aadultemail}},
                 {% endif %}
-            {% endfor %}   
+            {% endfor %}  
+            <table>
+                <tr><td>cohort</td><td>fname</td><td>lname</td><td>emails</td></tr>
+                {% for enrollment in otdstus %} 
+                    <tr>
+                        <td>
+                            {{enrollment.sortCohort}}
+                        </td>
+                        <td>
+                            {{enrollment.owner.fname}}
+                        </td>
+                        <td>
+                            {{enrollment.owner.lname}}
+                        </td>
+                        <td>
+                            {{enrollment.owner.otemail}},
+                            {% if enrollment and enrollment.owner.adults %}
+                                {% for adult in enrollment.owner.adults %}
+                                    {{ adult.email }}, 
+                                {% endfor %}
+                            {% elif enrollment and enrollment.owner.aadultemail %}
+                                {{enrollment.owner.aadultemail}},
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         {% else %}
         No Roster
-        {% endif %}     
+        {% endif %}   
+
         </div>
     </div>
 </div>

@@ -338,7 +338,7 @@ def getgaurdians(gclassid,index=0):
 
     if numStus > (index):
         # This is the url for the loading page to call back
-        url = f"/getguardians/{gclassid}"
+        url = f"/getguardians/{gclassid}/{index}"
 
         return render_template ('loading.html', url=url, nextIndex=index, total=numStus)
 
@@ -348,19 +348,21 @@ def getgaurdians(gclassid,index=0):
 @app.route('/inviteguardians/<gid>/<gclassid>/<gclassname>')
 @app.route('/inviteguardians/<gid>')
 def inviteguardians(gid,gclassid=None,gclassname=None):
+    
+    inviteEmails = []
+
     try:
         editStu = User.objects.get(gid=gid)
     except:
-        editStu = False
-
-    inviteEmails = []
-
+        flash("The student does not exist in this database.")
+        return redirect(url_for('roster',gclassid=gclassid))
+    
     if editStu.adults:
         for adult in editStu.adults:
             inviteEmails.append(adult.email)
-    elif editStu.aadultemail:
+    else:
         inviteEmails.append(editStu.aadultemail)
-    
+
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
     else:
@@ -380,8 +382,9 @@ def inviteguardians(gid,gclassid=None,gclassname=None):
         except Exception as error:
             flash(f"Error: {error}")
             flash(f"Invite already exists for {inviteEmail}.")
-
+    
     invites = service.userProfiles().guardianInvitations().list(studentId = gid).execute()
+    
     if invites:
         editStu.update(
             gclassguardianinvites = invites

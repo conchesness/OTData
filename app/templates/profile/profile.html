@@ -23,7 +23,7 @@
             {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}
         </h2>
         {% if session.audience.lower() == "ot" %}
-            <a href="#adults">Add your Adults!</a> <br>
+            <a href="#adults" class="btn btn-primary btn-sm" role="button">Add your Adults!</a> <br>
             <a href="/plan/{{currUser.gid}}" class="btn btn-primary btn-sm" role="button">Success Plan</a> 
             <a href="#compborrow" class="btn btn-primary btn-sm" role="button">Computer Checkout Section</a> 
         {% endif %}
@@ -269,10 +269,11 @@
         </div>
     </div>
     {% endif %}<!-- End CheckIns -->
+    <a id="adults"></a>
 
     <div class="row mt-3" id="StudentAdults">
         <h2>
-            <a id="adults">Student's Adults</a>  
+            Student's Adults
             <a href="/addadult/{{currUser.aeriesid}}"><img width="20" src="/static/new.png"></a> <br>
         </h2>
         {% if not currUser.adults %}

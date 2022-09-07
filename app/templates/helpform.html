@@ -14,6 +14,9 @@
             {{ form.hidden_tag() }}
             {{form.gclassid}}
             {% if isStuList %}
+                <br>
+                <small>Choosing a person will send them a txt msg to that person and the teacher.</small> 
+                <br>
                 {{form.students}}
             {% endif %}
 

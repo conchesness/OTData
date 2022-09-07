@@ -7,14 +7,12 @@ from datetime import datetime as dt
 #from datetime import timedelta
 from mongoengine import Q
 import mongoengine.errors
+from .msgs import txtOneStu
 
 @app.route('/help/create/<gclassid>', methods=['GET', 'POST'])
 def createhelp(gclassid):
 
     currUser = User.objects.get(gid=session['gid'])
-    # Only create a new help if there is not an active one for this class
-    #gClass = currUser.gclasses.filter(gclassid=gclassid)
-    #gClass = gClass[0]
     gClass = GoogleClassroom.objects.get(gclassid=gclassid)
     query = Q(requester=currUser) & Q(gclass=gClass) & (Q(status = 'asked') | Q(status = 'offered'))
     lastHelp = Help.objects(query)
@@ -28,21 +26,17 @@ def createhelp(gclassid):
     isStuList = False
     if form.validate_on_submit():
         gclass = GoogleClassroom.objects.get(gclassid = form.gclassid.data)
+        enrollments = GEnrollment.objects(gclassroom = gclass)
 
         if not form.students.data:
             stuGIdList = [('----','!Anyone'),(gclass.gteacherdict['id'],f"!Teacher: {gclass.gteacherdict['name']['familyName']}")]
-            try:
-                gclass.grosterTemp
-            except:
-                flash("There is no available roster for this class. This can only\
-                    be created by the teacher.")
-            else:
-                for stu in gclass.grosterTemp:
-                    stuName = f"{stu['profile']['name']['givenName']} {stu['profile']['name']['familyName']}"
-                    # if stu['sortCohort']:
-                    #     stuName = f"{stu['sortCohort']} {stuName}"
-                    stuGIdList.append((stu['userId'],stuName))
-                stuGIdList.sort(key=lambda tup: tup[1]) 
+
+            for enrollment in enrollments:
+                stuName = f"{enrollment.owner.fname} {enrollment.owner.lname}"
+                if enrollment.sortCohort:
+                    stuName = f"{enrollment.sortCohort} {stuName}"
+                stuGIdList.append((enrollment.owner.gid,stuName))
+            stuGIdList.sort(key=lambda tup: tup[1]) 
             form.students.choices = stuGIdList
             isStuList = True
         else:
@@ -61,6 +55,10 @@ def createhelp(gclassid):
                            was created but no one was specifically requested as the helper.")
                 else:
                     newHelp.update(reqhelper = reqHelper)
+                    msg = f"{currUser.fname} {currUser.lname} has requested your help in {gclass.gclassdict['name']}."
+                    txtOneStu(reqHelper.gid,msg)
+                    msg = f""
+                    txtOneStu(gclass.gteacherdict['id'],f"{currUser.fname} {currUser.lname} requested {reqHelper.fname} {reqHelper.lname}'s help in {gclass.gclassdict['name']}.")
 
             return redirect(url_for('classdash',gclassid=gclass.gclassid))
 

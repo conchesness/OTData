@@ -28,6 +28,29 @@ auth_token = twilio_auth_token
 
 # API Docs: https://www.twilio.com/docs/sms/api/message-resource
 
+def txtOneStu(gid,msg):
+    stu = User.objects.get(gid=gid)
+    if not stu.mobile:
+        flash(f"{stu.fname} {stu.lname} does not have a mobile phone number in OTData. Please ask them to add one!")
+
+    client = Client(account_sid, auth_token)
+
+    try:
+        client.messages.create(
+                body=msg,
+                from_='+15108043552',
+                status_callback='https://otdata.hsoakland.tech/msgstatus',
+                to=stu.mobile
+            )
+    except Exception as error:
+        flash(f"Got this error: {error} when trying to send a msg to {stu.mobile}")
+        result="failed"
+    else:
+        flash(f"msg sent to {stu.fname} {stu.lname}: {msg}.")
+        result="success"
+
+    return result
+
 def txtGroupFunc(groupid,msg,pars=0):
     phnums = []
     group = Group.objects.get(pk=groupid)
@@ -147,11 +170,6 @@ def msgstatus():
     if request.user_agent == None:
         flash('You are not authorized to access that page because you have no request user agent.')
         return redirect(url_for('index'))
-    # elif 'TwilioProxy' not in request.user_agent.string:
-    #     flash(f'You are not authorized to access that page because you are not Twilio.')
-    #     flash(f'You are {request.user_agent.string}')
-
-    #     return redirect(url_for('index'))
             
     # Get the message the user sent our Twilio number
     twilioid = request.values.get('MessageSid', None)

@@ -15,28 +15,45 @@
         {% else %}
             <img class="img-thumbnail" width = "100" src="/static/oths.jpg">
         {% endif %}
-    </div>
-    <div class="col-md-8">
-        <h2>
-            {{currUser.fname}} {{currUser.lname}}
-                
-            {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}
-        </h2>
-        {% if session.audience.lower() == "ot" %}
-            <a href="#adults" class="btn btn-primary btn-sm" role="button">Add your Adults!</a> <br>
-            <a href="/plan/{{currUser.gid}}" class="btn btn-primary btn-sm" role="button">Success Plan</a> 
-            <a href="#compborrow" class="btn btn-primary btn-sm" role="button">Computer Checkout Section</a> 
+        {% if currUser.lastlogin %} 
+        <br>
+            <span class="mt-1 mb-0">
+                <small>Last login: {{moment(currUser.lastlogin).calendar()}}</small>
+            </span>
         {% endif %}
-        {% if currUser.lastlogin %}
-            <p class="mt-1 mb-0"><small>Last login: {{moment(currUser.lastlogin).calendar()}}</small></p>
-        {% endif %}
-        {% if currUser.lastedited %}
-        <span class="mt-0"><small>Last 3 Edits: 
-        {% for edit in currUser.lastedited %}
-            {% if loop.index < 4 %}
-            {{moment(edit[0]).calendar()}} by {{edit[1].afname}} {{edit[1].alname}}, 
+    {% if currUser.lastedited %}
+        <span class="mt-0">
+            <small>Last 3 Edits: 
+                {% for edit in currUser.lastedited %}
+                    {% if loop.index < 4 %}
+                    {{moment(edit[0]).calendar()}} by {{edit[1].afname}} {{edit[1].alname}}, 
+                    {% endif %}
+                {% endfor %}
+            </small>
+        </span>
+        
+
+        </div>
+        <div class="col-md-8">
+            <h2>
+                {{currUser.fname}} {{currUser.lname}}
+                    
+                {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}
+            </h2>
+            {% if tokens | length > 0 %}
+            {% set tokenCount = namespace(count=0) %}
+            {% for token in tokens %}
+                {% if token.help.status.lower() == "approved" %}
+                    {% set tokenCount.count = tokenCount.count + token.amt %}
+                {% endif %}
+            {% endfor %} 
+            <small><b>Tokens: {{tokenCount.count}}</b></small> <br>
             {% endif %}
-        {% endfor %}</small></span> 
+            {% if session.audience.lower() == "ot" %}
+                {% if not currUser.adults %} <a href="#adults" class="btn btn-primary btn-sm" role="button">Add your Adults!</a> {% endif %}
+                <a href="/plan/{{currUser.gid}}" class="btn btn-primary btn-sm" role="button">Success Plan</a> 
+                <a href="#compborrow" class="btn btn-primary btn-sm" role="button">Computer Checkout Section</a> 
+            {% endif %}
     {% endif %}
     </div>
 </div><!--ProfileHead-->
@@ -213,6 +230,34 @@
 
     </div>
     {% endif %}
+
+    <div class="row mt-3 px-3" id="tokens">
+        <div class="col">
+            <h2>Tokens</h2>
+            <table class="table">
+                <tr><th>Date</th><th>owner</th><th>giver</th><th>Amt</th><th></th></tr>
+                {% for token in tokens %}
+                    <tr>
+                        <td>{{token.transaction}}</td>
+                        <td>{{token.owner.fname}} {{token.owner.lname}}</td>
+                        <td>{{token.giver.fname}} {{token.giver.lname}}</td>
+                        <td>{{token.amt}}</td>
+                        <td>
+                            {% if token.note %}
+                                {{token.note}}
+                            {% endif %}
+                            {% if token.help %}
+                                helped: {{token.help.requester.fname}} {{token.help.requester.lname}} <br>
+                                Status: {{token.help.status}} <br>
+                                {{token.help.confirmdesc}}
+                            {% endif %}
+                    </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
 
     <div class="row mt-3 px-3" id="StudentClasses">
         <div class="col">

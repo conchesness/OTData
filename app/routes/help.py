@@ -1,7 +1,7 @@
 from app.classes.forms import ActiveClassesForm, SimpleForm, TokenForm
 from app import app
-from flask import render_template, redirect, session, flash, url_for
-from app.classes.data import GoogleClassroom, User, Help, Token
+from flask import render_template, redirect, session, flash, url_for, Markup
+from app.classes.data import GEnrollment, GoogleClassroom, User, Help, Token
 from app.classes.forms import ActiveClassesForm
 from datetime import datetime as dt
 #from datetime import timedelta
@@ -23,20 +23,6 @@ def createhelp(gclassid):
         return redirect(url_for('classdash',gclassid=gclassid))
 
     form = ActiveClassesForm()
-
-
-
-    # gclasses = []
-    # for gCourse in gCourses:
-    #     if gCourse.gclassroom:
-    #         tempname = gCourse.gclassroom.gclassdict['name']
-    #         if not gCourse.status:
-
-    #             gCourse.status = ""
-
-    #         # a list of tuples for the form
-    #         if gCourse.status == "Active":
-    #             gclasses.append((gCourse.gclassroom.gclassid, tempname))
 
     form.gclassid.choices = [(gClass.gclassid,gClass.gclassdict['name'])]
     isStuList = False
@@ -100,7 +86,6 @@ def offerhelp(helpid):
         offered = dt.utcnow()
     )
 
- 
     return redirect(url_for('classdash',gclassid=offerHelp.gclass.gclassid))
 
 @app.route('/help/recind/<helpid>')
@@ -159,7 +144,8 @@ def confirmhelp(helpid):
     requester1 = Token(
         giver = banker,
         owner = confirmHelp.requester,
-        help = confirmHelp
+        help = confirmHelp,
+        amt = 0
     )
     requester1.save()
 
@@ -168,7 +154,8 @@ def confirmhelp(helpid):
         requester2 = Token(
             giver = banker,
             owner = confirmHelp.requester,
-            help = confirmHelp
+            help = confirmHelp,
+            amt = 0
         )
         requester2.save()
 
@@ -177,7 +164,8 @@ def confirmhelp(helpid):
         helper1 = Token(
             giver = banker,
             owner = confirmHelp.helper,
-            help = confirmHelp
+            help = confirmHelp,
+            amt = 0
         )
         helper1.save()
 
@@ -217,6 +205,12 @@ def approvehelps(gclassid):
 def approvehelp(helpid):
     help = Help.objects.get(pk=helpid)
     help.update(status='approved')
+    tokens = Token.objects(help=help)
+    for token in tokens:
+        if token.amt == 0:
+            token.update(amt=1)
+        else:
+            flash("Token already awarded.")
     
     return redirect(url_for('classdash',gclassid=help.gclass.gclassid))
 
@@ -228,15 +222,6 @@ def rejecthelp(helpid):
         note = 'Rejected for bad or missing confirmation description.'
         )
     help.reload()
-
-    tokens = Token.objects(owner = help.requester).sum('amt')
-    if tokens > 0:
-        Token.objects(owner = help.requester).first().delete()
-        note=help.note+" One Token was deleted from your account."
-        help.update(note=note)
-    else:
-        note=help.note+" I looked to delete a token from your account but you had none."
-
     
     return redirect(url_for('classdash',gclassid=help.gclass.gclassid))
 
@@ -257,9 +242,10 @@ def tokensAward(gclassid):
 
     currUser = User.objects.get(id=session['currUserId'])
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    enrollments = GEnrollment.objects(gclassroom=gClassroom)
     owners = []
-    for student in gClassroom.groster:
-        owner = (student['userId'], student['profile']['name']['fullName'])
+    for enrollment in enrollments:
+        owner = (enrollment.owner.gid, f"{enrollment.owner.fname} {enrollment.owner.lname}")
         owners.append(owner)
 
     owners.sort(key=lambda x:x[1])
@@ -268,27 +254,12 @@ def tokensAward(gclassid):
     form.owner.choices = owners
     if form.validate_on_submit():
         tokenReceiver = User.objects.get(gid=form.owner.data)
-        if int(form.numTokens.data) > 0:
-            for i in range(int(form.numTokens.data)):
-                Token(
-                    owner = tokenReceiver,
-                    giver = currUser,
-                    note = form.note.data
-                ).save()
-        else:
-            try:
-                token = Token.objects(owner = tokenReceiver).first()
-            except:
-                flash('No tokens to take.')
-            else:
-                token.delete()
-                flash(f'One Token Deleted for: {form.note.data}.')
-            Help(
-                requester = tokenReceiver,
-                note = f"One token deleted (if you had one) for: {form.note.data}",
-                status = "rejected",
-                confirmed = dt.utcnow
-            ).save()
+        Token(
+            owner = tokenReceiver,
+            giver = currUser,
+            note = form.note.data,
+            amt = form.numTokens.data
+        ).save()
         
         return(redirect(url_for('classdash',gclassid=gclassid)))
 

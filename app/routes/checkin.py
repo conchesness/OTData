@@ -216,6 +216,8 @@ def breakstart(gclassid):
                 return redirect(url_for('checkin'))
             for i,token in enumerate(tokens):
                 if i+1 <= spend:
+                    if token.help:
+                        token.help.note = Markup(f"{token.help.note} <br> Token spent on break.")
                     token.delete()
 
         currUser.update(
@@ -223,7 +225,6 @@ def breakstart(gclassid):
             breakduration = form.duration.data,
             breakclass = form.gclassid.data
         )
-        #return redirect(url_for('checkin')) 
         return redirect(url_for('classdash',gclassid=gclassid)) 
 
     form.duration.data = 10

@@ -55,7 +55,7 @@ class ActiveClassesForm(FlaskForm):
     submit = SubmitField("Submit")
 
 class TokenForm(FlaskForm):
-    numTokens = SelectField("Number of Tokens",choices=[(1,1),(-1,-1)],validators=[InputRequired()])
+    numTokens = SelectField("Number of Tokens",choices=[(1,1)],validators=[InputRequired()])
     owner = SelectField("To",choices=[],validators=[InputRequired()],validate_choice=False)
     note = TextAreaField("Note",validators=[InputRequired()])
     submit = SubmitField("Send")

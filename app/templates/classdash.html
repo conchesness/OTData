@@ -80,7 +80,7 @@
       {% if myHelps %}
           <tr><th colspan=6> My Requests </th></tr>
           <tr>
-            <td></td><th>Created</th><th>Status</th><th>Helper</th><th>Notes</th>
+            <td></td><th>Created</th><th>Status</th><th>Requested</th><th>Helper</th><th>Notes</th>
           </tr>
         {% for myHelp in myHelps | sort(attribute="status") | sort(reverse=true,attribute="created") %}
           <tr>
@@ -117,7 +117,7 @@
       {% endif %}
 
       {% if myOffers %}
-        <tr><th colspan="3">My Offers</th><th>Requester</th><th></th><th></th></tr>
+        <tr><th colspan="3">My Offers</th><th>Requester</th><th>Requested</th><th></th></tr>
         {% for myOffer in myOffers | sort(attribute="status",reverse=True) | sort(attribute="created",reverse=true)  %}
             <tr>
               <td>
@@ -132,7 +132,8 @@
               </td>
               <td>{{moment(myOffer.created).calendar()}}</td>
               <td>{{myOffer.status}}</td>            
-              <td>{{myOffer.requester.fname}} {{myOffer.requester.lname}}</td>
+              <td>Asker: {{myOffer.requester.fname}} {{myOffer.requester.lname}}</td>
+              <td>asked: {{myOffer.reqhelper.fname}} {{myOffer.reqhelper.lname}}</td>
               <td>{{myOffer.gclass.gclassdict['name']}}</td>
               <td>{{moment(myOffer.offered).calendar()}}</td>
             </tr>
@@ -142,17 +143,17 @@
 
       {% if helps %}
       <tr>
-        <th colspan="3"><h3>Requests for Help</h3><th><u>Requester<br>Helper</th></th>
+        <th colspan="2"><h3>Requests for Help</h3><th>Status</th><th><u>Requester<br>Helper</th></th>
       </tr>
       
       <p>
         {% for help in helps | sort(attribute="status") | sort(attribute="created", reverse=true) %}
         <tr>
           <td>
-            {% if not help.helper %}<a href="/help/offer/{{help.id}}">Offer</a> {% endif %}
+            {% if not help.helper and (help.reqhelper.id == currUser.id or not help.reqhelper) %}<a href="/help/offer/{{help.id}}">Offer</a> | {% endif %}
             {% if currUser.role.lower() == "teacher" %}
               <a href="/help/delete/{{help.id}}">
-                  | <img src="/static/delete.png" width="20" alt="">
+                  <img src="/static/delete.png" width="20" alt="">
               </a> 
               | <a href="/help/confirm/{{help.id}}">Confirm</a>
             {% endif %}
@@ -160,9 +161,12 @@
           <td>{{moment(help.created).calendar()}}</td>
           <td>{{help.status}}</td>
           <td>
-            {{help.requester.fname}} {{help.requester.lname}}
+            {{help.requester.fname}} {{help.requester.lname}} wants help
+            {% if help.reqhelper %}
+              from {{help.reqhelper.fname}} {{help.reqhelper.lname}}
+            {% endif %}
             {% if help.helper %}
-              /<br>{{help.helper.fname}} {{help.helper.lname}} 
+              <br>{{help.helper.fname}} {{help.helper.lname}} has offered help
             {% endif %}
           </td>
           <td>{{help.gclass.gclassdict['name']}}</td>
@@ -213,7 +217,7 @@
     <h1 class="display-5">Approve Helps</h1>
     <a class="btn btn-primary btn-sm" role="button" href="/approveallconfirmed/{{gClassroom.gclassid}}">Approve ALL Remaining</a>
     <table class="table">
-        <tr><th></th><th>Helped</th><th>Helper</th><th>Status</th><th>Created</th><th>Description of Help</th></tr>
+        <tr><th></th><th>Helped</th><th>Helper</th><th>Requested</th><th>Status</th><th>Created</th><th>Description of Help</th></tr>
         {% for help in approveHelps | sort(attribute="created", reverse=true) | sort(attribute="status")%}
         {% if help.requester.role.lower() == 'student' and help.helper.role.lower() == 'student' %}
             <tr>
@@ -228,6 +232,7 @@
                 </td>
                 <td>{{help.requester.fname}} {{help.requester.lname}}</td>
                 <td>{{help.helper.fname}} {{help.helper.lname}}</td>
+                <td>{{help.reqhelper.fname}} {{help.reqhelper.lname}}</td>
                 <td>{{help.status}}</td>
                 <td>{{moment(help.created).calendar()}}</td>
                 <td>{{help.confirmdesc}} {% if help.note %}<br><font color="red">{{help.note}}</font>{% endif %}</td>

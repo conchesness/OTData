@@ -233,10 +233,10 @@
         <div class="col">
             <h2>Tokens</h2>
             <table class="table">
-                <tr><th>Date</th><th>owner</th><th>giver</th><th>Amt</th><th></th></tr>
+                <tr><th>Date</th><th>owner</th><th>giver</th><th>Amt</th><th>Note</th></tr>
                 {% for token in tokens %}
                     <tr>
-                        <td>{{token.transaction}}</td>
+                        <td>{{moment(token.transaction).calendar()}}</td>
                         <td>{{token.owner.fname}} {{token.owner.lname}}</td>
                         <td>{{token.giver.fname}} {{token.giver.lname}}</td>
                         <td>{{token.amt}}</td>
@@ -244,12 +244,7 @@
                             {% if token.note %}
                                 {{token.note}}
                             {% endif %}
-                            {% if token.help %}
-                                helped: {{token.help.requester.fname}} {{token.help.requester.lname}} <br>
-                                Status: {{token.help.status}} <br>
-                                {{token.help.confirmdesc}}
-                            {% endif %}
-                    </td>
+                        </td>
                     </tr>
                 {% endfor %}
             </table>

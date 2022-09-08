@@ -43,9 +43,7 @@
             {% if tokens | length > 0 %}
             {% set tokenCount = namespace(count=0) %}
             {% for token in tokens %}
-                {% if token.help.status.lower() == "approved" %}
-                    {% set tokenCount.count = tokenCount.count + token.amt %}
-                {% endif %}
+                {% set tokenCount.count = tokenCount.count + token.amt %}
             {% endfor %} 
             <small><b>Tokens: {{tokenCount.count}}</b></small> <br>
             {% endif %}

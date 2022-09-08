@@ -165,7 +165,6 @@ def standardedit(standardid):
     form = StandardForm()
     standardEdit = Standard.objects.get(id = standardid)
     if form.validate_on_submit():
-        print(form.gclass.data)
         standardEdit.update(
             name = form.name.data,
             desc = form.desc.data,

@@ -22,7 +22,6 @@ from bson.objectid import ObjectId
 def addtocohort():
     form = AddToCohortForm()
     if form.validate_on_submit():
-        print(form.gclassmongoid.data)
         gClass = GoogleClassroom.objects.get(gclassid=form.gclassmongoid.data)
         if form.aeriesIds.data:
             ids = form.aeriesIds.data.replace(" ", "")
@@ -139,7 +138,7 @@ def getstudentwork(gclassid):
             return redirect('/authorize')
 
         except Exception as error:
-            print(error)
+            flash(f"unknown error: {error}")
 
         studSubsAll.extend(studSubs['studentSubmissions'])
         pageToken = studSubs.get('nextPageToken')
@@ -417,9 +416,7 @@ def gclasses(gclassid=None):
         gCourses = gCourses['courses']
 
     # Iterate through the classes
-    for i,gCourse in enumerate(gCourses):
-        length = len(gCourses)
-        print(f"course {i}/{length}")
+    for gCourse in enumerate(gCourses):
         # get the teacher record
         try:
             # See if I can find a Google Teacher User

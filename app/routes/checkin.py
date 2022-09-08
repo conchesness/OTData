@@ -78,7 +78,6 @@ def classdash(gclassid):
                 numCount = numCount + 1
 
             choice = (sortValue,ass['title'])
-            print(choice)
             assigns_choices.append(choice)
     if strCount > numCount:
         assigns_choices = []
@@ -197,7 +196,6 @@ def breakstart(gclassid):
     #gClass = gEnrollment.gclassroom
 
     gClass = GoogleClassroom.objects.get(gclassid=gclassid)
-    print(gClass.gclassdict)
     form.gclassid.choices = [(gClass.gclassdict['id'],gClass.gclassdict['name'])]
 
     try:

@@ -62,22 +62,18 @@
 
         <table class="table">
             <tr>
-                <th>Date</th><th>Student</th><th>Status</th><th>working on...</th><th>Did</th>
+                <th>Date</th><th>Student</th><th>Productive?</th><th>What they said they did</th><th>What they said they would do</th>
             </tr>
             {% for checkin in checkins %}
             
             <tr>
                 <td>
                     {{moment(checkin.createdate).format('h:mm a') }} <br> 
-                    <a class="btn btn-info btn-sm loadingModal" role="button" href="/deletecheckin/{{checkin.id}}/{{gclassid}}/{{gclassname}}">Delete</a>
+                    <a class="btn btn-info btn-sm loadingModal" role="button" href="/deletecheckin/{{checkin.id}}">Delete</a>
                 </td>
                 <td>
                     <a href="/profile/{{checkin.student.aeriesid}}">
-                        {{checkin.student.afname}} 
-                        {% if checkin.student.ufname %}
-                            ({{checkin.student.ufname}})
-                        {% endif %}
-                        {{checkin.student.alname}} {{checkin.student.aeriesid}}
+                        {{checkin.student.fname}} {{checkin.student.fname}} {{checkin.student.aeriesid}}
                     </a> <br> {{checkin.student.cohort}} 
                 </td>
                 {% if checkin.status == '4' or checkin.status == '5' %}
@@ -88,9 +84,9 @@
                     <td class="bg-danger"> 
                 {% endif %}
                 {{checkin.status}} </td>
-                <td> {{checkin.workingon}} </td>
+                <td> {% if checkin.desc %}{{checkin.desc}} {% endif %}</td>
                 <td>
-                    {{checkin.desc}}
+                    {{checkin.workingon}}
                 </td>
             </tr>
             {% endfor %}

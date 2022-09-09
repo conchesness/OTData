@@ -55,13 +55,18 @@
       
       <table class="table">
         <tr>
-          <td></td><th>Date</th><th>Were You Productive?</th><th>Desc</th>
+          <td></td>
+          <th>Date</th>
+          <th>Were You Productive?</th>
+          <th>What you did</th>
+          <th>What you said you would do</th>
         </tr>
         <tr>
             <td><a href="/deletecheckin/{{lastCheckIn.id}}"><img width="20" src="/static/delete.png"></a></td>
             <td>{{moment(lastCheckIn.createdate).calendar()}}</td>
-            <td>{{lastCheckIn.status}}</td>
+            <td>{{lastCheckIn.status}} {{lastCheckIn.other}}</td>
             <td>{{lastCheckIn.desc}}</td>
+            <td>{{lastCheckIn.workingon}}</td>
         </tr>
 
       </table>

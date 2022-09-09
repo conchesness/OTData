@@ -288,7 +288,7 @@
             <h3>Check Ins (last 10)</h3>               
             <table class="table">
             <tr>
-                <th>Class</th><th>Date</th><th>Status (1-5)</th>
+                <th>Class</th><th>Date</th><th>Status (1-5)</th><th>working on</th><th>Worked on</th>
             </tr>
             {% for checkin in checkins | sort(attribute='createdate', reverse = True) %}
                 <tr>
@@ -299,7 +299,13 @@
                     {{moment(checkin.createdate).calendar()}}
                 </td>
                 <td>
-                    {{checkin.status}} - {{checkin.desc}}
+                    {{checkin.status}}
+                </td>
+                <td>
+                    {{checkin.workingon}}
+                </td>
+                <td>
+                    {{checkin.desc}}
                 </td>
                 </tr>
             {% endfor %}

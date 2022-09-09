@@ -1,4 +1,5 @@
 from app import app
+from app.routes.sbg import gclass
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, request, Markup
 from app.classes.data import GEnrollment, User, CheckIn, GoogleClassroom, Help, Token, Settings
@@ -111,11 +112,11 @@ def classdash(gclassid):
             student = currUser,
             desc = form.desc.data,
             status = form.status.data,
-            other = f"{form.assigns.data} {form.desc.data}"
+            workingon = f"{form.assigns.data} {form.other.data}"
             )
-        
         checkin.save()
         lastCheckIn = checkin
+
         flash(f"CheckIn for {currUser.fname} {currUser.lname} saved.")
 
         form.desc.data = None
@@ -237,22 +238,22 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
                     desc = f"Check in created by {currUser.fname} {currUser.lname}"
                 )
     newCheckIn.save()
+
     return flash(f" {student.fname} {student.lname} was just checked in by {currUser.fname} {currUser.lname}. ")
 
-@app.route('/deletecheckin/<checkinid>/<gclassid>/<gclassname>')
 @app.route('/deletecheckin/<checkinid>')
-def deletecheckin(checkinid,gclassid=None,gclassname=None):
+def deletecheckin(checkinid,gclassid=None):
     checkin = CheckIn.objects.get(pk=checkinid)
+    gclassid=checkin.googleclass.gclassid
+
     currUser=User.objects.get(id=session['currUserId'])
     if currUser == checkin.student or currUser.role.lower() == "teacher":
         checkin.delete()
         flash('Checkin deleted')
     else:
         flash("can't delete a checkin you don't own.")
-    if gclassid and gclassname:
-        return redirect(url_for('checkinsfor', gclassid=gclassid,gclassname=gclassname)) 
 
-    return redirect(url_for('classdash',gclassid=checkin.googleclass.gclassid))
+    return redirect(url_for('checkinsfor', gclassid=gclassid)) 
 
 @app.route('/checkinsfor/<gclassid>', methods=['GET', 'POST'])
 def checkinsfor(gclassid,sndrmdr=0):

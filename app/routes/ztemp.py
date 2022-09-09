@@ -1,10 +1,24 @@
 from flask.helpers import url_for
 from app import app
 from flask import render_template, redirect, flash, session
-from app.classes.data import User,Help
+from app.classes.data import CheckIn, User,Help
 from mongoengine import Q
 import requests
 import time
+
+# @app.route("/fixcheckins")
+# def fixcheckins():
+#     query = Q(workingon__exists = False) and Q(desc__exists = True)
+#     checkins = CheckIn.objects(query)
+#     length = len(checkins)
+#     for i,checkin in enumerate(checkins):
+#         checkin.update(
+#             workingon = checkin.desc,
+#             unset__desc = 1
+#         )
+#         print(f"{i}/{length}")
+#     return
+
 
 # @app.route('/addlatlon')
 # def addlatlon():

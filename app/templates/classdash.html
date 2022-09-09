@@ -12,31 +12,43 @@
           {% for field in form.errors %}
               {% for error in form.errors[field] %}
                   <div class="alert alert-error">
-                      <strong>Error!</strong>{{field}}: {{error}}
+                      <strong>Error!</strong> {{field}}: {{error}}
                   </div>
               {% endfor %}
           {% endfor %}
           
-          <div class="row form-group">
-            <div class="col">
-              <form id="modalform" method=post>
-                {{ form.hidden_tag() }}
-                <p>Were you productive since last class?<font color="red">*</font>: {{form.status(class="form-control")}}</p>
-                
+          <div class="form-group">
+            <div class="row">
+              <div class="col">
+                <form id="modalform" method=post>
+                  {{ form.hidden_tag() }}
+                  <p>Were you productive since last class?<font color="red">*</font>: {{form.status(class="form-control")}}</p>
+              </div>
+              <div class="col">
+                <p>
+                What assignment are you working on<font color="red">*</font>:<br>
+                {{form.assigns(class="form-control")}}
+                </p>
+              </div>
             </div>
-            <div class="col">
-              <p>
-              What assignment are you working on<font color="red">*</font>:<br>
-              {{form.assigns(class="form-control")}}
-              </p>
+            <div class="row">
+              <div class="col">
+                What have you done since the last class<font color="red">*</font>: <br>
+                <small>Be specific!</small>
+                <br>{{form.desc(class="form-control")}}
+              </div>
+              <div class="col">
+                If you chose other, what are you gonna do?<font color="red">*</font>: <br>
+                <small>Be specific!</small>
+                <br>{{form.other(class="form-control")}}
+              </div>
             </div>
+            <div class="row my-3">
+              <div class="col">
+                {{form.submit(class="form-control btn-primary")}}
+              </div>
             </div>
-            <p>
-              If you chose other, what are you gonna do?<font color="red">*</font>: <br>
-              <small>Be specific!</small>
-              <br>{{form.desc(class="form-control")}}
-            </p>
-            <p>{{form.submit(class="form-control btn-primary")}}</p>
+          </div>
           </form>
           {% if lastCheckIn %}
           <h5>Last Check In</h5>

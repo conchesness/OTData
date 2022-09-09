@@ -85,7 +85,6 @@ def classdash(gclassid):
             choice = (ass['title'],ass['title'])
             assigns_choices.append(choice)
     else:
-        flash("Assignments are sorted numerically.")
         assigns_choices = sorted(assigns_choices, key = lambda i: (i[0]), reverse=True)
 
     assigns_choices.insert(0, ('other','other'))
@@ -93,22 +92,14 @@ def classdash(gclassid):
 
     form.assigns.choices = assigns_choices
 
-    #if form.validate_on_submit() and currUser.role.lower() == 'student':
     if form.validate_on_submit():
 
-        # nowPacific = nowUTC.astimezone(timezone('US/Pacific'))
-        # All dates retrieved from the DB are in UTC
-
         if lastCheckIn and lastCheckIn.gclassid and lastCheckIn.createdate.date() == dt.utcnow().date() and str(lastCheckIn.gclassid) == str(gclassid):
-            flash('It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
-            return redirect(url_for('classdash',gclassid=gclassid))
-
-        if len(form.status.data) == 0:
-            flash('"How are you" is a required field')
+            flash('CHECKIN DID NOT SAVE! It looks like you already checkedin to that class today? If so, please delete one of the checkins.')
             return redirect(url_for('classdash',gclassid=gclassid))
         
-        if form.assigns.data == "other" and len(form.desc.data) == 0:
-            flash("If you choose Other please describe what you are doing.")
+        if form.assigns.data == "other" and len(form.other.data) == 0:
+            flash("CHECKIN DID NOT SAVE! You chose Other. PLease describe what what you are planning to do!.")
             return redirect(url_for('classdash',gclassid=gclassid))
 
         googleclass = GoogleClassroom.objects.get(gclassid=gclassid)
@@ -118,8 +109,9 @@ def classdash(gclassid):
             googleclass = googleclass,
             gclassname = googleclass.gclassdict['name'],
             student = currUser,
-            desc = f"{form.assigns.data} {form.desc.data}",
-            status = form.status.data         
+            desc = form.desc.data,
+            status = form.status.data,
+            other = f"{form.assigns.data} {form.desc.data}"
             )
         
         checkin.save()

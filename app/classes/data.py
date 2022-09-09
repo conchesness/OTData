@@ -78,10 +78,12 @@ class CheckIn(Document):
     student = ReferenceField('User')
     user_agent = StringField()
     locationData = DictField()
+    workingon = StringField()
     desc = StringField()
     status = StringField(default='inactive')
     synchronous = BooleanField()
     createdBy = ReferenceField('User') # Only present if not created by student
+    approved = BooleanField()
 
     
     cameraoff = BooleanField()

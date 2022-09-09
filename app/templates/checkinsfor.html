@@ -62,7 +62,7 @@
 
         <table class="table">
             <tr>
-                <th>Date</th><th>Student</th><th>Status</th><th>working on...</th>
+                <th>Date</th><th>Student</th><th>Status</th><th>working on...</th><th>Did</th>
             </tr>
             {% for checkin in checkins %}
             
@@ -88,7 +88,10 @@
                     <td class="bg-danger"> 
                 {% endif %}
                 {{checkin.status}} </td>
-                <td> {{checkin.desc}} </td>
+                <td> {{checkin.workingon}} </td>
+                <td>
+                    {{checkin.desc}}
+                </td>
             </tr>
             {% endfor %}
         </table>

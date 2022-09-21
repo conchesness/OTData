@@ -109,15 +109,27 @@ def msg(aeriesnum,tophone=None):
     phoneNums=[]
 
     for adult in student.adults:
+        if adult.mobile == None:
+            adult.mobile = "----------"
         phoneNums.append((adult.mobile, Markup(f'Mobile for {adult.relation} <br> {adult.fname} {adult.lname}')))
-        
+    if student.mobile == None:
+        student.mobile = "----------"
+
     phoneNums.append((student.mobile, Markup('Student Mobile')))
 
-    student.aphone = int(re.sub("[^0-9]", "", student.aphone))
-    if student.aadult1phone:
+    try:
+        student.aphone = int(re.sub("[^0-9]", "", student.aphone))
+    except:
+        student.aphone = "----------"
+
+    if student.aadult1phone != None:
         student.aadult1phone = int(re.sub("[^0-9]", "", student.aadult1phone))
-    if student.aadult2phone:
+    else:
+        student.aadult1phone = "----------"
+    if student.aadult2phone != None:
         student.aadult2phone = int(re.sub("[^0-9]", "", student.aadult2phone))
+    else:
+        student.aadult2phone = "----------"
     phoneNums.append((student.aphone, f'Home Phone from Aeries for {student.aadults}'))
     phoneNums.append((student.aadult1phone, "Parent1 phone from Aeries"))
     phoneNums.append((student.aadult2phone, "Parent2 phone from Aeries"))

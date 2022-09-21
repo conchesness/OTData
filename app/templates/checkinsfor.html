@@ -69,11 +69,11 @@
             <tr>
                 <td>
                     {{moment(checkin.createdate).format('h:mm a') }} <br> 
-                    <a class="btn btn-info btn-sm loadingModal" role="button" href="/deletecheckin/{{checkin.id}}">Delete</a>
+                    <a class="btn btn-info btn-sm loadingModal" role="button" href="/deletecheckin/{{checkin.id}}/checkinsfor">Delete</a>
                 </td>
                 <td>
                     <a href="/profile/{{checkin.student.aeriesid}}">
-                        {{checkin.student.fname}} {{checkin.student.fname}} {{checkin.student.aeriesid}}
+                        {{checkin.student.fname}} {{checkin.student.lname}} {{checkin.student.aeriesid}}
                     </a> <br> {{checkin.student.cohort}} 
                 </td>
                 {% if checkin.status == '4' or checkin.status == '5' %}

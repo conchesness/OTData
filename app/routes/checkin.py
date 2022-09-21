@@ -241,8 +241,9 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
 
     return flash(f" {student.fname} {student.lname} was just checked in by {currUser.fname} {currUser.lname}. ")
 
+@app.route('/deletecheckin/<checkinid>/<returnurl>')
 @app.route('/deletecheckin/<checkinid>')
-def deletecheckin(checkinid,gclassid=None):
+def deletecheckin(checkinid,returnurl='classdash'):
     checkin = CheckIn.objects.get(pk=checkinid)
     gclassid=checkin.googleclass.gclassid
 
@@ -253,7 +254,7 @@ def deletecheckin(checkinid,gclassid=None):
     else:
         flash("can't delete a checkin you don't own.")
 
-    return redirect(url_for('checkinsfor', gclassid=gclassid)) 
+    return redirect(url_for(returnurl, gclassid=gclassid)) 
 
 @app.route('/checkinsfor/<gclassid>', methods=['GET', 'POST'])
 def checkinsfor(gclassid,sndrmdr=0):

@@ -483,6 +483,8 @@ def editprofile(aeriesid=None):
         # Record edit datetime to user record
         userModified(editUser)
 
+        editUser.reload()
+
         if form.image.data:
             editUser.image.delete()
             editUser.image.put(form.image.data, content_type = 'image/jpeg')

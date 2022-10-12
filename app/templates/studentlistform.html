@@ -61,6 +61,7 @@
 <table class="table">
     <tr>
         <th>ID</th><th>name</th><th>Email</th><th>cohort</th><th>ethnicity</th><th>grade</th><th>gender</th>
+        <th>Postgrad</th>
     </tr>
 {% if users %}
 {% for user in users | sort(attribute="alname,afname") %}
@@ -76,6 +77,13 @@
         <td>{{user.aethnicity}}</td>
         <td>{{user.grade}}</td>
         <td>{{user.agender}}</td>
+        {% if user.postgrads %}
+            <td>PG:
+                {% for pg in user.postgrads %}
+                    {{pg.org}}
+                {% endfor %}
+            </td>
+        {% endif %}
     </tr>
 {% endfor %}
 {% endif %}

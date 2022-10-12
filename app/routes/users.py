@@ -370,10 +370,11 @@ def profile(aeriesid=None):
 
     if targetUser.role.lower() == "student":
         checkins = CheckIn.objects(student=targetUser).limit(15)
-        messages = Message.objects(student=targetUser).limit(6)
+        #messages = Message.objects(student=targetUser).limit(6)
         tokens = Token.objects(owner=targetUser)
     else:
         checkins = None
+        tokens = None
 
     form = CohortForm()
 

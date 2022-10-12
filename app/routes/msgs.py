@@ -55,6 +55,15 @@ def txtGroupFunc(groupid,msg,pars=0):
     phnums = []
     group = Group.objects.get(pk=groupid)
     for stu in group.students:
+        try:
+            stu.adult1phone
+        except:
+            stu.adult1phone = None
+        try:
+            stu.adult2phone
+        except:
+            stu.adult2phone = None
+            
         if stu.mobile:
             phnums.append(stu.mobile)
         else:

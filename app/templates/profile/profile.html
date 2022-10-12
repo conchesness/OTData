@@ -40,7 +40,7 @@
                     
                 {% if currUser.pronouns %}({{ currUser.pronouns }}){% endif %}
             </h2>
-            {% if tokens | length > 0 %}
+            {% if tokens and tokens | length > 0 %}
             {% set tokenCount = namespace(count=0) %}
             {% for token in tokens %}
                 {% set tokenCount.count = tokenCount.count + token.amt %}

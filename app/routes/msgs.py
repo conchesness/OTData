@@ -132,11 +132,18 @@ def msg(aeriesnum,tophone=None):
         student.aphone = "----------"
 
     if student.aadult1phone != None:
-        student.aadult1phone = int(re.sub("[^0-9]", "", student.aadult1phone))
+        try:
+            student.aadult1phone = int(re.sub("[^0-9]", "", student.aadult1phone))
+        except:
+            student.aadult1phone = "----------"
     else:
         student.aadult1phone = "----------"
     if student.aadult2phone != None:
-        student.aadult2phone = int(re.sub("[^0-9]", "", student.aadult2phone))
+        try:
+            student.aadult2phone = int(re.sub("[^0-9]", "", student.aadult2phone))
+        except:
+            student.aadult1phone = "----------"
+
     else:
         student.aadult2phone = "----------"
     phoneNums.append((student.aphone, f'Home Phone from Aeries for {student.aadults}'))

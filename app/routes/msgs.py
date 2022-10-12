@@ -134,15 +134,17 @@ def msg(aeriesnum,tophone=None):
     if student.aadult1phone != None:
         try:
             student.aadult1phone = int(re.sub("[^0-9]", "", student.aadult1phone))
-        except:
+        except Exception as error:
             student.aadult1phone = "----------"
+            flash(f'Error formating aasult1phone:{error}')
     else:
         student.aadult1phone = "----------"
     if student.aadult2phone != None:
         try:
             student.aadult2phone = int(re.sub("[^0-9]", "", student.aadult2phone))
-        except:
+        except Exception as error:
             student.aadult1phone = "----------"
+            flash(f'Error formating aasult1phone:{error}')
 
     else:
         student.aadult2phone = "----------"

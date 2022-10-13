@@ -115,7 +115,7 @@ def before_request():
     # TODO could just prefix the url with "/stu/" for studentpaths
     unauthPaths = ['/','/home','/authorize','/login','/oauth2callback','/static','/logout','/revoke','/msgreply','/msgstatus']   
     communityPaths = ['/profile','/editprofile','/findstufromadult','/addstutoadult','/equity']
-    studentPaths = ['/getgclasses','/student','/breaks','/classdash','/assignments','/comp','/help','/breakstart','/postgrad','/cc','/plan','/profile','/editprofile','/addadult','/editadult','/deleteadult','/sendstudentemail','/checkin','/deletecheckin','/editgclass','/deletegclass','/gclasses','/comp','/missingassignmentsstu'] 
+    studentPaths = ['/getgclasses','/comp/','/compborrow','/student','/breaks','/classdash','/assignments','/help','/breakstart','/postgrad','/cc','/plan','/profile','/editprofile','/addadult','/editadult','/deleteadult','/sendstudentemail','/checkin','/deletecheckin','/editgclass','/deletegclass','/gclasses','/missingassignmentsstu'] 
     # this is some tricky code designed to send the user to the page they requested even if they have to first go through
     # a authorization process.
     try: 

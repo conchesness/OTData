@@ -141,7 +141,7 @@ def checkin():
     currUser = User.objects.get(pk = session['currUserId'])
     enrollments = GEnrollment.objects(owner=currUser)
 
-    return render_template('checkin.html', enrollments=enrollments, currUser=currUser)
+    return render_template('checkins/checkin.html', enrollments=enrollments, currUser=currUser)
 
 @app.route('/breaksettings/<gClassid>', methods=['GET', 'POST'])
 def breaksettings(gClassid):
@@ -258,6 +258,7 @@ def deletecheckin(checkinid,returnurl='classdash'):
 
 @app.route('/checkinsfor/<gclassid>', methods=['GET', 'POST'])
 def checkinsfor(gclassid,sndrmdr=0):
+
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     gclassname = gClassroom.gclassdict['name']
 
@@ -285,7 +286,6 @@ def checkinsfor(gclassid,sndrmdr=0):
     utcsearchdatetime = searchdatetime.astimezone(ZoneInfo("UTC")).date()
 
     dateForm.querydate.data = searchdatetime.date()
-
 
     query = (Q(gclassid = gclassid) & (Q(createdate__gt = utcsearchdatetime) & Q(createdate__lt = utcsearchdatetime + timedelta(days=1))))
 
@@ -331,6 +331,61 @@ def checkinsfor(gclassid,sndrmdr=0):
             checkinstus(gclassid,gclassname,student,searchdatetime)
         request.form = None
         return redirect(url_for('checkinsfor', gclassid=gclassid)) 
+    
+    return render_template('checkins/checkinsfor.html', querydate= dateForm.querydate.data, checkins=checkins, stuForm=stuForm, dateForm=dateForm, gclassid=gclassid, gclassname=gclassname, notcheckedstus=notcheckedstus, searchdatetime=searchdatetime)
 
-    return render_template('checkinsfor.html', querydate= dateForm.querydate.data, checkins=checkins, stuForm=stuForm, dateForm=dateForm, gclassid=gclassid, gclassname=gclassname, notcheckedstus=notcheckedstus, searchdatetime=searchdatetime)
 
+@app.route('/checkinssince/<gclassid>', methods=['GET', 'POST'])
+def checkinssince(gclassid):
+    gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
+    gclassname = gClassroom.gclassdict['name']
+    dateForm = DateForm()
+    searchdate = dt.now(ZoneInfo('US/Pacific')).date()
+
+    try:
+        searchdatetime = session['searchdatetime']
+    except KeyError:
+        searchdate = dt.now(ZoneInfo('US/Pacific')).date()
+
+    #dateForm.querydate.data = searchdatetime.date()
+
+    if dateForm.validate_on_submit():
+        # get the date from the form
+        searchdate = dateForm.querydate.data
+        # turn the date in to a datetime 
+        searchdatetime = dt(searchdate.year, searchdate.month, searchdate.day)
+        session['searchdatetime'] = searchdatetime
+    
+    utcsearchdatetime = searchdatetime.astimezone(ZoneInfo("UTC")).date()
+
+    query = (Q(gclassid = gclassid) & (Q(createdate__gt = utcsearchdatetime)))
+
+    checkins = CheckIn.objects(query)
+
+    users = []
+    for checkin in checkins:
+        users.append(checkin.student)
+    users = list(set(users))
+    usersdict = {}
+    for user in users:
+        usersdict[user] = "X"
+    for checkin in checkins:
+        if usersdict[checkin.student] == "X":
+            usersdict[checkin.student] = [checkin]
+        else:
+            usersdict[checkin.student].append(checkin)
+    
+    newdict = {}
+    for user in usersdict:
+        total = 0
+        length = len(usersdict[user])
+        for checkin in usersdict[user]:
+            total = total + int(checkin.status)
+        newdict[user] = [length,round(total/length,2)]
+    usersdict = newdict
+
+    usersdict = sorted(usersdict.items(), key=lambda e: e[1][1])
+
+
+
+    return render_template('checkins/checkinsforsince.html', querydate= dateForm.querydate.data, checkins=checkins, dateForm=dateForm, gclassid=gclassid, searchdatetime=searchdatetime, usersdict=usersdict, gclassname=gclassname)

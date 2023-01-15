@@ -1,3 +1,16 @@
 {
-    "python.defaultInterpreterPath": "C:\\Users\\steve\\anaconda3\\envs\\otdata\\python.exe"
+    "python.defaultInterpreterPath": "C:\\Users\\steve\\anaconda3\\envs\\otdata\\python.exe",
+    "python.languageServer": "Pylance",
+    "python.linting.pylintEnabled": false,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingModuleSource": "none"
+    },
+    "python.analysis.extraPaths": [
+        "c:\\Users\\steve\\.vscode\\extensions\\joedevivo.vscode-circuitpython-0.1.19-win32-x64\\boards\\0x239A\\0x80F4",
+        "c:\\Users\\steve\\.vscode\\extensions\\joedevivo.vscode-circuitpython-0.1.19-win32-x64\\stubs",
+        "c:\\Users\\steve\\AppData\\Roaming\\Code\\User\\globalStorage\\joedevivo.vscode-circuitpython\\bundle\\20230105\\adafruit-circuitpython-bundle-py-20230105\\lib"
+    ],
+    "circuitpython.board.version": null,
+    "circuitpython.board.vid": "0x239A",
+    "circuitpython.board.pid": "0x80F4"
 }

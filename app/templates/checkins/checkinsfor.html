@@ -5,6 +5,7 @@
     <form method=post>
         {{ dateForm.hidden_tag() }}{{ dateForm.querydate() }} 
         <span class="loadingModal">{{dateForm.submitDateForm()}}</span>
+        <a href="/checkinssince/{{gclassid}}">Checkins Since</a>
     </form>
 
     {% if gclassname %}

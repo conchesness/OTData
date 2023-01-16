@@ -375,16 +375,13 @@ def checkinssince(gclassid):
         else:
             usersdict[checkin.student].append(checkin)
     
-    newdict = {}
     for user in usersdict:
         total = 0
         length = len(usersdict[user])
         for checkin in usersdict[user]:
             total = total + int(checkin.status)
-        newdict[user] = [length,round(total/length,2)]
-    usersdict = newdict
-
-    usersdict = sorted(usersdict.items(), key=lambda e: e[1][1])
+        usersdict[user].insert(0,[length,round(total/length,2)])
+    usersdict = sorted(list(usersdict.items()), key=lambda e: e[1][0][1])
 
 
 

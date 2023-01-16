@@ -2,14 +2,16 @@
 
 {% block body %}
 <div class="container">
-    Checkins Since <br>
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
     <form method=post>
         {{ dateForm.hidden_tag() }}{{ dateForm.querydate() }} 
         <span class="loadingModal">{{dateForm.submitDateForm()}}</span>
     </form>
 
     {% if gclassname %}
-    <h3><span class="showDate"></span> in {{gclassname}}</h3>
+    <h3>Checkins Since <span class="showDate"></span> in {{gclassname}}</h3>
     {% endif %}
 
     {% for field in dateForm.errors %}
@@ -22,10 +24,6 @@
 
     {% if usersdict%}
 
-    <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
-
             <table class="table">
                 <tr>
                     <th>Student</th>
@@ -34,9 +32,27 @@
                 </tr>
             {% for stu in usersdict %}
                 <tr>
-                    <td>{{stu[0].fname}} {{stu[0].lname}}</td>
-                    <td>{{stu[1][0]}}</td>
-                    <td>{{stu[1][1]}}</td>
+                    <td>
+                        <a data-bs-toggle="collapse" href="#collapseCheckins{{loop.index}}" aria-expanded="false" aria-controls="collapseRoster">
+                            <img src="/static/collapse.png" width="20">
+                        </a>
+                        {{stu[0].fname}} {{stu[0].lname}}
+                    </td>
+                    <td>{{stu[1][0][0]}}</td>
+                    <td>{{stu[1][0][1]}}</td>
+                    <tr>
+                        <td colspan="3">
+                        <div class="collapse" id="collapseCheckins{{loop.index}}">
+                        {% for checkin in stu[1] %}
+                            {% if not loop.first %}
+                                <b>{{moment(checkin.createdate).calendar()}}</b> <br>
+                                <u>Since last time:</u> {{checkin.status}} {{checkin.desc}} <br>
+                                <u>Working On:</u> {{checkin.workingon}} <br>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </td>
+                    </tr>
                 </tr>
             {% endfor %}
             </table>

@@ -297,16 +297,15 @@ def checkinsfor(gclassid,sndrmdr=0):
     checkingids = [checkin.student.gid for checkin in checkins]
 
     # This is a list of gids for the students in the Google Classroom
-    rostergids = [enrollment.owner.id for enrollment in enrollments]
+    rostergids = [enrollment.owner.gid for enrollment in enrollments]
 
     # This is a list of gids for of students on the google roster but not in the checked in
-    notcheckedingids = [rostergid for rostergid in rostergids if rostergid not in checkingids]
-
+    notcheckedingids = [rostergid for rostergid in rostergids if str(rostergid) not in checkingids]
     notcheckedstus = []
     notcheckedstuschoices = []
 
     for enrollment in enrollments:
-        if enrollment.owner.id in notcheckedingids:
+        if enrollment.owner.gid in notcheckedingids:
             try:
                 notcheckedstus.append(enrollment.owner)
             except:

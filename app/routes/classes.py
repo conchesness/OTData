@@ -25,7 +25,9 @@ def addtocohort():
         gClass = GoogleClassroom.objects.get(gclassid=form.gclassmongoid.data)
         if form.aeriesIds.data:
             ids = form.aeriesIds.data.replace(" ", "")
-            ids = ids.strip(",")
+            ids = form.aeriesIds.data.replace("\n", "")
+            ids = form.aeriesIds.data.replace("\r", "")
+            #ids = ids.strip(",")
             ids = ids.split(",")
             for id in ids:
                 try:

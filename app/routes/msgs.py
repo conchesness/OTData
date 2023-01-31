@@ -51,7 +51,40 @@ def txtOneStu(gid,msg):
 
     return result
 
+def txtGroupAdhoc(gidList,msg):
+    phnums = []
+    for gid in gidList:
+        try:
+            stu = User.objects.get(gid=gid)
+        except:
+            flash(f"User with id: {gid} does not exist in OTData.")
+        else:
+            if stu.mobile:
+                phnums.append(stu.mobile)
+            else:
+                flash(f"{stu.fname} {stu.lname} does not have a mobile phone number in OTData.")
+        
+    #deduplicate the phnums
+    phnums = list(set(phnums))
+
+    client = Client(account_sid, auth_token)
+
+    for phnum in phnums:
+        try:
+            client.messages.create(
+                    body=msg,
+                    from_='+15108043552',
+                    status_callback='https://otdata.hsoakland.tech/msgstatus',
+                    to=f"+1{phnum}"
+                )
+        except Exception as error:
+            flash(f"Got this error: {error} when trying to send a msg to +1{phnum}")
+
+    return 
+
+
 def txtGroupFunc(groupid,msg,pars=0):
+    #if pars = 1, also txt parents
     phnums = []
     group = Group.objects.get(pk=groupid)
     for stu in group.students:

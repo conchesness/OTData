@@ -9,6 +9,7 @@ from datetime import datetime as dt
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 from mongoengine import Q
+from .msgs import txtGroupAdhoc
 
 @app.route("/classdash/<gclassid>", methods=["GET","POST"])
 def classdash(gclassid):
@@ -257,6 +258,7 @@ def deletecheckin(checkinid,returnurl='classdash'):
     return redirect(url_for(returnurl, gclassid=gclassid)) 
 
 @app.route('/checkinsfor/<gclassid>', methods=['GET', 'POST'])
+@app.route('/checkinsfor/<gclassid>/<sndrmdr>', methods=['GET', 'POST'])
 def checkinsfor(gclassid,sndrmdr=0):
 
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
@@ -301,6 +303,12 @@ def checkinsfor(gclassid,sndrmdr=0):
 
     # This is a list of gids for of students on the google roster but not in the checked in
     notcheckedingids = [rostergid for rostergid in rostergids if str(rostergid) not in checkingids]
+
+    if sndrmdr == "1":
+        print("send reminder")
+        txtGroupAdhoc(notcheckedingids,f"Please checkin to {gclassname}.")
+
+        
     notcheckedstus = []
     notcheckedstuschoices = []
 

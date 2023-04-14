@@ -64,6 +64,7 @@
               <a class="waitMsg" data-toggle="tooltip" data-placement="top" title="View CheckIns" href="/checkinsfor/{{enrollment.gclassroom.gclassdict.id}}">
                 <img width="25" src="/static/checkin.png">
               </a>
+              <a href="/project/dashboard/{{enrollment.gclassroom.id}}">P</a>
               {% endif %}
             </td>
             {% if session['role'].lower() == 'student' %}

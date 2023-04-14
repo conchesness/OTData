@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
 
 {% block body %}
+
 <div class="row">
     <div class="col-2">
-        <h1>My Projects</h1>
+        <h1>
+            {% if currProj %}
+                {{currUser.fname}} {{currUser.lname}} 
+            {% endif %}
+            Projects
+        </h1>
     </div>
     <div class="col">
         <div class="row">
@@ -19,8 +25,10 @@
                     {% for proj in myProjects %}
                         <tr>
                             <td>
-                                <a href="/myprojects/{{proj.id}}">Select</a> | 
-                                <a href="/project/delete/{{proj.id}}">Del</a>
+                                {% if currUser.id | string == session['currUserId'] | string %}
+                                    <a href="/myprojects/{{proj.id}}">Select</a> | 
+                                    <a href="/project/delete/{{proj.id}}">Del</a>
+                                {% endif %}
                             </td>
                             <td>{{proj.name}}</td>
                             <td>{{moment(proj.createdate).calendar()}}</td>
@@ -40,10 +48,12 @@
                         </div>
                     {% endfor %}
                 {% endfor %}
+                {% if currUser.id | string == session['currUserId'] | string %}
                 <form method=post>
                     {{ projectForm.hidden_tag() }}
                     {{projectForm.gclass}} {{projectForm.name(placeholder="Project Name")}} {{projectForm.submitProject()}}
                 </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -70,8 +80,10 @@
             {% for task in currProj.tasks %}
             <tr>
                 <td>
+                    {% if currUser.id | string == session['currUserId'] | string %}
                     <a href="/project/task/delete/{{currProj.id}}/{{task.oid}}">Del</a> |
                     <a href="/project/task/edit/{{currProj.id}}/{{task.oid}}">Edit</a>
+                    {% endif %}
                 </td>
                 <td>
                     {{task.order}}
@@ -102,6 +114,7 @@
                 </div>
             {% endfor %}
         {% endfor %}
+        {% if currUser.id | string == session['currUserId'] | string %}
         <form method=post>
             {{ projectTaskForm.hidden_tag() }}
             <div class="mb-2">
@@ -112,12 +125,13 @@
                 {{projectTaskForm.status()}} 
             </div>
             <div class="mb-2">
-                {{projectTaskForm.desc(placeholder="Task Description")}} 
+                {{projectTaskForm.desc(cols=50,placeholder="Task Description")}} 
             </div>
             <div>
                 {{projectTaskForm.submitTask()}}
             </div>
         </form>
+        {% endif %}
     </div>
     <div class="col border border-2 m-2">
         <h3>Progress</h3>
@@ -135,13 +149,15 @@
                     Status
                 </th>
                 <th>
-                    Desc
+                    Des
                 </th>
             </tr>
             {% for ci in currProj.checkins %}
             <tr>
                 <td>
+                    {% if currUser.id | string == session['currUserId'] | string %}
                     <a href="/project/checkin/delete/{{currProj.id}}/{{ci.oid}}">Del</a>
+                    {% endif %}
                 </td>
                 <td>
                     {{moment(ci.createdate).calendar()}}
@@ -162,7 +178,6 @@
     <div class="col border border-2 m-2">
         <h3>Checkin</h3>
         <div  class="col border border-2 m-2">
-            <b>New Checkin</b><br>
             {% for field in projectCheckinForm.errors %}
                 {% for error in projectCheckinForm.errors[field] %}
                     <div class="alert alert-error">
@@ -170,23 +185,31 @@
                     </div>
                 {% endfor %}
             {% endfor %}
+
+            {% if currUser.id | string == session['currUserId'] | string %}
             <form method=post>
                 {{ projectCheckinForm.hidden_tag() }}
+                {% if currProj.checkins | length > 0 %}
                 <div class="mb-2">
+                    <small>
+                        On {{moment(currProj.checkins[-1].createdate).format('M/D/YY')}} you worked on {{currProj.checkins[-1].workingonname}} <br>
+                        Rate your progress: {{projectCheckinForm.status()}} 
+                    </small>
+                </div>
+                <div class="mb-2">
+                    <small>What specifically did yo do since last checkin?</small> <br>
+                    {{projectCheckinForm.desc(cols=50,placeholder="Task Description")}} 
+                </div>
+                {% endif %}
+                <div class="mb-2">
+                    <small>Which task are you working on today?</small>
                     {{projectCheckinForm.workingon(placeholder="Task Name")}}
                 </div> 
-                <div class="mb-2">
-                    <small>How have you done since last checkin?</small> <br>
-                    {{projectCheckinForm.status()}} 
-                </div>
-                <div class="mb-2">
-                    <small>What have you done since last checkin?</small> <br>
-                    {{projectCheckinForm.desc(placeholder="Task Description")}} 
-                </div>
                 <div>
                     {{projectCheckinForm.submitCheckin()}}
                 </div>
             </form>
+            {% endif %}
         </div>
     </div>
 </div>

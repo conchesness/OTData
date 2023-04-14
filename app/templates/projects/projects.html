@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1> {{gclass.gclassdict.name}}</h1>
+
+<div class="row">
+{% for project in projects %}
+    <div class="col mb-2">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body shadow p-3 bg-body rounded">
+                <h5 class="card-title">{{project.student.fname}} {{project.student.lname}} </h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    <a href="/myprojects/{{project.id}}/{{project.student.id}}">{{project.name}}</a>
+                </h6>
+                <p class="card-text"><b>{{project.checkins | length}} Checkins</b></p>
+                <p class="card-text"><b>Tasks</b></p>
+                <ul class="list-group list-group-flush">
+                    {% for task in project.tasks %}
+                        <li class="list-group-item">
+                            <em>
+                            {% if task.status == "Complete" %}
+                                {{moment(task.completedate).format('M/D/YY')}}
+                            {% else %}
+                                {{task.status}} 
+                            {% endif %}
+                            </em>
+                            {{task.name}}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}

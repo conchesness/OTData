@@ -26,20 +26,29 @@ def reNumberTasks(editProj):
     editProj.reload()
     return editProj
 
+@app.route('/myprojects/<currProjId>/<uid>', methods=['GET', 'POST'])
 @app.route('/myprojects/<currProjId>', methods=['GET', 'POST'])
 @app.route('/myprojects', methods=['GET', 'POST'])
-def myProjects(currProjId=None):
+def myProjects(currProjId=None, uid=None):
+    
     if currProjId:
         currProj = Project.objects.get(pk=currProjId)
     else:
         currProj=None
-    currUser = User.objects.get(pk = session['currUserId'])
-    myProjects = Project.objects(student = currUser)
+
+    if uid:
+        stu = User.objects.get(id = uid)
+    else:
+        stu = User.objects.get(pk = session['currUserId'])
+
+    print(stu.fname)
+
+    myProjects = Project.objects(student = stu)
     projectForm = ProjectForm()
     projectTaskForm = ProjectTaskForm()
     projectCheckinForm = ProjectCheckinForm()
 
-    gclasses = GEnrollment.objects(owner = currUser, status="Active")
+    gclasses = GEnrollment.objects(owner = stu, status="Active")
     classChoices = []
     for gClass in gclasses:
         classChoices.append((gClass.gclassroom.id,gClass.gclassroom.gclassdict['name']))
@@ -55,11 +64,10 @@ def myProjects(currProjId=None):
         gClass = GoogleClassroom.objects.get(pk = projectForm.gclass.data)
         newProject = Project(
             name = projectForm.name.data,
-            student = currUser,
+            student = stu,
             gclass = gClass
         )
         newProject.save()
-        #projectForm = ProjectForm(formdata=None)
         return redirect(url_for('myProjects'))
 
 
@@ -73,7 +81,6 @@ def myProjects(currProjId=None):
             )
         currProj = reNumberTasks(currProj)
         currProj.save()
-        #projectTaskForm = ProjectTaskForm(formdata=None)
         return redirect(url_for('myProjects',currProjId=currProj.id))
 
 
@@ -86,10 +93,9 @@ def myProjects(currProjId=None):
                 desc = projectCheckinForm.desc.data
             )
         currProj.save()
-        #projectCheckinForm = ProjectTaskForm(formdata=None)
         return redirect(url_for('myProjects',currProjId=currProj.id))
     
-    return render_template('projects/myprojects.html',currProj=currProj,myProjects=myProjects,projectForm=projectForm, projectTaskForm=projectTaskForm, projectCheckinForm=projectCheckinForm)
+    return render_template('projects/myprojects.html',currUser=stu,currProj=currProj,myProjects=myProjects,projectForm=projectForm, projectTaskForm=projectTaskForm, projectCheckinForm=projectCheckinForm)
 
 @app.route('/project/delete/<pid>')
 def projectDelete(pid):
@@ -140,3 +146,9 @@ def projectCheckinDelete(pid,pcid):
     editProject.checkins.filter(oid=pcid).delete()
     editProject.save()
     return redirect(url_for('myProjects',currProjId=pid))
+
+@app.route('/project/dashboard/<gcid>')
+def projectDashboard(gcid):
+    gclass = GoogleClassroom.objects.get(id=gcid)
+    projects = Project.objects(gclass=gclass)
+    return render_template('projects/projects.html', projects=projects, gclass=gclass)

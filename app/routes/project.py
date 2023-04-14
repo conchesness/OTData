@@ -60,7 +60,7 @@ def myProjects(currProjId=None):
         )
         newProject.save()
         #projectForm = ProjectForm(formdata=None)
-        return redirect(url_for('myProjects',currProjId=currProj.id))
+        return redirect(url_for('myProjects'))
 
 
     elif projectTaskForm.submitTask.data and projectTaskForm.validate_on_submit():

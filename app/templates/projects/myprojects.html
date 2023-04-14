@@ -131,8 +131,12 @@
                 <th></th>
                 <th>Date</th>
                 <th>Task</th>
-                <th>Status</th>
-                <th>Desc</th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Desc
+                </th>
             </tr>
             {% for ci in currProj.checkins %}
             <tr>
@@ -172,9 +176,11 @@
                     {{projectCheckinForm.workingon(placeholder="Task Name")}}
                 </div> 
                 <div class="mb-2">
+                    <small>How have you done since last checkin?</small> <br>
                     {{projectCheckinForm.status()}} 
                 </div>
                 <div class="mb-2">
+                    <small>What have you done since last checkin?</small> <br>
                     {{projectCheckinForm.desc(placeholder="Task Description")}} 
                 </div>
                 <div>

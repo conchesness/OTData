@@ -1,8 +1,7 @@
-#import matplotlib
-
 from app.routes.coursecat import course
-#matplotlib.use('Agg')
-#import matplotlib.pyplot as plt 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt 
 from app import app
 from .users import credentials_to_dict
 from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
@@ -122,7 +121,9 @@ def getstudentwork(gclassid):
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
     else:
         return redirect('/authorize')
+
     session['credentials'] = credentials_to_dict(credentials)
+
     classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
     studSubsAll = []
     pageToken=None
@@ -133,7 +134,6 @@ def getstudentwork(gclassid):
                 courseId=gclassid,
                 #states=['TURNED_IN','RETURNED','RECLAIMED_BY_STUDENT'],
                 courseWorkId='-',
-                pageToken=pageToken
                 ).execute()
         except RefreshError:
             flash('Had to reauthorize your Google credentials.')
@@ -222,7 +222,8 @@ def ontimeperc(gclassid):
 
     subsDF = subsDF.drop(columns='id')
 
-    subsDF = subsDF[['userId', 'courseId', 'courseWorkId', 'creationTime', 'updateTime', 'state', 'alternateLink', 'courseWorkType', 'assignmentSubmission', 'submissionHistory', 'late', 'draftGrade', 'assignedGrade']]
+    #subsDF = subsDF[['userId', 'courseId', 'courseWorkId', 'creationTime', 'updateTime', 'state', 'alternateLink', 'courseWorkType', 'assignmentSubmission', 'submissionHistory', 'late', 'draftGrade', 'assignedGrade']]
+    subsDF = subsDF[['userId', 'courseId', 'courseWorkId', 'creationTime', 'updateTime', 'state', 'alternateLink', 'courseWorkType', 'assignmentSubmission', 'submissionHistory', 'late']]
 
     dictfordf = {}
     for row in enrollments:

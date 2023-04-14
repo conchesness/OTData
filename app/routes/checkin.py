@@ -308,7 +308,6 @@ def checkinsfor(gclassid,sndrmdr=0):
         print("send reminder")
         txtGroupAdhoc(notcheckedingids,f"Please checkin to {gclassname}.")
 
-        
     notcheckedstus = []
     notcheckedstuschoices = []
 

@@ -110,6 +110,43 @@ class PostGrad(EmbeddedDocument):
     pg_state = StringField()
     pg_zip = IntField()
 
+class ProjectTask(EmbeddedDocument):
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
+    order = IntField()
+    name = StringField()
+    desc = StringField()
+    status = StringField(default="New")
+    completedate = DateTimeField()
+    createdate = DateTimeField(default=d.datetime.utcnow)
+    
+    meta = {
+        'ordering': ['order','createdate']
+    }
+
+class ProjectCheckin(EmbeddedDocument):
+    oid = ObjectIdField(default=ObjectId(), sparse=True, required=True, unique=True, primary_key=True)
+    workingon = ObjectIdField('ProjectTask')
+    workingonname = StringField()
+    status = StringField()
+    desc = StringField()
+    createdate = DateTimeField(default=d.datetime.utcnow)
+
+    meta = {
+        'ordering': ['-createdate']
+    }
+
+class Project(Document):
+    name = StringField()
+    student = ReferenceField('User')
+    gclass = ReferenceField('GoogleClassroom')
+    tasks = EmbeddedDocumentListField('ProjectTask')
+    checkins = EmbeddedDocumentListField('ProjectCheckin')
+    createdate = DateTimeField(default=d.datetime.utcnow)
+
+    meta = {
+        'ordering': ['-createdate']
+    }
+
 class User(Document):
     # temp
     # gclasses = StringField()

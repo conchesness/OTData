@@ -8,4 +8,4 @@ if __name__ == "__main__":
     
     # app.run(debug="True", ssl_context='adhoc')
     # app.run(debug="True",use_reloader=False, ssl_context=('cert.pem', 'key.pem'))
-    app.run(debug="True",use_reloader=True, ssl_context=('cert.pem', 'key.pem'))
+    app.run(debug="True",use_reloader=True, ssl_context=('cert.pem', 'key.pem'),port=8080)

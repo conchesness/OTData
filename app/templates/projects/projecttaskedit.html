@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Project: {{editProject.name}}</h1>
+        <h5>{{editProject.student.fname}} {{editProject.student.lname}}</h5>
+        <b>{{editProject.gclass.gclassdict.name}}</b> <br>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <h5 class="mt-4">Edit Task</h5>
+        <form method=post>
+            {{ form.hidden_tag() }}
+            <div class="mt-2">
+                Order <br> {{form.order(size=2)}}
+            </div>
+            <div class="mt-2">
+                Name <br> {{form.name}}
+            </div>
+            <div class="mt-2">
+                status <br> {{form.status}}
+            </div>            
+            <div class="mt-2">
+                Description <br> {{form.desc}}
+            </div>
+            <div>
+                {{form.submitTask()}}
+            </div>
+        </form>
+    </div>
+{% endblock %}

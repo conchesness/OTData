@@ -4,7 +4,7 @@ from flask.app import Flask
 from flask_wtf import FlaskForm
 from mongoengine.fields import IntField
 from wtforms.fields.html5 import URLField, DateField, DateTimeField, EmailField
-from wtforms.widgets.core import Select
+#from wtforms.widgets.core import Select
 from wtforms_components import TimeField
 from wtforms.validators import URL, NumberRange, Email, Optional, InputRequired, ValidationError
 from wtforms import widgets, SelectMultipleField, StringField, SubmitField, validators, TextAreaField, HiddenField, IntegerField, SelectField, FileField, BooleanField
@@ -324,3 +324,21 @@ class StandardForm(FlaskForm):
 class AssignmentForm(FlaskForm):
     standards = MultiCheckboxField("Standards",choices=[],validate_choice=False)
     submit = SubmitField("Submit")
+
+class ProjectTaskForm(FlaskForm):
+    order = IntegerField('Order',validators=[InputRequired()])
+    name = StringField('Name',validators=[InputRequired()])
+    status = SelectField('Status', choices=[('New','New'),('In Progress','In Progress'),('Complete','Complete')])
+    desc = TextAreaField('Desc',validators=[InputRequired()])
+    submitTask = SubmitField("Submit", id="submitTaskForm")
+
+class ProjectCheckinForm(FlaskForm):
+    workingon = SelectField('Working On', choices=[],validate_choice=False,validators=[InputRequired()])
+    status = SelectField('Status', choices=[('Red','Red'),('Yellow','Yellow'),('Green','Green')],validators=[InputRequired()])
+    desc = TextAreaField(validators=[InputRequired()])
+    submitCheckin = SubmitField("Submit", id="submitCheckinForm")
+
+class ProjectForm(FlaskForm):
+    name = StringField(validators=[InputRequired()])
+    gclass = SelectField('Class', choices=[],validate_choice=False)
+    submitProject = SubmitField("Submit", id="submitProjectForm")

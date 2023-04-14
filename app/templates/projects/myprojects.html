@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="row">
+    <div class="col-2">
+        <h1>My Projects</h1>
+    </div>
+    <div class="col">
+        <div class="row">
+            {% if myProjects | length > 0 %}
+            <div class="col-12">
+                <table class="table">
+                    <tr>
+                        <th></th>
+                        <th>Project Name</th>
+                        <th>Create Date</th>
+                        <th>Class</th>
+                    </tr>
+                    {% for proj in myProjects %}
+                        <tr>
+                            <td>
+                                <a href="/myprojects/{{proj.id}}">Select</a> | 
+                                <a href="/project/delete/{{proj.id}}">Del</a>
+                            </td>
+                            <td>{{proj.name}}</td>
+                            <td>{{moment(proj.createdate).calendar()}}</td>
+                            <td>{{proj.gclass.gclassdict.name}}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% endif %}
+
+            <div class="col-12">
+                <b>New Project</b><br>
+                {% for field in projectForm.errors %}
+                    {% for error in projectForm.errors[field] %}
+                        <div class="alert alert-error">
+                            <strong>Error!</strong>{{field}}: {{error}}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                <form method=post>
+                    {{ projectForm.hidden_tag() }}
+                    {{projectForm.gclass}} {{projectForm.name(placeholder="Project Name")}} {{projectForm.submitProject()}}
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<hr class="border border-2 opacity-100">
+
+{% if currProj %}
+<div class="row">
+    <div class="col-12">
+        <h1>Project: {{currProj.name}}</h1>
+    </div>
+    <div class="col-6 border border-2 m-2">
+        <h3>Tasks</h3>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>Order</th>
+                <th>Status</th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+            {% for task in currProj.tasks %}
+            <tr>
+                <td>
+                    <a href="/project/task/delete/{{currProj.id}}/{{task.oid}}">Del</a> |
+                    <a href="/project/task/edit/{{currProj.id}}/{{task.oid}}">Edit</a>
+                </td>
+                <td>
+                    {{task.order}}
+                </td>
+                <td>
+                    {{task.status}}
+                    {% if task.status == "Complete" %}
+                        {{moment(task.completedate).calendar()}}
+                    {% endif %}
+                </td>
+                <td>
+                    {{task.name}}
+                </td>
+                <td>
+                    {{task.desc}}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+    <div  class="col border border-2 m-2">
+        <b>New Task</b><br>
+        {% for field in projectTaskForm.errors %}
+            {% for error in projectTaskForm.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <form method=post>
+            {{ projectTaskForm.hidden_tag() }}
+            <div class="mb-2">
+                {{projectTaskForm.order(size=2, placeholder="#")}} 
+                {{projectTaskForm.name(placeholder="Task Name")}}
+            </div> 
+            <div class="mb-2">
+                {{projectTaskForm.status()}} 
+            </div>
+            <div class="mb-2">
+                {{projectTaskForm.desc(placeholder="Task Description")}} 
+            </div>
+            <div>
+                {{projectTaskForm.submitTask()}}
+            </div>
+        </form>
+    </div>
+    <div class="col border border-2 m-2">
+        <h3>Progress</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col border border-2 m-2">
+        <h3>Checkin History</h3>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>Date</th>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Desc</th>
+            </tr>
+            {% for ci in currProj.checkins %}
+            <tr>
+                <td>
+                    <a href="/project/checkin/delete/{{currProj.id}}/{{ci.oid}}">Del</a>
+                </td>
+                <td>
+                    {{moment(ci.createdate).calendar()}}
+                </td>
+                <td>
+                    {{ci.workingonname}}
+                </td>
+                <td>
+                    {{ci.status}}
+                </td>
+                <td>
+                    {{ci.desc}}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col border border-2 m-2">
+        <h3>Checkin</h3>
+        <div  class="col border border-2 m-2">
+            <b>New Checkin</b><br>
+            {% for field in projectCheckinForm.errors %}
+                {% for error in projectCheckinForm.errors[field] %}
+                    <div class="alert alert-error">
+                        <strong>Error!</strong>{{field}}: {{error}}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            <form method=post>
+                {{ projectCheckinForm.hidden_tag() }}
+                <div class="mb-2">
+                    {{projectCheckinForm.workingon(placeholder="Task Name")}}
+                </div> 
+                <div class="mb-2">
+                    {{projectCheckinForm.status()}} 
+                </div>
+                <div class="mb-2">
+                    {{projectCheckinForm.desc(placeholder="Task Description")}} 
+                </div>
+                <div>
+                    {{projectCheckinForm.submitCheckin()}}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %} <!-- currProject -->
+{% endblock %}

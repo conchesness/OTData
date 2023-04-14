@@ -156,7 +156,7 @@
                         <b>Ethnicity</b> {{currUser.aethnicity}} <br>
                         <b>Language Fluency:</b> {{currUser.langflu}} <br>
                         {% if currUser.sped %}<b>SPED:</b> {{currUser.sped}}<br>{% endif %}
-                        {% if currUser.gpa > 0 %}
+                        {% if currUser.gpa and currUser > 0 %}
                             <b>AGPA:</b> {{currUser.gpa}} <br>
                         {% endif %}
                         <b>Academy/House:</b> {{currUser.cohort}} <br>

@@ -96,9 +96,11 @@ def listq():
             return render_template('studentlistform.html',form=form, users=users, total=len(users))
     return render_template('studentlistform.html',form=form, users=None, total=None)
 
+
 @app.route('/usermap')
 def usermap():
-    return render_template('usermap.html')
+    users=User.objects()
+    return render_template('usermap.html',users=users)
 
 
 @app.route('/logins')

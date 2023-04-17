@@ -41,8 +41,6 @@ def myProjects(currProjId=None, uid=None):
     else:
         stu = User.objects.get(pk = session['currUserId'])
 
-    print(stu.fname)
-
     myProjects = Project.objects(student = stu)
     projectForm = ProjectForm()
     projectTaskForm = ProjectTaskForm()

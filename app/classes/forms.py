@@ -334,7 +334,7 @@ class ProjectTaskForm(FlaskForm):
 
 class ProjectCheckinForm(FlaskForm):
     workingon = SelectField('Working On', choices=[],validate_choice=False,validators=[InputRequired()])
-    status = SelectField('Status', choices=[('Red','Red'),('Yellow','Yellow'),('Green','Green')],validators=[InputRequired()])
+    status = SelectField('Status', choices=[('Red','Red'),('Yellow','Yellow'),('Green','Green'),('---','---'),],validators=[InputRequired()])
     desc = TextAreaField(validators=[InputRequired()])
     submitCheckin = SubmitField("Submit", id="submitCheckinForm")
 

@@ -189,7 +189,6 @@
             {% if currUser.id | string == session['currUserId'] | string %}
             <form method=post>
                 {{ projectCheckinForm.hidden_tag() }}
-                {% if currProj.checkins | length > 0 %}
                 <div class="mb-2">
                     <small>
                         On {{moment(currProj.checkins[-1].createdate).format('M/D/YY')}} you worked on {{currProj.checkins[-1].workingonname}} <br>
@@ -197,10 +196,9 @@
                     </small>
                 </div>
                 <div class="mb-2">
-                    <small>What specifically did yo do since last checkin?</small> <br>
+                    <small>What specifically did yo do since last checkin? Enter 'NA' if this is your first checkin.</small> <br>
                     {{projectCheckinForm.desc(cols=50,placeholder="Task Description")}} 
                 </div>
-                {% endif %}
                 <div class="mb-2">
                     <small>Which task are you working on today?</small>
                     {{projectCheckinForm.workingon(placeholder="Task Name")}}

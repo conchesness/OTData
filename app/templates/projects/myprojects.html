@@ -190,10 +190,16 @@
             <form method=post>
                 {{ projectCheckinForm.hidden_tag() }}
                 <div class="mb-2">
+                    {% if currProj.checkins | length > 0 %}
                     <small>
                         On {{moment(currProj.checkins[-1].createdate).format('M/D/YY')}} you worked on {{currProj.checkins[-1].workingonname}} <br>
                         Rate your progress: {{projectCheckinForm.status()}} 
                     </small>
+                    {% else %}
+                    <small>
+                        This is your first checkin!
+                    </small>
+                    {% endif %}
                 </div>
                 <div class="mb-2">
                     <small>What specifically did yo do since last checkin? Enter 'NA' if this is your first checkin.</small> <br>

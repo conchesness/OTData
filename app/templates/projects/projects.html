@@ -13,6 +13,9 @@
                     <a href="/myprojects/{{project.id}}/{{project.student.id}}">{{project.name}}</a>
                 </h6>
                 <p class="card-text"><b>{{project.checkins | length}} Checkins</b></p>
+                {% if project.checkins | length > 0 %}
+                    <p class="card-text"><b>Last Checkin: {{moment(project.checkins[-1].createdate).calendar()}} </b></p>
+                {% endif %}
                 <p class="card-text"><b>Tasks</b></p>
                 <ul class="list-group list-group-flush">
                     {% for task in project.tasks %}

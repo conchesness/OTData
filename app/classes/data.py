@@ -486,3 +486,6 @@ class ReqClass(Document):
     name = StringField()
     semester = StringField() #Fall, Spring
     
+class Transcript(Document):
+    transcript = ListField()
+    student = ReferenceField('User')

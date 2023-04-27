@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div class="container">
+        <h1>Transcript</h1>
+        {% for field in form.errors %}
+            {% for error in form.errors[field] %}
+                <div class="alert alert-error">
+                    <strong>Error!</strong>{{field}}: {{error}}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <form method=post>
+            {{ form.hidden_tag() }}
+            Go to the transcript page in Aeries and right click on the page and choose "View Page Source". Select all and copy 
+            and then paste them in the box here and hit submit!
+            {{ form.transcript(cols=150, rows=10) }} <br>
+            {{ form.submit() }}
+        </form>
+        You can select and copy this table and paste it into Excel or Google Sheets.
+        {{transcript}}
+        <br> <br>
+        
+    </div>
+{% endblock %}

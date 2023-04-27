@@ -19,4 +19,5 @@ from .help import *
 from .sandbox import *
 from .misc import *
 from .project import *
+from .transcript import *
 #from .zscripts import *

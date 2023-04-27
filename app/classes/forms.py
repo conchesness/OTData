@@ -342,3 +342,7 @@ class ProjectForm(FlaskForm):
     name = StringField(validators=[InputRequired()])
     gclass = SelectField('Class', choices=[],validate_choice=False)
     submitProject = SubmitField("Submit", id="submitProjectForm")
+
+class TranscriptForm(FlaskForm):
+    transcript = TextAreaField('Transcript HTML')
+    submit = SubmitField('Submit')

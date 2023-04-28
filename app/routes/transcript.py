@@ -14,6 +14,11 @@ def transcript():
     if form.validate_on_submit():
         html = form.transcript.data
         soup = BeautifulSoup(html,features="html.parser")
+        stuName = soup.find('span',{'class':'student-full-name'})
+        stuName = stuName.text.strip()
+        stuName = " ".join(stuName.split())
+
+        print(stuName)
         results = soup.find('table',{"class":"CourseHistory"})
         all_tr = results.find_all('tr')
         transcript = []
@@ -53,7 +58,7 @@ def transcript():
                     'nh':nh.text.strip()
                     }
                 transcript.append(row)
-        pd.set_option('display.float_format', '{:.2f}'.format)
+        pd.set_option('display.float_format', '{:.3f}'.format)
 
         transcriptDF = pd.DataFrame.from_dict(transcript)
 
@@ -84,25 +89,30 @@ def transcript():
                             on ='mark', 
                             how ='inner')
 
-        # Create Adjusted Grade Points Column
         transcriptDF['cc'] = transcriptDF['cc'].astype('float64')
-        transcriptDF['cr'] = pd.to_numeric(transcriptDF['cr'])
-        # Add a GP for Honors and AP whever grade is above a D
+        transcriptDF['cr'] = transcriptDF['cr'].astype('float64')
+        # Created an Adjusted Grade Points for Honors and AP whever grade is above a D
         transcriptDF['adjgp'] = np.where(((transcriptDF['nh'] == "H") | (transcriptDF['nh'] == "H/AP")) & ((transcriptDF['gp'] > 1)), transcriptDF['gp']+1, transcriptDF['gp'])
-        # Remove the GP for N like PE
+        # Remove values from adjusted grade points that are not cllege prep
         transcriptDF['adjgp'] = np.where((transcriptDF['nh'] == "N") | (transcriptDF['cp'] != "P"), np.nan, transcriptDF['adjgp'])
-
+        # Sort the data
         transcriptDF = transcriptDF.sort_values(by=['grade', 'term','sname']).reset_index(drop=True)
-        transcriptDF.loc['total'] = transcriptDF[['gp','adjgp']].mean()
-        transcriptDF.loc['sum'] = transcriptDF[['cc','cr']].sum()
-        transcriptDF.at['total','cc'] = transcriptDF.at['sum','cc'] 
-        transcriptDF.at['total','cr'] = transcriptDF.at['sum','cr'] 
-        transcriptDF = transcriptDF.drop('sum')
-
-        transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh']] = transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh']].fillna('')
+        # created weighted colums that multiply the credits received by the gradepoints
+        transcriptDF['weightedgp'] = transcriptDF['cc']*transcriptDF['gp']
+        transcriptDF['weightedadjgp'] = transcriptDF['cc']*transcriptDF['adjgp']
+        # get total for numeric columns
+        transcriptDF.loc['total'] = transcriptDF[['cc','cr','weightedgp','weightedadjgp']].sum()
+        # Divide weighted columns by credit earned (cc) to get weighted averages
+        transcriptDF.at['total','weightedadjgp'] = transcriptDF.at['total','weightedadjgp'] / transcriptDF.at['total','cc']
+        transcriptDF.at['total','weightedgp'] = transcriptDF.at['total','weightedgp'] / transcriptDF.at['total','cc']
+        # Drop the weighted columns
+        #transcriptDF = transcriptDF.drop(['weightedgp','weightedadjgp'],axis=1)
+        # Cleanup the NaN's
+        transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh','gp','adjgp']] = transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh','gp','adjgp']].fillna('')
+        # create the html
         transcriptDFHTML = Markup(transcriptDF.to_html())
         transcriptDFHTML = transcriptDFHTML.replace('dataframe','table')
 
-        return render_template('transcripts/transcript.html', form=form,transcript = transcriptDFHTML)
+        return render_template('transcripts/transcript.html', form=form,transcript = transcriptDFHTML,stuName=stuName)
     
     return render_template('transcripts/transcript.html',form=form)

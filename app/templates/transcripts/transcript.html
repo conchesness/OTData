@@ -17,6 +17,9 @@
             {{ form.transcript(cols=150, rows=10) }} <br>
             {{ form.submit() }}
         </form>
+        {% if stuName %}
+           <h1>{{stuName}}</h1>
+        {% endif %}
         You can select and copy this table and paste it into Excel or Google Sheets.
         {{transcript}}
         <br> <br>

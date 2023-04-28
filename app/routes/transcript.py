@@ -18,7 +18,6 @@ def transcript():
         stuName = stuName.text.strip()
         stuName = " ".join(stuName.split())
 
-        print(stuName)
         results = soup.find('table',{"class":"CourseHistory"})
         all_tr = results.find_all('tr')
         transcript = []
@@ -58,6 +57,7 @@ def transcript():
                     'nh':nh.text.strip()
                     }
                 transcript.append(row)
+
         pd.set_option('display.float_format', '{:.3f}'.format)
 
         transcriptDF = pd.DataFrame.from_dict(transcript)
@@ -87,8 +87,10 @@ def transcript():
         transcriptDF = pd.merge(transcriptDF, 
                             gpDF, 
                             on ='mark', 
-                            how ='inner')
-
+                            how ='left')
+        
+        print(transcriptDF)
+        
         transcriptDF['cc'] = transcriptDF['cc'].astype('float64')
         transcriptDF['cr'] = transcriptDF['cr'].astype('float64')
         # Created an Adjusted Grade Points for Honors and AP whever grade is above a D
@@ -96,15 +98,19 @@ def transcript():
         # Remove values from adjusted grade points that are not cllege prep
         transcriptDF['adjgp'] = np.where((transcriptDF['nh'] == "N") | (transcriptDF['cp'] != "P"), np.nan, transcriptDF['adjgp'])
         # Sort the data
-        transcriptDF = transcriptDF.sort_values(by=['grade', 'term','sname']).reset_index(drop=True)
+        transcriptDF = transcriptDF.sort_values(by=['grade', 'term','snum']).reset_index(drop=True)
         # created weighted colums that multiply the credits received by the gradepoints
         transcriptDF['weightedgp'] = transcriptDF['cc']*transcriptDF['gp']
         transcriptDF['weightedadjgp'] = transcriptDF['cc']*transcriptDF['adjgp']
         # get total for numeric columns
         transcriptDF.loc['total'] = transcriptDF[['cc','cr','weightedgp','weightedadjgp']].sum()
         # Divide weighted columns by credit earned (cc) to get weighted averages
-        transcriptDF.at['total','weightedadjgp'] = transcriptDF.at['total','weightedadjgp'] / transcriptDF.at['total','cc']
-        transcriptDF.at['total','weightedgp'] = transcriptDF.at['total','weightedgp'] / transcriptDF.at['total','cc']
+
+        transcriptDF.loc['Ave'] = transcriptDF[['gp','adjgp']].mean()
+        transcriptDF.at['Ave','weightedadjgp'] = transcriptDF.at['total','weightedadjgp'] / transcriptDF.at['total','cc']
+        transcriptDF.at['Ave','weightedgp'] = transcriptDF.at['total','weightedgp'] / transcriptDF.at['total','cc']
+
+
         # Drop the weighted columns
         #transcriptDF = transcriptDF.drop(['weightedgp','weightedadjgp'],axis=1)
         # Cleanup the NaN's

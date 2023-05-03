@@ -487,5 +487,6 @@ class ReqClass(Document):
     semester = StringField() #Fall, Spring
     
 class Transcript(Document):
-    transcript = ListField()
-    student = ReferenceField('User')
+    transcriptDF = DictField()
+    transcriptHTML = StringField()
+    student = ReferenceField('User',unique=True)

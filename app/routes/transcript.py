@@ -5,18 +5,59 @@ from app.classes.forms import TranscriptForm
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
+import mongoengine.errors
 
+@app.route('/transcript/delete/<tid>')
+def transcriptDelete(tid):
+    tObj = Transcript.objects.get(id=tid)
+    currUser = User.objects.get(id=session['currUserId'])
+    if tObj.student == currUser or currUser.isadmin:
+        tObj.delete()
+        flash("Transcript is deleted.")
+    return redirect(url_for('transcriptNew'))
+
+@app.route('/transcript/<aid>')
+def transcript(aid):
+    try:
+        student=User.objects.get(aeriesid=aid)
+    except mongoengine.errors.DoesNotExist:
+        flash(f"No student with Aeries ID: {aid}")
+        return redirect(url_for('transcriptNew'))
+    try:
+        tObj = Transcript.objects.get(student=student)
+    except:
+        flash(f"{student.fname} {student.lname} does not yet have a transcript on OTData.")
+        return redirect(url_for('transcriptNew'))
+    transcriptDFHTML = Markup(tObj.transcriptHTML)
+    return render_template('transcripts/transcript.html', transcriptHTML = transcriptDFHTML,tObj=tObj,student=student)
 
 @app.route('/transcript/new', methods=['GET', 'POST'])
-def transcript():
+def transcriptNew():
     form = TranscriptForm()
 
     if form.validate_on_submit():
         html = form.transcript.data
         soup = BeautifulSoup(html,features="html.parser")
         stuName = soup.find('span',{'class':'student-full-name'})
+        # strip extra whitespace from ends and center of string
         stuName = stuName.text.strip()
         stuName = " ".join(stuName.split())
+        stuID = soup.find('span',attrs={"data-tcfc":"STU.ID"})
+        stuID = stuID.text
+        try:
+            student = User.objects.get(aeriesid = stuID)
+        except:
+            tObj=None
+            student = {'stuName':stuName,'aeriesid':stuID}
+            flash("This student is not in OTData.")
+        else:
+            try:
+                tObj = Transcript.objects.get(student=student)
+            except:
+                tObj = None
+            else:
+                flash(f"This student already has a transcript in OTData.")
+                return redirect(url_for("transcript",aid=stuID))
 
         results = soup.find('table',{"class":"CourseHistory"})
         all_tr = results.find_all('tr')
@@ -109,26 +150,35 @@ def transcript():
         transcriptDF.at['Ave','weightedadjgp'] = transcriptDF.at['total','weightedadjgp'] / transcriptDF.at['total','adjcr']
         transcriptDF.at['Ave','weightedgp'] = transcriptDF.at['total','weightedgp'] / transcriptDF.at['total','countcr']
 
-
         # Drop the weighted columns
         # transcriptDF = transcriptDF.drop(['weightedgp','weightedadjgp'],axis=1)
         # Cleanup the NaN's
         transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh']] = transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh']].fillna('')
-        # create the html
+        transcriptDF.rename(columns={'cc': 'Credit Attempted', 'cr': 'Credit Earned', 'cp':'College Prep?','nh':'Honors-AP-Not'}, inplace=True)
+        transcriptDF.index = transcriptDF.index.map(str)
 
+        # Style and create the html
         transcriptDFHTML = transcriptDF.style\
             .format(precision=2)\
             .set_table_styles([
-                {'selector': 'tr:hover','props': 'background-color: grey; font-size: 1em;'}])\
-            .set_properties(**{'border': '1px black solid !important'})\
+                {'selector': 'tr:hover','props': 'background-color: #CCCCCC; font-size: 1em;'},\
+                {'selector': 'thead','props': 'height:120px'},\
+                {'selector': 'th','props': 'background-color: white !important'}], overwrite=False)\
             .set_table_attributes('class="table"')  \
-            .set_sticky(axis="index")\
+            .set_uuid('trans')\
             .set_sticky(axis="columns")\
+            .set_sticky(axis="index")\
             .to_html()
-        
-    
-        transcriptDFHTML = Markup(transcriptDFHTML.replace('dataframe','table'))
 
-        return render_template('transcripts/transcript.html', form=form,transcript = transcriptDFHTML,stuName=stuName)
+        transcriptDict = transcriptDF.to_dict()
+        tObj = Transcript(
+            student=student,
+            transcriptDF = transcriptDict,
+            transcriptHTML = transcriptDFHTML
+        )
+        tObj.save()
+        flash("Transcipt saved to OTData.")
+
+        return redirect(url_for('transcript',aid=stuID))
     
     return render_template('transcripts/transcript.html',form=form)

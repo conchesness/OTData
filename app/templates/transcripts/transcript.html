@@ -1,8 +1,27 @@
 {% extends "base.html" %}
 
 {% block body %}
-    <div class="container">
         <h1>Transcript</h1>
+        {% if tObj %}
+        <a href="/transcript/delete/{{tObj.id}}">Delete</a>
+        {% endif %}
+
+        {% if student %}
+        
+           <h1>
+            {% if student.stuName %}
+                {{student.stuName}}
+            {% else %}
+                {{student.fname}} {{student.lname}}
+            {% endif %}
+           </h1>
+            {{student.aeriesid}}
+        {% endif %}
+        <div id="result"></div>
+        {{transcriptHTML}}
+        <br> <br>
+        {% if form %}
+
         {% for field in form.errors %}
             {% for error in form.errors[field] %}
                 <div class="alert alert-error">
@@ -17,12 +36,19 @@
             {{ form.transcript(cols=150, rows=10) }} <br>
             {{ form.submit() }}
         </form>
-        {% if stuName %}
-           <h1>{{stuName}}</h1>
         {% endif %}
-        You can select and copy this table and paste it into Excel or Google Sheets.
-        {{transcript}}
-        <br> <br>
+
+        <script>
+            const tds = document.getElementsByTagName("td");
+            const result = document.getElementById("result");
         
-    </div>
+            const tdPressed = e => { 
+            result.innerHTML = `ID of <em>${e.target.innerHTML}</em> is <strong>${e.target.id}</strong>`;
+            }
+        
+            for (let td of tds) {
+                td.addEventListener("click", tdPressed);
+            }
+        </script>
+        
 {% endblock %}

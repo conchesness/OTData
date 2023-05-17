@@ -3,7 +3,7 @@
 {% block body %}
         <h1>Transcript</h1>
         {% if tObj %}
-        <a href="/transcript/delete/{{tObj.id}}">Delete</a>
+            <a href="/transcript/delete/{{tObj.id}}">Delete</a>
         {% endif %}
 
         {% if student %}
@@ -41,14 +41,22 @@
         <script>
             const tds = document.getElementsByTagName("td");
             const result = document.getElementById("result");
-        
             const tdPressed = e => { 
-            result.innerHTML = `ID of <em>${e.target.innerHTML}</em> is <strong>${e.target.id}</strong>`;
+            var idSplit = e.target.id.split('_');
+            var row = idSplit[2].substring(3,idSplit[2].length);
+            var cols = '{{cols}}'
+            cols = cols.replace(/&#39;/g, '"');
+            cols = JSON.parse(cols);
+            var colNum = idSplit[3].substring(3,idSplit[3].length);
+            var col = cols[colNum]
+            result.innerHTML = 'Value '+e.target.innerHTML+' is at row '+row+' and column '+col+'.';
+            alert(result.innerHTML);
             }
         
             for (let td of tds) {
                 td.addEventListener("click", tdPressed);
             }
+
         </script>
         
 {% endblock %}

@@ -180,7 +180,7 @@
         </div>
     </div> <!--StudentRowOne-->
 
-    {% if currUser.grade >= 12 and (currUser.id|string == session['currUserId']|string or session['role'].lower() != "student") %}
+    {% if currUser.grade >= 11 and (currUser.id|string == session['currUserId']|string or session['role'].lower() != "student") %}
     <div class="row" id="PostGrad">
         <h2>
             Post Grad Info

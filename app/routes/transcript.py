@@ -28,8 +28,30 @@ def transcript(aid):
     except:
         flash(f"{student.fname} {student.lname} does not yet have a transcript on OTData.")
         return redirect(url_for('transcriptNew'))
-    transcriptDFHTML = Markup(tObj.transcriptHTML)
-    return render_template('transcripts/transcript.html', transcriptHTML = transcriptDFHTML,tObj=tObj,student=student)
+    
+    # Style and create the html
+    transcriptDF = pd.DataFrame.from_dict(tObj.transcriptDF)
+
+    # miCols = []
+    # for i,col in enumerate(transcriptDF.columns):
+    #     miCols.append((i,col))
+    # transcriptDF.columns = pd.MultiIndex.from_tuples(miCols)
+
+    transcriptDFHTML = transcriptDF.style\
+        .format(precision=2)\
+        .set_table_styles([
+            {'selector': 'tr:hover','props': 'background-color: #CCCCCC; font-size: 1em;'},\
+            {'selector': 'thead','props': 'height:140px'},\
+            {'selector': 'th','props': 'background-color: white !important'}], overwrite=False)\
+        .set_table_attributes('class="table"')  \
+        .set_uuid('trans')\
+        .set_sticky(axis="columns",levels=0)\
+        .set_sticky(axis="index")\
+        .to_html()
+
+    transcriptDFHTML = Markup(transcriptDFHTML)
+
+    return render_template('transcripts/transcript.html', cols=list(transcriptDF.columns), transcriptHTML = transcriptDFHTML,tObj=tObj,student=student)
 
 @app.route('/transcript/new', methods=['GET', 'POST'])
 def transcriptNew():
@@ -155,27 +177,13 @@ def transcriptNew():
         # Cleanup the NaN's
         transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh']] = transcriptDF[["sname","snum",'grade','year','term','cc','cr','mark','course','altCourse','cp','nh']].fillna('')
         transcriptDF.rename(columns={'cc': 'Credit Attempted', 'cr': 'Credit Earned', 'cp':'College Prep?','nh':'Honors-AP-Not'}, inplace=True)
+            
         transcriptDF.index = transcriptDF.index.map(str)
-
-        # Style and create the html
-        transcriptDFHTML = transcriptDF.style\
-            .format(precision=2)\
-            .set_table_styles([
-                {'selector': 'tr:hover','props': 'background-color: #CCCCCC; font-size: 1em;'},\
-                {'selector': 'thead','props': 'height:120px'},\
-                {'selector': 'th','props': 'background-color: white !important'}], overwrite=False)\
-            .set_table_attributes('class="table"')  \
-            .set_uuid('trans')\
-            .set_sticky(axis="columns")\
-            .set_sticky(axis="index")\
-            .to_html()
 
         transcriptDict = transcriptDF.to_dict()
         tObj = Transcript(
             student=student,
-            transcriptDF = transcriptDict,
-            transcriptHTML = transcriptDFHTML
-        )
+            transcriptDF = transcriptDict        )
         tObj.save()
         flash("Transcipt saved to OTData.")
 

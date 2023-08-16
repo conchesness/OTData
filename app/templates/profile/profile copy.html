@@ -43,7 +43,7 @@
         <div class="row">
             <div class="col-2"><a class="btn-sm btn-primary" href="/editprofile">Edit</a></div>
             <div class="col-5">
-                email: {{currUser.otemail}} <br>
+                email: {{currUser.oemail}} <br>
                 mobile: {{formatphone(currUser.mobile)}}
             </div>
             <div class="col-5">
@@ -63,7 +63,7 @@
         </a>
             {% set ns = namespace(emails="") %}
             {% for stu in group.students %}
-                {% set ns.emails = ns.emails + stu.otemail + ", " %}
+                {% set ns.emails = ns.emails + stu.oemail + ", " %}
             {% endfor %}
             <a data-toggle="tooltip" data-placement="top" title="Send a txt msg to everyone" href="/groupmsgto/{{group.id}}"><img width="20" src="static/txt.png"></a>
             <a data-toggle="tooltip" data-placement="top" title="Delete this group" href="/deletegroup/{{group.id}}"><img width="20" src="static/delete.png"></a>
@@ -121,7 +121,7 @@
             <div class="col-1"></div>
             <div class="col-3">
                 <b>Aeries Name:</b> {{currUser.afname}} {{currUser.alname}} <br>
-                <b>OUSD Email:</b> {{currUser.otemail}} <br>
+                <b>OUSD Email:</b> {{currUser.oemail}} <br>
                 <b>Home Phone:</b> {{currUser.aphone}} <br>
                 <b>Adults:</b>  {{currUser.aadults}} <br>
                 <b>Adult 1 Phone:</b>  {{currUser.aadult1phone}} <br>

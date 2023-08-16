@@ -6,6 +6,7 @@ from app.classes.data import User, Project, ProjectCheckin, ProjectTask, GEnroll
 from app.classes.forms import ProjectForm, ProjectTaskForm, ProjectCheckinForm
 import datetime as dt
 from bson.objectid import ObjectId
+from flask_login import current_user
 
 def newNumberTasks(editProj,num):
     for task in editProj.tasks:
@@ -39,7 +40,7 @@ def myProjects(currProjId=None, uid=None):
     if uid:
         stu = User.objects.get(id = uid)
     else:
-        stu = User.objects.get(pk = session['currUserId'])
+        stu = current_user
 
     myProjects = Project.objects(student = stu)
     projectForm = ProjectForm()

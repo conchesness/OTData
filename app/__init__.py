@@ -2,6 +2,7 @@
 # of the app to each other. 
 
 from mongoengine import connect
+from flask_login import LoginManager
 from flask import Flask
 import os
 from flask_moment import Moment
@@ -13,9 +14,15 @@ app = Flask(__name__)
 app.jinja_env.add_extension('jinja2.ext.do')
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY") # or os.urandom(20)
 # you must change the next line to be link to your database at mongodb.com
-connect("otdata", host=f"{os.environ.get('mongodb_host')}/otdata?retryWrites=true&w=majority")
+connect("ccpa", host=f"{os.environ.get('mongodb_host')}/ccpa?retryWrites=true&w=majority")
 # Sandbox DB
 # connect("otdatasb", host=f"{os.environ.get('mongodb_host')}/otdatasb?retryWrites=true&w=majority")
+
+# User session management setup
+# https://flask-login.readthedocs.io/en/latest
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 moment = Moment(app)
 

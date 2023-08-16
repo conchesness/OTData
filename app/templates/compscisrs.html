@@ -4,7 +4,7 @@
 <div class="container">
     Name;email;mobile;home phone;full address;street;city;state;zip <br>
     {% for sr in srs%}
-        {{sr.fname}} {{sr.lname}}; {{sr.otemail}}; {{formatphone(sr.mobile)}}; {{sr.aphone}};
+        {{sr.fname}} {{sr.lname}}; {{sr.oemail}}; {{formatphone(sr.mobile)}}; {{sr.aphone}};
         {% if sr.ustreet %}
             {{sr.ustreet}} {{sr.ucity}} {{sr.ustate}} {{sr.uzipcode}};{{sr.ustreet}}; {{sr.ucity}}; {{sr.ustate}}; {{sr.uzipcode}}
         {% else %}

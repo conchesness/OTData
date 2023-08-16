@@ -10,10 +10,11 @@ from datetime import timedelta
 from zoneinfo import ZoneInfo
 from mongoengine import Q
 from .msgs import txtGroupAdhoc
+from flask_login import current_user
 
 @app.route("/classdash/<gclassid>", methods=["GET","POST"])
 def classdash(gclassid):
-    currUser = User.objects.get(pk = session['currUserId'])
+    currUser = current_user
     try:
         gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     except Exception as error:
@@ -139,7 +140,7 @@ def breaks(gclassid):
 
 @app.route("/checkin", methods=['GET', 'POST'])
 def checkin():
-    currUser = User.objects.get(pk = session['currUserId'])
+    currUser = current_user
     enrollments = GEnrollment.objects(owner=currUser)
 
     return render_template('checkins/checkin.html', enrollments=enrollments, currUser=currUser)
@@ -179,7 +180,7 @@ def breaksettings(gClassid):
 @app.route('/breakstart/<gclassid>', methods=['GET', 'POST'])
 def breakstart(gclassid):
 
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
     form = BreakForm()
 
     if currUser.breakstart and dt.now().date() == currUser.breakstart.date() and currUser.breakclass == gclassid:
@@ -227,7 +228,7 @@ def checkinstus(gclassid,gclassname,student,searchdatetime):
     if session['role'].lower == "student":
         flash("Students can't checkin other studnets.")
         return redirect('index.html')
-    currUser = User.objects.get(id=session['currUserId'])
+    currUser = current_user
 
     searchdatetime = searchdatetime.replace(tzinfo=ZoneInfo('UTC')) 
 
@@ -248,7 +249,7 @@ def deletecheckin(checkinid,returnurl='classdash'):
     checkin = CheckIn.objects.get(pk=checkinid)
     gclassid=checkin.googleclass.gclassid
 
-    currUser=User.objects.get(id=session['currUserId'])
+    currUser=current_user
     if currUser == checkin.student or currUser.role.lower() == "teacher":
         checkin.delete()
         flash('Checkin deleted')

@@ -9,6 +9,7 @@ from .msgs import txtGroupFunc
 from mongoengine import Q
 from .users import formatphone
 import datetime as dt
+from flask_login import current_user
 
 @app.route('/listq', methods=['GET', 'POST'])
 def listq():
@@ -134,7 +135,7 @@ def compsciemails():
     csstuds = User.objects(cohort__icontains = "computer", grade__lt = 13)
     for csstud in csstuds:
         emails.append(csstud.aadultemail)
-        emails.append(csstud.otemail)
+        emails.append(csstud.oemail)
         emails.append(csstud.personalemail)
         for adult in csstud.adults:
             emails.append(adult.email)
@@ -154,7 +155,7 @@ def mmcompsci():
         anames = None
         aemails = None
         stulist.append(csstud.aeriesid)
-        stulist.append(csstud.otemail)
+        stulist.append(csstud.oemail)
         stulist.append(csstud.grade)
         if csstud.ufname and not csstud.ufname == csstud.afname:
             stulist.append(f"{csstud.afname} ({csstud.ufname})")
@@ -227,7 +228,7 @@ def groupaddresses():
             email=email.strip()
             
             try:
-                stu = User.objects.get(otemail=email)
+                stu = User.objects.get(oemail=email)
             except:
                 if len(email)>1:
                     flash( f"couldn't find {email} in our records")
@@ -258,7 +259,7 @@ def groupaddresses():
 @app.route("/newgroup", methods=['GET','POST'])
 def newgroup():
     form = GroupsForm()
-    currUser = User.objects.get(pk=session['currUserId'])
+    currUser = current_user
     try:
         groups = Group.objects(owner=currUser)
     except:
@@ -271,7 +272,7 @@ def newgroup():
         for email in students:
             email=email.strip()
             try:
-                stu = User.objects.get(otemail=email)
+                stu = User.objects.get(oemail=email)
             except:
                 flash(f'{email} is not in the OTData Student database.')
             else:
@@ -343,7 +344,7 @@ def pglist():
 def srinfo():
     query = Q(cohort__icontains = 'computer') & Q(grade__gt = 11) & (Q(shirtsize__exists = False) | Q(mobile__exists=False) | Q(ustreet__exists=False) | Q(personalemail__exists = False))
     srs = User.objects(query)
-    seniors = [['Name','otemail','pemails','Shirt Size','Personal Email','Mobile','PostGrad','Address']]
+    seniors = [['Name','oemail','pemails','Shirt Size','Personal Email','Mobile','PostGrad','Address']]
     for sr in srs:
         senior = []
         if sr.adults:
@@ -354,9 +355,9 @@ def srinfo():
         srname = ""
         senior.append(f"{sr.fname} {sr.lname}")
         if sr.personalemail:
-            senior.append(f"{sr.otemail};{sr.personalemail},{sr.aadultemail};{aemails}")
+            senior.append(f"{sr.oemail};{sr.personalemail},{sr.aadultemail};{aemails}")
         else:
-            senior.append(f"{sr.otemail},{sr.aadultemail};{aemails}")
+            senior.append(f"{sr.oemail},{sr.aadultemail};{aemails}")
 
         if not sr.shirtsize:
             senior.append("No Shirt Size")
@@ -390,7 +391,7 @@ def srinfo():
 def srssmm():
     query = Q(cohort__icontains = 'computer') & Q(grade__gt = 11) & Q(shirtsize__exists = False)
     srs = User.objects(query)
-    seniors = [['Name','otemail','pemails','Shirt Size','Personal Email','Mobile','PostGrad','Address']]
+    seniors = [['Name','oemail','pemails','Shirt Size','Personal Email','Mobile','PostGrad','Address']]
     for sr in srs:
         senior = []
         aemails = ""
@@ -402,9 +403,9 @@ def srssmm():
 
         senior.append(f"{sr.fname} {sr.lname}")
         if sr.personalemail:
-            senior.append(f"{sr.otemail};{sr.personalemail},{sr.aadultemail};{aemails}")
+            senior.append(f"{sr.oemail};{sr.personalemail},{sr.aadultemail};{aemails}")
         else:
-            senior.append(f"{sr.otemail},{sr.aadultemail};{aemails}")
+            senior.append(f"{sr.oemail},{sr.aadultemail};{aemails}")
 
         if not sr.shirtsize:
             senior.append("No Shirt Size")
@@ -437,7 +438,7 @@ def srssmm():
 def srsmm():
     query = Q(cohort__icontains = 'computer') & Q(grade__gt = 11)
     srs = User.objects(query)
-    seniors = [['Name','otemail','pemails','Shirt Size','Personal Email','Mobile','PostGrad','Address']]
+    seniors = [['Name','oemail','pemails','Shirt Size','Personal Email','Mobile','PostGrad','Address']]
     for sr in srs:
         senior = []
         if sr.adults:
@@ -449,9 +450,9 @@ def srsmm():
 
         senior.append(f"{sr.fname} {sr.lname}")
         if sr.personalemail:
-            senior.append(f"{sr.otemail};{sr.personalemail},{sr.aadultemail};{aemails}")
+            senior.append(f"{sr.oemail};{sr.personalemail},{sr.aadultemail};{aemails}")
         else:
-            senior.append(f"{sr.otemail},{sr.aadultemail};{aemails}")
+            senior.append(f"{sr.oemail},{sr.aadultemail};{aemails}")
 
         if not sr.shirtsize:
             senior.append("No Shirt Size")
@@ -490,7 +491,7 @@ def mailmerge():
     for user in users:
         row=[]
         row.append(f'{user.fname} {user.lname}')
-        emails=f'{user.otemail};{user.aadultemail}'
+        emails=f'{user.oemail};{user.aadultemail}'
         if user.aadultemail:
             emails+=f';{user.aadultemail}'
         if user.personalemail:

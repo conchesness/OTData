@@ -120,7 +120,7 @@ def roster(gclassid, sort="cohort"):
         if enrollment.owner.role.lower() == 'student' and enrollment.owner.lname and enrollment.owner.fname:
             otdstus.append(enrollment)
         elif enrollment.owner.role.lower() == 'student':
-            flash(f"Something's wrong with this students record so they were not included in the roster.: {enrollment.owner.otemail}")
+            flash(f"Something's wrong with this students record so they were not included in the roster.: {enrollment.owner.oemail}")
     if sort == "cohort":
         try:
             otdstus = sorted(otdstus, key = lambda i: (i.sortCohort,i.owner.lname,i.owner.fname))
@@ -196,16 +196,33 @@ def getroster(gclassid,index=0):
 
         try:
             # see if they are in OTData
-            otdstu = User.objects.get(otemail=stu['profile']['emailAddress'])
+            otdstu = User.objects.get(oemail=stu['profile']['emailAddress'])
         except mongoengine.errors.DoesNotExist as error:
-            session['missingStus'].append(f"{stu['profile']['name']['fullName']}'s email is not in OTData.")
-            #stu['otdobject'] = None
+            # session['missingStus'].append(f"{stu['profile']['name']['fullName']}'s email is not in OTData.")
+
+            newStu = User(
+                gid=stu['profile']['id'], 
+                gname=f"{stu['profile']['name']['givenName']} {stu['profile']['name']['familyName']}", 
+                oemail=stu['profile']['emailAddress'], 
+                fname = stu['profile']['name']['givenName'],
+                lname = stu['profile']['name']['familyName'],
+                role = "Student"
+            )
+            newStu.save()
+            flash(f"NEW--> {newStu.fname} {newStu.lname}")
+            enrollment=GEnrollment(
+                owner=newStu,
+                gclassroom=currGClass
+                )
+            try:
+                enrollment.save()
+            except NotUniqueError:
+                pass
+                
+            otdstu = newStu
         except Exception as error:
             session['missingStus'].append(f"{stu['profile']['name']['fullName']} had error: {error}")
-            #stu['otdobject'] = None
         else:
-            #stu['otdobject'] = otdstu
-            # see if an enrollment exists, if it doesn't make one
             try:
                 enrollment = GEnrollment.objects.get(owner=otdstu, gclassroom=currGClass)
             except:
@@ -231,9 +248,10 @@ def getroster(gclassid,index=0):
         return render_template ('loading.html', url=url, nextIndex=index, total=numStus)
 
     currGClass.update(grosterTemp=gstudents)
-    for stu in session['missingStus']:
-        flash(stu)
-    session.pop('missingStus',None)
+    if 'missingStus' in session:
+        for stu in session['missingStus']:
+            flash(stu)
+        session.pop('missingStus',None)
     return redirect(url_for('roster',gclassid=gclassid))
 
 @app.route('/genrollment/delete/<geid>/<gclassid>')
@@ -301,7 +319,7 @@ def getgaurdians(gclassid,index=0):
         guardians = classroom_service.userProfiles().guardians().list(studentId=student['userId']).execute()
         # see if the student is in OTData
         try:
-            editStu = User.objects.get(otemail=student['profile']['emailAddress'])
+            editStu = User.objects.get(oemail=student['profile']['emailAddress'])
         except:
             editStu = False
             flash(f"{student['profile']['emailAddress']} is not in OTData.")
@@ -376,7 +394,7 @@ def inviteguardians(gid,gclassid=None,gclassname=None):
         try:
             # TODO check the error msg to be sure it is cause it already exists
             guardianInvitation = service.userProfiles().guardianInvitations().create(
-                                    studentId=editStu.otemail, 
+                                    studentId=editStu.oemail, 
                                     body=guardianInvitation
                                 ).execute()
         except Exception as error:
@@ -565,12 +583,12 @@ def editrostersortorder(gclassid,sort=None):
     form=SortOrderCohortForm()
 
     if form.validate_on_submit():
-        otStudent = User.objects.get(otemail = form.gmail.data)
+        otStudent = User.objects.get(oemail = form.gmail.data)
 
         try:
             enrollment = GEnrollment.objects.get(owner=otStudent, gclassroom=gclassroom)
         except mongoengine.errors.DoesNotExist:
-            flash(Markup(f"You need to <a href='/addgclass/{{otStudent.otemail}}/{{gclassid}}'>add {otStudent.fname} {otStudent.alname}</a> to the class."))
+            flash(Markup(f"You need to <a href='/addgclass/{{otStudent.oemail}}/{{gclassid}}'>add {otStudent.fname} {otStudent.alname}</a> to the class."))
         else:
             enrollment.update(
                 sortCohort = form.sortOrderCohort.data
@@ -588,7 +606,7 @@ def editrostersortorder(gclassid,sort=None):
             sortOrderCohort = None
         sortForms['form'+str(i)]=SortOrderCohortForm()
         sortForms['form'+str(i)].gid.data = groster[i]['owner']['id']
-        sortForms['form'+str(i)].gmail.data = groster[i]['owner']['otemail']
+        sortForms['form'+str(i)].gmail.data = groster[i]['owner']['oemail']
         sortForms['form'+str(i)].gclassid.data = groster[i]['gclassroom']['id']
         sortForms['form'+str(i)].sortOrderCohort.data = sortOrderCohort
         if gclassroom.sortcohorts:

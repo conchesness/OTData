@@ -71,7 +71,7 @@
         {% if user.grade > 12 and user.personalemail %}
             <td>{{user.personalemail}}</td>
         {% else %}
-            <td>{{user.otemail}}</td>
+            <td>{{user.oemail}}</td>
         {% endif %}
         <td>{{user.cohort}}</td>
         <td>{{user.aethnicity}}</td>
@@ -99,7 +99,7 @@
     {% if user.grade > 12 and user.personalemail %}
     {{user.personalemail}},
     {% else %}
-    {{user.otemail}},
+    {{user.oemail}},
     {% endif %}
 {%endfor%}
 <hr>

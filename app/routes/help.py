@@ -8,11 +8,12 @@ from datetime import datetime as dt
 from mongoengine import Q
 import mongoengine.errors
 from .msgs import txtOneStu
+from flask_login import current_user
 
 @app.route('/help/create/<gclassid>', methods=['GET', 'POST'])
 def createhelp(gclassid):
 
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
     gClass = GoogleClassroom.objects.get(gclassid=gclassid)
     query = Q(requester=currUser) & Q(gclass=gClass) & (Q(status = 'asked') | Q(status = 'offered'))
     lastHelp = Help.objects(query)
@@ -68,7 +69,7 @@ def createhelp(gclassid):
 def offerhelp(helpid):
 
     offerHelp = Help.objects.get(pk=helpid)
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
 
     if currUser == offerHelp.requester:
         flash("You can't be the helper AND the help requester.")
@@ -89,7 +90,7 @@ def offerhelp(helpid):
 @app.route('/help/recind/<helpid>')
 def helprecind(helpid):
     recindHelp = Help.objects.get(pk=helpid)
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
 
     if currUser == recindHelp.helper:
         recindHelp.update(
@@ -108,7 +109,7 @@ def helprecind(helpid):
 def confirmhelp(helpid):
         
     confirmHelp = Help.objects.get(pk=helpid)
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
     form = SimpleForm()
 
     if currUser.role.lower() == "teacher" and not confirmHelp.helper:
@@ -137,7 +138,7 @@ def confirmhelp(helpid):
         status = "confirmed",
         confirmdesc = form.field.data
     )
-    banker = User.objects.get(otemail='stephen.wright@ousd.org')
+    banker = User.objects.get(oemail='stephen.wright@ousd.org')
     # give the help requester a Token for requesting a help that is now confirmed
     requester1 = Token(
         giver = banker,
@@ -175,7 +176,7 @@ def deletehelp(helpid):
 
     delHelp = Help.objects.get(pk=helpid)
     gclassid = delHelp.gclass.gclassid
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
 
     if currUser.role.lower() == "teacher":
         delHelp.delete()
@@ -238,7 +239,7 @@ def tokensAward(gclassid):
         flash("You can't award tokens")
         return(redirect(url_for('classdash',gclassid=gclassid)))
 
-    currUser = User.objects.get(id=session['currUserId'])
+    currUser = current_user
     gClassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     enrollments = GEnrollment.objects(gclassroom=gClassroom)
     owners = []

@@ -1,12 +1,17 @@
 from app import app
-from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string
+from flask import render_template, redirect, session, flash, url_for, Markup, render_template_string, request
 from app.classes.data import User, GoogleClassroom, GEnrollment, CourseWork, Standard
 from app.classes.forms import AssignmentForm, StandardForm
 from bson.objectid import ObjectId
 import google.oauth2.credentials
 import googleapiclient.discovery
 from google.auth.exceptions import RefreshError
+import google_auth_oauthlib.flow   
+from .credentials import GOOGLE_CLIENT_CONFIG
+from .scopes import scopes_ousd
 from .users import credentials_to_dict
+from flask_login import current_user
+
 #from .roster import getCourseWork
 
 # this function exists to update or create active google classrooms for the current user
@@ -14,17 +19,16 @@ from .users import credentials_to_dict
 @app.route('/getgclasses')
 def getgclasses():
 
-    # Get the currently logged in user because, this will only work for the Current User as I don't have privleges to retrieve classes for other people.
-    currUser = User.objects.get(pk = session['currUserId'])
-    # setup the Google API access credentials
-    if google.oauth2.credentials.Credentials(**session['credentials']).valid:
-        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    if not 'credentials' in session:
+        return redirect(url_for('authorize'))
+    elif not google.oauth2.credentials.Credentials(**session['credentials']).valid:
+        return redirect(url_for('authorize'))
     else:
-        return redirect('/authorize')
-    session['credentials'] = credentials_to_dict(credentials)
-    classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
+        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
 
-    # Get all of the google classes
+    classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
+    gCourses = classroom_service.courses().list(courseStates='ACTIVE').execute()
+
     try:
         gCourses = classroom_service.courses().list(courseStates='ACTIVE').execute()
     except RefreshError:
@@ -91,10 +95,10 @@ def getgclasses():
 
         # Check for an enrollment.  If not there, create one.
         try:
-            userEnrollment = GEnrollment.objects.get(owner = currUser, gclassroom = otdataGCourse)
+            userEnrollment = GEnrollment.objects.get(owner = current_user, gclassroom = otdataGCourse)
         except:
             userEnrollment = GEnrollment(
-                owner = currUser, 
+                owner = current_user, 
                 gclassroom = otdataGCourse)
             userEnrollment.save()
 
@@ -241,7 +245,7 @@ def standardDelete(standardid):
 #         if gclassroom.gteacherdict and not gclassroom.teacher:
 
 #             try:
-#                 teacher = User.objects.get(otemail = str(gclassroom.gteacherdict['emailAddress']))
+#                 teacher = User.objects.get(oemail = str(gclassroom.gteacherdict['emailAddress']))
 #             except:
 #                 print("No teacher added")
 #             else:

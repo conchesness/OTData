@@ -4,9 +4,7 @@
 <div class="container-fluid">    
   <div class="row">
   <div class="col-12">
-    {% if currUser.id|string() == session.currUserId|string() %} <br>
       <a href="/getgclasses" class="btn btn-info btn-sm" role="button">Update All My Classes from Google</a> <-- This script takes a little while to run.
-    {% endif %}
 
     <h1>My Google Classes</h1>
     <a href="/standard/list">Standards</a>

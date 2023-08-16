@@ -12,6 +12,7 @@ from app.classes.data import Post, Comment
 from app.classes.forms import PostForm, CommentForm
 import datetime as dt
 from bson import ObjectId
+from flask_login import current_user
 
 @app.route('/posts')
 def posts():
@@ -39,7 +40,7 @@ def newcomment(postId):
     if form.validate_on_submit():
         newComment = Comment(
             comment=form.comment.data, 
-            user=ObjectId(session['currUserId']),
+            user=current_user,
             post=post.id
         )
         newComment.save()
@@ -51,7 +52,7 @@ def newcomment(postId):
 def deletecomment(postId, commentId):
  
     deleteComment=Comment.objects.get(pk=commentId)
-    if str(deleteComment.user.id) == session['currUserId']:
+    if str(deleteComment.user.id) == current_user.id:
         deleteComment.delete()
         flash('Comment deleted.')
     else:
@@ -70,7 +71,7 @@ def newpost():
         newPost = Post(
             subject=form.subject.data, 
             body=form.body.data, 
-            user=ObjectId(session['currUserId'])
+            user=current_user
         )
         newPost.save()
         newPost.reload()
@@ -84,7 +85,7 @@ def newpost():
 def editpost(postId):
 
     editPost = Post.objects.get(pk=postId)
-    if str(editPost.user.id) == session['currUserId']:
+    if editPost.user == current_user:
         form = PostForm()
         if form.validate_on_submit():
             editPost.update(
@@ -108,7 +109,7 @@ def editpost(postId):
 def deletepost(postId):
 
     deletePost = Post.objects.get(pk=postId)
-    if str(deletePost.user.id) == session['currUserId']:
+    if deletePost.user == current_user:
         deletePost.delete()
         flash('Post was deleted')
         posts=Post.objects()

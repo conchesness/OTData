@@ -1,19 +1,12 @@
 <!-- This is the navbar code. This code will be included in all of the template files. -->
 <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid border mx-2">
-    <a class="navbar-brand" href="/">OTData </a>
+    <a class="navbar-brand" href="/">CCPA</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    {% if session['audience'] %}
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="#">Audience: {{session['audience']}}</a>
-        </li>
-      </ul>
-    {% endif %}
-    {% if session['credentials'] and session['displayName'] %}
-    {% if session['role'].lower() == "teacher" and session['audience'].lower() == 'ot' %}
+    {% if not current_user.is_anonymous %}
+    {% if current_user.role.lower() == "teacher" %}
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
@@ -39,20 +32,19 @@
         <li class="nav-item">
           <a class="nav-link" href="/transcript/new">Transcripts</a>
         </li>
-        {% if session['role'].lower() == "student" %}
+        {% if current_user.role.lower() == "student" %}
         <li class="nav-item">
           <a class="nav-link" href="/checkin">Classes/Checkin</a>
         </li>
         {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="/profile">{{ session["fname"] }} {{ session["lname"] }} ({{session['role']}})</a>
+          <a class="nav-link" href="/profile">{{ current_user.gname }} {{ current_user.role }}</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/logout">logout</a>
         </li>
         <li class="nav-item">
-          <a data-toggle="tooltip" data-placement="top" title="This will revoke the privledges you gave to Google when you logged in.
-          You need to do this if you want to switch from OUSD to Community login."  class="nav-link" href="/revoke">revoke
+          <a data-toggle="tooltip" data-placement="top" title="This will revoke the privledges you gave to Google when you logged in."  class="nav-link" href="/revoke">revoke
           <img src="/static/info.png" width=15px style="background-color:white;"></a>
         </li>
         <li class="nav-item">
@@ -67,19 +59,15 @@
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a data-toggle="tooltip" data-placement="top" title="Choose this if you do not have an ousd.org email address
-          and you are Oakland Tech alumni, a parent or other community member." class="nav-link" href="/login/community">
-            Log In (Parent/Community)
-            <img src="/static/info.png" width=15px style="background-color:white;">
-          </a>
         </li>
         <li class="nav-item">
           <a data-toggle="tooltip" data-placement="top" title="Choose this if you have an ousd.org email address 
-          AND you are an Oakland Tech Student or Staff." class="nav-link" href="/login/ot">
+          AND you are an Oakland Tech Student or Staff." class="nav-link" href="/login">
             Log In (OUSD.org)
             <img src="/static/info.png" width=15px style="background-color:white;">
           </a>
         </li>
+
       </ul>
     </div>
     {% endif %}

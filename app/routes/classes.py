@@ -16,6 +16,7 @@ from .roster import getCourseWork
 import pandas as pd
 import numpy as np
 from bson.objectid import ObjectId
+from flask_login import current_user
 
 @app.route('/addtocohort', methods=['GET', 'POST'])
 def addtocohort():
@@ -49,7 +50,7 @@ def addtocohort():
             emails = emails.split(",")
             for email in emails:
                 try:
-                    student = User.objects.get(otemail=email)
+                    student = User.objects.get(oemail=email)
                 except mongoengine.errors.DoesNotExist:
                     flash(f"The email: {email} does not exist in OTData.")
                 else:
@@ -66,7 +67,7 @@ def addtocohort():
             flash(f"You must include EITHER Aeries ID's or OT Emails")
         return redirect(url_for('roster',gclassid=gClass.gclassid))
 
-    currUser = ObjectId(session['currUserId'])
+    currUser = current_user
     activeEnrollments = GEnrollment.objects(owner=currUser,status="Active")
     for enrollment in activeEnrollments:
         form.gclassmongoid.choices.append((enrollment.gclassroom.gclassdict['id'],enrollment.gclassroom.gclassdict['name']))
@@ -77,7 +78,7 @@ def addtocohort():
 def addgclass(gmail,gclassid):
 
     try:
-        stu = User.objects.get(otemail=gmail)
+        stu = User.objects.get(oemail=gmail)
     except mongoengine.errors.DoesNotExist:
         flash("I can't find this user in OTData.")
         return redirect(url_for('roster',gclassid=gclassid))
@@ -149,7 +150,7 @@ def getstudentwork(gclassid):
             break
     studSubsDict = {}
     studSubsDict['mySubmissions'] = studSubsAll
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
     currUser.gclasses.filter(gclassid = gclassid).update(
         submissions = studSubsDict,
         submissionsupdate = dt.datetime.utcnow()
@@ -160,7 +161,7 @@ def getstudentwork(gclassid):
 
 @app.route('/student/mywork')
 def mywork():
-    currUser = User.objects.get(gid = session['gid'])
+    currUser = current_user
 
     myClasses = currUser.gclasses.filter(status = 'Active')
     myWorkList= []
@@ -227,7 +228,7 @@ def ontimeperc(gclassid):
 
     dictfordf = {}
     for row in enrollments:
-        newRow = {'userId':row['owner']['gid'],'fname':row['owner']['fname'],'lname':row['owner']['lname'],'email':row['owner']['otemail']}
+        newRow = {'userId':row['owner']['gid'],'fname':row['owner']['fname'],'lname':row['owner']['lname'],'email':row['owner']['oemail']}
         dictfordf[row['owner']['id']] = newRow
 
     stusDF = pd.DataFrame.from_dict(dictfordf, orient='index')
@@ -269,7 +270,7 @@ def ontimeperc(gclassid):
         missing = stu[2]
         
         try:
-            stu = User.objects.get(otemail=email)
+            stu = User.objects.get(oemail=email)
         except:
             if len(email)>1:
                 flash( f"couldn't find {email} in our records")
@@ -399,7 +400,7 @@ def getstudsubs(gclassid,courseWorkId="-"):
 def gclasses(gclassid=None):
 
     # Get the currently logged in user because, this will only work for the Current User as I don't have privleges to retrieve classes for other people.
-    currUser = User.objects.get(pk = session['currUserId'])
+    currUser = current_user
     # setup the Google API access credentials
     if google.oauth2.credentials.Credentials(**session['credentials']).valid:
         credentials = google.oauth2.credentials.Credentials(**session['credentials'])
@@ -493,7 +494,7 @@ def gclasses(gclassid=None):
 
 @app.route('/editgclass/<gclassid>', methods=['GET', 'POST'])
 def editgclass(gclassid):
-    currUser = User.objects.get(pk=session['currUserId'])
+    currUser = current_user
     gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
     enrollment = GEnrollment.objects.get(owner=currUser,gclassroom=gclassroom)
     
@@ -523,7 +524,7 @@ def deletegclass(gclassid):
     if session['role'].lower() == "student":
         flash("Students can't delete enrollments.")
     else:
-        currUser = User.objects.get(pk=session['currUserId'])
+        currUser = current_user
         gclassroom = GoogleClassroom.objects.get(gclassid=gclassid)
         enrollment = GEnrollment.objects.get(owner=currUser,gclassroom=gclassroom)
         enrollment.delete()

@@ -10,6 +10,7 @@ from google.auth.exceptions import RefreshError
 import base64
 from email.mime.text import MIMEText
 from bson.objectid import ObjectId
+from flask_login import current_user
 
 
 @app.route('/findstudent', methods=['GET', 'POST'])
@@ -68,7 +69,7 @@ def newstudent():
             lname = form.alname.data,
             aeriesid = form.aeriesid.data,
             grade = grade,
-            otemail = form.otemail.data,
+            oemail = form.oemail.data,
             role = 'student',
             gpa = 0
         )
@@ -106,7 +107,7 @@ def sendstudentemail(aeriesid):
     emailList = []
     
     # add the student
-    emailList.append((student.otemail,Markup(f"<b>Student:</b> {student.otemail}")))
+    emailList.append((student.oemail,Markup(f"<b>Student:</b> {student.oemail}")))
 
     if student.personalemail:
         emailList.append((student.personalemail,Markup(f"<b>Student Personal Email:</b> {student.personalemail}")))
@@ -208,9 +209,9 @@ def sendstudentemail(aeriesid):
             flash(f"Error happened: {error}. Page was refreshed.")
             return render_template('sendstudentemail.html', form=form, emailList=emailList, student=student)
             
-        currUser = User.objects.get(id=session['currUserId'])
+        currUser = current_user
         # If the student was included in the email or the student sent the email it should not be tagged confidential
-        if student.otemail in form.to.data or student.otemail == session['email']:
+        if student.oemail in form.to.data or student.oemail == session['email']:
             confidential = False
         else:
             confidential = True
@@ -220,7 +221,7 @@ def sendstudentemail(aeriesid):
             type_ = "email",
             to = emailToString + emailCCString,
             fromadd = session['email'],
-            fromwho = currUser,
+            fromwho = current_user,
             subject = form.subject.data,
             body = form.body.data,
             confidential = confidential
@@ -244,7 +245,7 @@ def deletecomm(aeriesid,commid):
 @app.route('/studentnote/<aeriesid>', methods=['GET','POST'])
 def studentnote(aeriesid):
     student = User.objects.get(aeriesid = aeriesid)
-    currUser = User.objects.get(id = session['currUserId'])
+    currUser = current_user
     form = StudentNoteForm()
 
     if form.validate_on_submit():

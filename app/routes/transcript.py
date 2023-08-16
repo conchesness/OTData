@@ -6,11 +6,12 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 import mongoengine.errors
+from flask_login import current_user
 
 @app.route('/transcript/delete/<tid>')
 def transcriptDelete(tid):
     tObj = Transcript.objects.get(id=tid)
-    currUser = User.objects.get(id=session['currUserId'])
+    currUser = current_user
     if tObj.student == currUser or currUser.isadmin:
         tObj.delete()
         flash("Transcript is deleted.")

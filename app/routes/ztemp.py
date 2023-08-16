@@ -79,7 +79,6 @@ import time
 # @app.route('/updategclasses')
 # def updategclasses():
 #     users = User.objects(gclasses__exists = True )
-#     #users = User.objects(id = session['currUserId'])
 #     for j,user in enumerate(users):
 #         print(f"{j}/{len(users)} {user.fname} {user.lname}")
 #         changed = False

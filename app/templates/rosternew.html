@@ -144,7 +144,7 @@
                     <h3>{{stu.sortCohort}}</h3>
                     {% do cohort.update({'currCohort' : stu.sortCohort}) %}
                 {% endif %}
-                {{ stu.owner.otemail }}, 
+                {{ stu.owner.oemail }}, 
             {% endfor %}
 
             <br> <br>
@@ -178,7 +178,7 @@
                             {{enrollment.owner.lname}}
                         </td>
                         <td>
-                            {{enrollment.owner.otemail}},
+                            {{enrollment.owner.oemail}},
                             {% if enrollment and enrollment.owner.adults %}
                                 {% for adult in enrollment.owner.adults %}
                                     {{ adult.email }}, 

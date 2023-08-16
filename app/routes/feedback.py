@@ -9,7 +9,8 @@ from app.classes.forms import FeedbackForm
 import datetime as dt
 from bson.objectid import ObjectId
 # this imports the admins list from the users.py file
-from .users import admins
+from .login import admins
+from flask_login import current_user
 
 # This route lists all of the feedback records. The first line triggers this code when the user asks for your
 # webpage ending in '/feedbackall'. 
@@ -32,7 +33,7 @@ def feedback(feedbackid):
     fback = Feedback.objects.get(pk=feedbackid)
     # Here is the get method used again to retrive the object that is the user that has requested this specific feedbackid.
     # The current user ID is being stored in the session.  You can see how that is done in the user.py file.
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
     # Each feedback record can have a conversation attached to it. These convesations are post and comment objects.
     # In python using 'try:' is a way to capture if an error happens and if it does then do something else --> 'except:'
     # This try will cause an error if there is no post record attached to the feedback item.  If it fails, the except
@@ -83,7 +84,7 @@ def newfeedback(url):
             # a new session is started and certain values are stored in it including the users Id # for the site which 
             # can be referenced as session['currUserId'].  If you look at the profile page on the site you can see
             # all the session values available.
-            author=ObjectId(session['currUserId']),
+            author=current_user,
             status=form.status.data
         )
         # Once the object is filled with the data from the form you then save it to the database.
@@ -114,7 +115,7 @@ def newfeedback(url):
 def editfeedback(feedbackid):
 
     # get the current users object to check if this user has the authority to edit this record
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
     # get the feedbackForm from the FeedbackForms class in the forms file in the classes folder.
     form = FeedbackForm()
     # get the intended feedback record that is associated with the feedbackid that is passed in to this route. To do this you 
@@ -124,7 +125,7 @@ def editfeedback(feedbackid):
 
     # Check that the user has the appropriate privleges to edit this record.  Either they are the original author and
     # the feedback is still in the new status or the user is an admin as designated by a list in users.py file in routes.
-    if not (currUser.id == editFback.author.id and editFback.status == "4-New") and not currUser.otemail in admins:
+    if not (currUser.id == editFback.author.id and editFback.status == "4-New") and not currUser.oemail in admins:
         # If this fails then tell the user they can't edit the file and send them back to the feedback's record.
         flash('You cannot edit this job..')
         return redirect(url_for('feedback',feedbackid=editFback.id))
@@ -173,7 +174,7 @@ def deletefeedback(feedbackid):
     # retrieve the feedback object to be deleted
     deleteFback = Feedback.objects.get(pk=feedbackid)
     # load the current user's object to check if they are allowed to delete the feedback record
-    currUser = User.objects.get(gid=session['gid'])
+    currUser = current_user
 
     # check if the current user is the author of the feedback and it is still n new status or the current user is an admin
     if not (currUser.id == deleteFback.author.id and deleteFback.status == "4-New") and not currUser.email in admins:

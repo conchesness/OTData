@@ -14,6 +14,7 @@ from .credentials import twilio_account_sid, twilio_auth_token
 # Download the helper library from https://www.twilio.com/docs/python/install
 from twilio.rest import Client
 import re
+from flask_login import current_user
 
 @app.route('/communications')
 def communications():
@@ -145,7 +146,7 @@ def msg(aeriesnum,tophone=None):
         flash("Only teachers can send txt messages at the moment.")
         return redirect(url_for('index'))
 
-    currUser = User.objects.get(pk=session['currUserId'])
+    currUser = current_user
     reloadurl = f'/msg/{aeriesnum}'
     student = User.objects.get(aeriesid=aeriesnum)
     phoneNums=[]
@@ -295,7 +296,7 @@ def msgreply():
     except:
         # TODO hardcoded! Booo!
         notifyNum = '+15107616409'
-        reply_to = User.objects.get(otemail='stephen.wright@ousd.org')
+        reply_to = User.objects.get(oemail='stephen.wright@ousd.org')
     
     replyMsg = Message(
         twilioid = request.values.get('MessageSid', None),

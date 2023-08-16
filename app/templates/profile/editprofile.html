@@ -34,9 +34,7 @@
                             </td>
                         </tr>
                         <tr><td>Your Mobile:</td><td>{{ form.mobile() }}</td></tr>
-                        {% if session.audience.lower() == "ot" %}
-                            <tr><td>Shirt Size</td> <td>{{form.shirtsize()}}</td> </tr>
-                        {% endif %}
+                        <tr><td>Shirt Size</td> <td>{{form.shirtsize()}}</td> </tr>
                         {% if session.role.lower() == "student" or (request.view_args['aeriesid'] and session['role'].lower() != 'student') %}
                             <tr><td>Other Phone:</td><td>{{ form.altphone() }}</td></tr>
                             <tr><td colspan=2>Personal Email:<br>{{form.personalemail()}}</td></tr>

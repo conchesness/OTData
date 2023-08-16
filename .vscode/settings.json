@@ -1,6 +1,6 @@
 {
     "python.defaultInterpreterPath": "C:\\Users\\steve\\anaconda3\\envs\\otdata\\python.exe",
-    "python.languageServer": "Pylance",
+    "python.languageServer": "Jedi",
     "python.linting.pylintEnabled": false,
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingModuleSource": "none"

@@ -5,6 +5,7 @@ from app.classes.forms import CourseForm, SectionForm
 import datetime as d
 from mongoengine import Q
 from bs4 import BeautifulSoup
+from flask_login import current_user
 
 @app.route("/ccteachers/<sort>")
 @app.route("/ccteachers")
@@ -171,7 +172,7 @@ def teacherclassedit(tnum,cnum):
     teacher=User.objects.get(tnum=tnum)
     course=Course.objects.get(aeriesnum=cnum)
     section=Section.objects.get(course=course,teacher=teacher)
-    currUser = User.objects.get(pk=session['currUserId'])
+    currUser = current_user
     if not currUser == section.teacher and not session['courseCatAdmin'] and not session['isadmin']:
         flash(f"You can't edit that section because it is not yours.")
         return redirect(url_for('teacherclass',tnum=tnum,cnum=cnum))

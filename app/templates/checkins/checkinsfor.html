@@ -57,7 +57,7 @@
     <b>Student Email Addresses</b> <br>
         {% for stu in notcheckedstus | sort(attribute="lname,fname")  %}
             {% if stu.gid %}
-                {{stu.otemail}}, 
+                {{stu.oemail}}, 
             {% endif %}
         {% endfor %}
 

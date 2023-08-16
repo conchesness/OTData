@@ -1,8 +1,9 @@
 
 #from typing_extensions import Required
 from ast import List
-from mongoengine import EmbeddedDocumentListField, DictField, FloatField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, CASCADE
+from mongoengine import EmbeddedDocumentListField, DictField, FloatField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, URLField, CASCADE
 from flask_mongoengine import Document
+from flask_login import UserMixin
 from bson.objectid import ObjectId
 import datetime as d
 
@@ -147,7 +148,7 @@ class Project(Document):
         'ordering': ['-createdate']
     }
 
-class User(Document):
+class User(UserMixin, Document):
     # temp
     # gclasses = StringField()
     # sections = StringField()
@@ -164,7 +165,7 @@ class User(Document):
     grade = IntField()
     langflu = StringField()
     sped = StringField() 
-    otemail = StringField(unique=True, required=True)
+    oemail = StringField(unique=True, required=True)
     aphone = StringField()
     aeriesid = IntField(sparse=True, unique=True, required=False)
     gid = StringField(sparse=True, unique=True, required=False)
@@ -177,6 +178,8 @@ class User(Document):
     cohort = StringField() #academy or house name
     gclassguardians = DictField(default={})
     gclassguardianinvites = DictField(default={})
+    gprofile_pic = URLField()
+    gname = StringField()
     
     # Data that can be edited
     lat = FloatField()

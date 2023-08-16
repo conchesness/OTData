@@ -47,19 +47,18 @@
             {% endfor %} 
             <small><b>Tokens: {{tokenCount.count}}</b></small> <br>
             {% endif %}
-            {% if session.audience.lower() == "ot" %}
-                {% if not currUser.adults %} <a href="#adults" class="btn btn-primary btn-sm" role="button">Add your Adults!</a> {% endif %}
+
+            {% if not currUser.adults %} 
+                <a href="#adults" class="btn btn-primary btn-sm" role="button">Add your Adults!</a> {% endif %}
                 <a href="/plan/{{currUser.gid}}" class="btn btn-primary btn-sm" role="button">Success Plan</a> 
                 <a href="#compborrow" class="btn btn-primary btn-sm" role="button">Computer Checkout Section</a> 
             {% endif %}
-    {% endif %}
-    </div>
+        </div>
 </div><!--ProfileHead-->
 
 <hr>
-{% if session.audience.lower() == "community" %}
-    {% include 'profile/communityprofile.html' %}
-{% elif currUser.role.lower() == "teacher" %}
+
+{% if currUser.role.lower() == "teacher" %}
     {% include 'profile/teacherprofile.html' %}
 
 <div>{% elif currUser.role.lower() == "student" %}
@@ -132,7 +131,7 @@
                     <h6 class="card-subtitle mb-2 text-muted">Cannot be editted</h6>
                     <p class="card-text">
                         <b>Aeries Name:</b> {{currUser.afname}} {{currUser.alname}} <br>
-                        <b>OUSD Email:</b> {{currUser.otemail}} <br>
+                        <b>OUSD Email:</b> {{currUser.oemail}} <br>
                         <b>Home Phone:</b> {{currUser.aphone}} <br>
                         <b>Adults:</b>  {{currUser.aadults}} <br>
                         <b>Adult 1 Phone:</b>  {{currUser.aadult1phone}} <br>
@@ -180,7 +179,7 @@
         </div>
     </div> <!--StudentRowOne-->
 
-    {% if currUser.grade >= 11 and (currUser.id|string == session['currUserId']|string or session['role'].lower() != "student") %}
+    {% if (currUser.id|string == current_user.id|string or session['role'].lower() != "student") %}
     <div class="row" id="PostGrad">
         <h2>
             Post Grad Info
@@ -337,7 +336,7 @@
                         <h5 class="card-title">Adults with Accounts on OTData
                             <p class="card-text">
                             {% for parent in currUser.this_students_parents %}
-                                {{parent.fname}} {{parent.lname}} {{parent.otemail}} <br>
+                                {{parent.fname}} {{parent.lname}} {{parent.oemail}} <br>
                             {% endfor %}
                             </p>
                         </h5>

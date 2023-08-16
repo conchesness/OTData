@@ -6,7 +6,7 @@
                     <h5 class="card-title">Basic Info <a href="/editprofile"><img width="20" src="/static/edit.png"></a></a></h5>
                     <h6 class="card-subtitle mb-2 text-muted">In Progress...</h6>
                     <p class="card-text">
-                        email: {{currUser.otemail}} <br>
+                        email: {{currUser.oemail}} <br>
                         mobile: {{formatphone(currUser.mobile)}} <br>
                         {% if currUser.role.lower() == "parent" and currUser.this_parents_students %}
                             Students: 

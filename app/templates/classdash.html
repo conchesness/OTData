@@ -195,8 +195,8 @@
     </table>
     </div>
     </div>
-
-    <!--Break Column-->
+{#
+      <!--Break Column-->
     <div class="row">
     <div class="col mx-3 pb-3 border border-3">
         <h3 class="display-5 mb-0">
@@ -225,7 +225,7 @@
       {% endfor %}
     </div>
   </div>
-  
+#}
 
     {% if session.role.lower()=="teacher" %}
     <a href="/tokens/award/{{gClassroom.gclassid}}">Award Tokens</a>

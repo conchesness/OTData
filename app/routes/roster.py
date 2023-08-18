@@ -18,13 +18,12 @@ def getCourseWork(gclassid):
     pageToken = None
     assignmentsAll = {}
     assignmentsAll['courseWork'] = []
-
-    if google.oauth2.credentials.Credentials(**session['credentials']).valid:
-        credentials = google.oauth2.credentials.Credentials(**session['credentials'])
+    if not "credentials" in session:
+        return redirect('/authorize')    
+    elif not google.oauth2.credentials.Credentials(**session['credentials']).valid:
+        return redirect('/authorize')
     else:
-        flash("need to refresh your connection to Google Classroom.")
-        return "refresh"
-        # return redirect('/authorize')    
+        credentials = google.oauth2.credentials.Credentials(**session['credentials'])  
     
     session['credentials'] = credentials_to_dict(credentials)
     classroom_service = googleapiclient.discovery.build('classroom', 'v1', credentials=credentials)
@@ -48,8 +47,10 @@ def getCourseWork(gclassid):
         else:
             flash(f"Got unknown Error: {errorDict}")
             return False
-    
-    topics = topics['topic']
+    try:
+        topics = topics['topic']
+    except:
+        topics = None
 
     # Topic dictionary
     # [{'courseId': '450501150888', 'topicId': '487477497511', 'name': 'Dual Enrollment', 'updateTime': '2022-05-20T20:55:41.926Z'}, {...}]

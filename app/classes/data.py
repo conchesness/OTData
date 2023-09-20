@@ -1,9 +1,8 @@
 
 #from typing_extensions import Required
 from ast import List
-from mongoengine import EmbeddedDocumentListField, DictField, FloatField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, URLField, CASCADE
-from flask_mongoengine import Document
-from flask_login import UserMixin
+from mongoengine import Document, EmbeddedDocumentListField, DictField, FloatField, ObjectIdField, EmailField, BooleanField, URLField, DateField, FileField, StringField, IntField, ReferenceField, EmbeddedDocument, DateTimeField, ListField, CASCADE
+#from flask_mongoengine import Document
 from bson.objectid import ObjectId
 import datetime as d
 

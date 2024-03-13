@@ -16,4 +16,4 @@ dnspython==1.16.0
 google_api_python_client==1.7.11
 protobuf==3.11.3
 gunicorn==20.0.4
-pandas==0.25.3
+#pandas==0.25.3

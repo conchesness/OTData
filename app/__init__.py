@@ -10,7 +10,7 @@ import base64
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY") # or os.urandom(20)
 # you must change the next line to be link to your database at mlab
-connect("otdata", host='mongodb+srv://admin:bulldogz@cluster0-8m0v1.gcp.mongodb.net/otdata?retryWrites=true&w=majority')
+connect("otdata", host=f"{os.environ.get('mongodb_host')}/otdata?retryWrites=true&w=majority")
 
 moment = Moment(app)
 

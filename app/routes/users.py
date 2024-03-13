@@ -21,18 +21,18 @@ admins = ['stephen.wright@ousd.org','russell.campisi@ousd.org']
 
 # This code is run right after the app starts up and then not again. It defines a few universal things
 # like is the app being run on a local computer and what is the local timezone
-@app.before_first_request
-def before_first_request():
-    settings = Config.objects.first()
-    if not settings:
-        settings = Config(devenv=True,localtz='nada')
-        settings.save()
-        settings.reload()
+# @app.before_first_request
+# def before_first_request():
+#     settings = Config.objects.first()
+#     if not settings:
+#         settings = Config(devenv=True,localtz='nada')
+#         settings.save()
+#         settings.reload()
 
-    if request.url_root[8:11] == '127' or request.url_root[8:17] == 'localhost':
-        settings.update(devenv = True, localtz='America/Los_Angeles')
-    else:
-        settings.update(devenv = False, localtz='UTC')
+#     if request.url_root[8:11] == '127' or request.url_root[8:17] == 'localhost':
+#         settings.update(devenv = True, localtz='America/Los_Angeles')
+#     else:
+#         settings.update(devenv = False, localtz='UTC')
 
 # This runs before every route and serves to make sure users are using a secure site and can only
 # access pages they are allowed to access
@@ -126,7 +126,7 @@ def login():
         session['isadmin'] = True
     else:
         session['isadmin'] = False
-
+    currUser = User.objects.get(otemail = data['emailAddresses'][0]['value'])
     try:
         currUser = User.objects.get(otemail = data['emailAddresses'][0]['value'])
         # if currUser.role == "Student":

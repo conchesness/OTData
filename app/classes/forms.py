@@ -1,9 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms.fields.html5 import URLField, DateField
 from wtforms_components import TimeField
 from wtforms.validators import url, NumberRange, Email, Optional
-from wtforms import widgets, SelectMultipleField, StringField, SubmitField, validators, TextAreaField, HiddenField, IntegerField, SelectField, FileField
-from wtforms.fields.html5 import EmailField
+from wtforms import widgets, SelectMultipleField, StringField, SubmitField, validators, TextAreaField, HiddenField, IntegerField, SelectField, FileField, URLField, DateField, EmailField
 
 class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)

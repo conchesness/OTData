@@ -107,6 +107,17 @@ class User(Document):
     interventions = ListField(ReferenceField('Intervention'))
     checkins = ListField(ReferenceField('Checkin'))
 
+    # old data
+    lastlogin = StringField()
+    lname = StringField()
+    linkedin = StringField()
+    breakduration = StringField()
+    fname = StringField()
+    breakstart = StringField()
+    breakclass = StringField()
+    shirtsize = StringField()
+    lastedited = StringField()
+
     meta = {
         'ordering': ['+glname', '+gfname']
     }

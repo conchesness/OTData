@@ -137,3 +137,4 @@ app.yaml
 *.pem
 req.conf
 appengine_config.py
+local.py
